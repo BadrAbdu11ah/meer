@@ -1,0 +1,13 @@
+class: PhoneAuthAccount
+table: phone_auth_account
+serverOnly: true
+
+fields:
+  authUser: module:serverpod_auth_core:AuthUser?, relation(onDelete=Cascade)
+  phone: String
+  createdAt: DateTime, defaultModel=now
+
+indexes:
+  phone_auth_account_phone_unique_idx:
+    fields: phone
+    unique: true

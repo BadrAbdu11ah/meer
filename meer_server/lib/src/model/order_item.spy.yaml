@@ -1,0 +1,8 @@
+class: OrderItem
+table: order_item
+fields:
+  orderId: int, relation(parent=order_info, name=order_items)
+  productId: int
+  product: Product?, relation(field=productId) # رابط جلب تفاصيل المنتج داخل العنصر
+  quantity: int
+  price: double

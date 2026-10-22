@@ -29,4 +29,12 @@ Future<void> initializeClient() async {
     ..connectivityMonitor = FlutterConnectivityMonitor()
     ..authSessionManager = FlutterAuthSessionManager();
   unawaited(client.auth.initialize());
+
+  await client.auth.initialize();
+
+  // تفعيل تسجيل الدخول بـ Google مباشرة من حزمة idp
+  client.auth.initializeGoogleSignIn(
+    serverClientId:
+        '845088443476-sccb74o87mj41oluk6m44ddoti6p9nhu.apps.googleusercontent.com', // مطلوب لـ Android و Web
+  );
 }

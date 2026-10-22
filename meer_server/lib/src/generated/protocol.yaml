@@ -1,13 +1,22 @@
-emailIdp:
+googleIdp:
   - login:
-  - startRegistration:
-  - verifyRegistrationCode:
-  - finishRegistration:
-  - startPasswordReset:
-  - verifyPasswordResetCode:
-  - finishPasswordReset:
+  - loginWithCode:
   - hasAccount:
 jwtRefresh:
   - refreshAccessToken:
+appAuth:
+  - hasAccount:
+  - sendOtp:
+  - verifyOtp:
+  - syncCurrentUser:
+  - syncGoogleUser:
+order:
+  - createOrder:
+  - getCustomerOrders:
+  - getSellerOrders:
+  - getAvailableOrdersForDrivers:
+  - acceptOrderAsDriver:
+  - updateOrderStatus:
+  - getOrderWithDetails:
 greeting:
   - hello:

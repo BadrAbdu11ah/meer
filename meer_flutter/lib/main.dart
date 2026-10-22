@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:meer_flutter/app_router.dart';
+import 'package:meer_flutter/core/constant/app_route.dart';
+import 'package:meer_flutter/core/id/injection.dart';
+import 'package:meer_flutter/core/routes/app_route_observer.dart';
+import 'package:meer_flutter/core/services/app_service.dart';
 
 import 'client.dart';
-import 'screens/greetings_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await initialService();
   await initializeClient();
+  await initGetIt();
+
   runApp(const MyApp());
 }
 
@@ -25,37 +33,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Serverpod Demo',
+      title: 'Meer App',
       theme: _buildTheme(Brightness.light),
       darkTheme: _buildTheme(Brightness.dark),
       themeMode: ThemeMode.system,
-      home: const MyHomePage(title: 'Serverpod Example'),
-    );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      body: const GreetingsScreen(),
-      // To test authentication in this example app, uncomment the line below
-      // and comment out the line above. This wraps the GreetingsScreen with a
-      // SignInScreen, which automatically shows a sign-in UI when the user is
-      // not authenticated and displays the GreetingsScreen once they sign in.
-      //
-      // body: SignInScreen(
-      //   child: GreetingsScreen(
-      //     onSignOut: () async {
-      //       await client.auth.signOutDevice();
-      //     },
-      //   ),
-      // ),
+      navigatorObservers: [AppRouteObserver()],
+      onGenerateRoute: AppRouter.onGenerateRoute,
+      initialRoute: AppRoute.loginScreen,
     );
   }
 }

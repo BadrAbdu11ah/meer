@@ -13,6 +13,10 @@
 import 'dart:async' as _ida;
 import 'package:http/http.dart' as _i85jenna;
 import 'package:meer_client/src/protocol/greetings/greeting.dart' as _iqfsds6k;
+import 'package:meer_client/src/protocol/model/order_info.dart' as _iiv379dz;
+import 'package:meer_client/src/protocol/model/order_item.dart' as _iharcat9;
+import 'package:meer_client/src/protocol/model/user.dart' as _iihl4vea;
+import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i312scxx;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _iacc;
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
@@ -20,184 +24,55 @@ import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
 import 'protocol.dart' as _il2as5qe;
 
-/// By extending [EmailIdpBaseEndpoint], the email identity provider endpoints
-/// are made available on the server and enable the corresponding sign-in widget
-/// on the client.
 /// {@category Endpoint}
-class EndpointEmailIdp extends _iaic.EndpointEmailIdpBase {
-  EndpointEmailIdp(_isc.EndpointCaller caller) : super(caller);
+class EndpointGoogleIdp extends _iaic.EndpointGoogleIdpBase {
+  EndpointGoogleIdp(_isc.EndpointCaller caller) : super(caller);
 
   @override
-  String get name => 'emailIdp';
+  String get name => 'googleIdp';
 
-  /// Logs in the user and returns a new session.
+  /// Validates a Google ID token and either logs in the associated user or
+  /// creates a new user account if the Google account ID is not yet known.
   ///
-  /// Throws an [EmailAccountLoginException] in case of errors, with reason:
-  /// - [EmailAccountLoginExceptionReason.invalidCredentials] if the email or
-  ///   password is incorrect.
-  /// - [EmailAccountLoginExceptionReason.tooManyAttempts] if there have been
-  ///   too many failed login attempts.
-  ///
-  /// Throws an [AuthUserBlockedException] if the auth user is blocked.
+  /// If a new user is created an associated [UserProfile] is also created.
   @override
   _ida.Future<_iacc.AuthSuccess> login({
-    required String email,
-    required String password,
+    required String idToken,
+    required String? accessToken,
   }) => caller.callServerEndpoint<_iacc.AuthSuccess>(
-    'emailIdp',
+    'googleIdp',
     'login',
     {
-      'email': email,
-      'password': password,
+      'idToken': idToken,
+      'accessToken': accessToken,
     },
   );
 
-  /// Starts the registration for a new user account with an email-based login
-  /// associated to it.
+  /// Validates a Google authorization code from the web OAuth2 PKCE flow and
+  /// either logs in the associated user or creates a new account.
   ///
-  /// Upon successful completion of this method, an email will have been
-  /// sent to [email] with a verification link, which the user must open to
-  /// complete the registration.
+  /// This is the web counterpart of [login], which accepts an ID token directly
+  /// (used on native platforms via the `google_sign_in` package).
   ///
-  /// Always returns a account request ID, which can be used to complete the
-  /// registration. If the email is already registered, the returned ID will not
-  /// be valid.
+  /// If a new user is created an associated [UserProfile] is also created.
   @override
-  _ida.Future<_isc.UuidValue> startRegistration({required String email}) =>
-      caller.callServerEndpoint<_isc.UuidValue>(
-        'emailIdp',
-        'startRegistration',
-        {'email': email},
-      );
-
-  /// Verifies an account request code and returns a token
-  /// that can be used to complete the account creation.
-  ///
-  /// Throws an [EmailAccountRequestException] in case of errors, with reason:
-  /// - [EmailAccountRequestExceptionReason.expired] if the account request has
-  ///   already expired.
-  /// - [EmailAccountRequestExceptionReason.policyViolation] if the password
-  ///   does not comply with the password policy.
-  /// - [EmailAccountRequestExceptionReason.invalid] if no request exists
-  ///   for the given [accountRequestId] or [verificationCode] is invalid.
-  @override
-  _ida.Future<String> verifyRegistrationCode({
-    required _isc.UuidValue accountRequestId,
-    required String verificationCode,
-  }) => caller.callServerEndpoint<String>(
-    'emailIdp',
-    'verifyRegistrationCode',
-    {
-      'accountRequestId': accountRequestId,
-      'verificationCode': verificationCode,
-    },
-  );
-
-  /// Completes a new account registration, creating a new auth user with a
-  /// profile and attaching the given email account to it.
-  ///
-  /// Throws an [EmailAccountRequestException] in case of errors, with reason:
-  /// - [EmailAccountRequestExceptionReason.expired] if the account request has
-  ///   already expired.
-  /// - [EmailAccountRequestExceptionReason.policyViolation] if the password
-  ///   does not comply with the password policy.
-  /// - [EmailAccountRequestExceptionReason.invalid] if the [registrationToken]
-  ///   is invalid.
-  ///
-  /// Throws an [AuthUserBlockedException] if the auth user is blocked.
-  ///
-  /// Returns a session for the newly created user.
-  @override
-  _ida.Future<_iacc.AuthSuccess> finishRegistration({
-    required String registrationToken,
-    required String password,
+  _ida.Future<_iacc.AuthSuccess> loginWithCode({
+    required String code,
+    required String codeVerifier,
+    required String redirectUri,
   }) => caller.callServerEndpoint<_iacc.AuthSuccess>(
-    'emailIdp',
-    'finishRegistration',
+    'googleIdp',
+    'loginWithCode',
     {
-      'registrationToken': registrationToken,
-      'password': password,
-    },
-  );
-
-  /// Requests a password reset for [email].
-  ///
-  /// If the email address is registered, an email with reset instructions will
-  /// be send out. If the email is unknown, this method will have no effect.
-  ///
-  /// Always returns a password reset request ID, which can be used to complete
-  /// the reset. If the email is not registered, the returned ID will not be
-  /// valid.
-  ///
-  /// Throws an [EmailAccountPasswordResetException] in case of errors, with reason:
-  /// - [EmailAccountPasswordResetExceptionReason.tooManyAttempts] if the user has
-  ///   made too many attempts trying to request a password reset.
-  ///
-  @override
-  _ida.Future<_isc.UuidValue> startPasswordReset({required String email}) =>
-      caller.callServerEndpoint<_isc.UuidValue>(
-        'emailIdp',
-        'startPasswordReset',
-        {'email': email},
-      );
-
-  /// Verifies a password reset code and returns a finishPasswordResetToken
-  /// that can be used to finish the password reset.
-  ///
-  /// Throws an [EmailAccountPasswordResetException] in case of errors, with reason:
-  /// - [EmailAccountPasswordResetExceptionReason.expired] if the password reset
-  ///   request has already expired.
-  /// - [EmailAccountPasswordResetExceptionReason.tooManyAttempts] if the user has
-  ///   made too many attempts trying to verify the password reset.
-  /// - [EmailAccountPasswordResetExceptionReason.invalid] if no request exists
-  ///   for the given [passwordResetRequestId] or [verificationCode] is invalid.
-  ///
-  /// If multiple steps are required to complete the password reset, this endpoint
-  /// should be overridden to return credentials for the next step instead
-  /// of the credentials for setting the password.
-  @override
-  _ida.Future<String> verifyPasswordResetCode({
-    required _isc.UuidValue passwordResetRequestId,
-    required String verificationCode,
-  }) => caller.callServerEndpoint<String>(
-    'emailIdp',
-    'verifyPasswordResetCode',
-    {
-      'passwordResetRequestId': passwordResetRequestId,
-      'verificationCode': verificationCode,
-    },
-  );
-
-  /// Completes a password reset request by setting a new password.
-  ///
-  /// The [verificationCode] returned from [verifyPasswordResetCode] is used to
-  /// validate the password reset request.
-  ///
-  /// Throws an [EmailAccountPasswordResetException] in case of errors, with reason:
-  /// - [EmailAccountPasswordResetExceptionReason.expired] if the password reset
-  ///   request has already expired.
-  /// - [EmailAccountPasswordResetExceptionReason.policyViolation] if the new
-  ///   password does not comply with the password policy.
-  /// - [EmailAccountPasswordResetExceptionReason.invalid] if no request exists
-  ///   for the given [passwordResetRequestId] or [verificationCode] is invalid.
-  ///
-  /// Throws an [AuthUserBlockedException] if the auth user is blocked.
-  @override
-  _ida.Future<void> finishPasswordReset({
-    required String finishPasswordResetToken,
-    required String newPassword,
-  }) => caller.callServerEndpoint<void>(
-    'emailIdp',
-    'finishPasswordReset',
-    {
-      'finishPasswordResetToken': finishPasswordResetToken,
-      'newPassword': newPassword,
+      'code': code,
+      'codeVerifier': codeVerifier,
+      'redirectUri': redirectUri,
     },
   );
 
   @override
   _ida.Future<bool> hasAccount() => caller.callServerEndpoint<bool>(
-    'emailIdp',
+    'googleIdp',
     'hasAccount',
     {},
   );
@@ -245,6 +120,126 @@ class EndpointJwtRefresh extends _iacc.EndpointRefreshJwtTokens {
       );
 }
 
+/// {@category Endpoint}
+class EndpointAppAuth extends _isc.EndpointRef {
+  EndpointAppAuth(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'appAuth';
+
+  _ida.Future<bool> hasAccount() => caller.callServerEndpoint<bool>(
+    'appAuth',
+    'hasAccount',
+    {},
+  );
+
+  _ida.Future<bool> sendOtp(String phone) => caller.callServerEndpoint<bool>(
+    'appAuth',
+    'sendOtp',
+    {'phone': phone},
+    authenticated: false,
+  );
+
+  _ida.Future<_iacc.AuthSuccess> verifyOtp(
+    String phone,
+    String code,
+  ) => caller.callServerEndpoint<_iacc.AuthSuccess>(
+    'appAuth',
+    'verifyOtp',
+    {
+      'phone': phone,
+      'code': code,
+    },
+    authenticated: false,
+  );
+
+  _ida.Future<_iihl4vea.User> syncCurrentUser() =>
+      caller.callServerEndpoint<_iihl4vea.User>(
+        'appAuth',
+        'syncCurrentUser',
+        {},
+      );
+
+  _ida.Future<_iihl4vea.User> syncGoogleUser() =>
+      caller.callServerEndpoint<_iihl4vea.User>(
+        'appAuth',
+        'syncGoogleUser',
+        {},
+      );
+}
+
+/// {@category Endpoint}
+class EndpointOrder extends _isc.EndpointRef {
+  EndpointOrder(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'order';
+
+  _ida.Future<_iiv379dz.OrderInfo> createOrder(
+    _iiv379dz.OrderInfo order,
+    List<_iharcat9.OrderItem> items,
+  ) => caller.callServerEndpoint<_iiv379dz.OrderInfo>(
+    'order',
+    'createOrder',
+    {
+      'order': order,
+      'items': items,
+    },
+  );
+
+  _ida.Future<List<_iiv379dz.OrderInfo>> getCustomerOrders(int customerId) =>
+      caller.callServerEndpoint<List<_iiv379dz.OrderInfo>>(
+        'order',
+        'getCustomerOrders',
+        {'customerId': customerId},
+      );
+
+  _ida.Future<List<_iiv379dz.OrderInfo>> getSellerOrders(int sellerId) =>
+      caller.callServerEndpoint<List<_iiv379dz.OrderInfo>>(
+        'order',
+        'getSellerOrders',
+        {'sellerId': sellerId},
+      );
+
+  _ida.Future<List<_iiv379dz.OrderInfo>> getAvailableOrdersForDrivers() =>
+      caller.callServerEndpoint<List<_iiv379dz.OrderInfo>>(
+        'order',
+        'getAvailableOrdersForDrivers',
+        {},
+      );
+
+  _ida.Future<bool> acceptOrderAsDriver(
+    int orderId,
+    int driverId,
+  ) => caller.callServerEndpoint<bool>(
+    'order',
+    'acceptOrderAsDriver',
+    {
+      'orderId': orderId,
+      'driverId': driverId,
+    },
+  );
+
+  _ida.Future<bool> updateOrderStatus(
+    int orderId,
+    String newStatus,
+  ) => caller.callServerEndpoint<bool>(
+    'order',
+    'updateOrderStatus',
+    {
+      'orderId': orderId,
+      'newStatus': newStatus,
+    },
+  );
+
+  _ida.Future<_iiv379dz.OrderInfo?> getOrderWithDetails(int orderId) =>
+      caller.callServerEndpoint<_iiv379dz.OrderInfo?>(
+        'order',
+        'getOrderWithDetails',
+        {'orderId': orderId},
+      );
+}
+
 /// This is an example endpoint that returns a greeting message through
 /// its [hello] method.
 /// {@category Endpoint}
@@ -266,10 +261,13 @@ class EndpointGreeting extends _isc.EndpointRef {
 class Modules {
   Modules(Client client) {
     serverpod_auth_idp = _iaic.Caller(client);
+    auth = _i312scxx.Caller(client);
     serverpod_auth_core = _iacc.Caller(client);
   }
 
   late final _iaic.Caller serverpod_auth_idp;
+
+  late final _i312scxx.Caller auth;
 
   late final _iacc.Caller serverpod_auth_core;
 }
@@ -301,15 +299,21 @@ class Client extends _isc.ServerpodClientShared {
              disconnectStreamsOnLostInternetConnection,
          httpClientOverride: httpClientOverride,
        ) {
-    emailIdp = EndpointEmailIdp(this);
+    googleIdp = EndpointGoogleIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
+    appAuth = EndpointAppAuth(this);
+    order = EndpointOrder(this);
     greeting = EndpointGreeting(this);
     modules = Modules(this);
   }
 
-  late final EndpointEmailIdp emailIdp;
+  late final EndpointGoogleIdp googleIdp;
 
   late final EndpointJwtRefresh jwtRefresh;
+
+  late final EndpointAppAuth appAuth;
+
+  late final EndpointOrder order;
 
   late final EndpointGreeting greeting;
 
@@ -317,14 +321,17 @@ class Client extends _isc.ServerpodClientShared {
 
   @override
   Map<String, _isc.EndpointRef> get endpointRefLookup => {
-    'emailIdp': emailIdp,
+    'googleIdp': googleIdp,
     'jwtRefresh': jwtRefresh,
+    'appAuth': appAuth,
+    'order': order,
     'greeting': greeting,
   };
 
   @override
   Map<String, _isc.ModuleEndpointCaller> get moduleLookup => {
     'serverpod_auth_idp': modules.serverpod_auth_idp,
+    'auth': modules.auth,
     'serverpod_auth_core': modules.serverpod_auth_core,
   };
 }

@@ -1,0 +1,15 @@
+class: OrderInfo
+table: order_info
+fields:
+  customerId: int
+  customer: User?, relation(field=customerId) # رابط استرجاع بيانات المشتري
+  sellerId: int
+  seller: User?, relation(field=sellerId) # رابط استرجاع بيانات الأسرة المنتجة
+  driverId: int?, relation(parent=user)
+  status: String
+  totalAmount: double
+  deliveryAddress: String
+  deliveryLatitude: double?
+  deliveryLongitude: double?
+  createdAt: DateTime
+  items: List<OrderItem>?, relation(name=order_items) # رابط جلب قائمة عناصر الطلب
