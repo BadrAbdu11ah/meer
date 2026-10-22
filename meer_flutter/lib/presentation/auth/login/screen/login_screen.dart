@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meer_flutter/core/constant/app_route.dart';
 import 'package:meer_flutter/presentation/auth/login/bloc/login_bloc.dart';
 import 'package:meer_flutter/presentation/auth/login/view/login_view.dart';
-import 'package:meer_flutter/presentation/auth/verify_otp/view/verify_otp_view.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

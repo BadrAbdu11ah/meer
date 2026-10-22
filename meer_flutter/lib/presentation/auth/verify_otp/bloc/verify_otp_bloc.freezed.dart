@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // coverage:ignore-file
-// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
+// ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'verify_otp_bloc.dart';
@@ -9,7 +9,6 @@ part of 'verify_otp_bloc.dart';
 // FreezedGenerator
 // **************************************************************************
 
-// GENERATED CODE - DO NOT MODIFY BY HAND
 // dart format off
 T _$identity<T>(T value) => value;
 /// @nodoc
@@ -21,7 +20,7 @@ mixin _$VerifyOtpState {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is VerifyOtpState);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is VerifyOtpState);
 }
 
 
@@ -30,7 +29,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-    return 'VerifyOtpState()';
+  return 'VerifyOtpState()';
 }
 
 
@@ -204,7 +203,7 @@ class _Initial implements VerifyOtpState {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Initial);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Initial);
 }
 
 
@@ -213,7 +212,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-    return 'VerifyOtpState.initial()';
+  return 'VerifyOtpState.initial()';
 }
 
 
@@ -236,7 +235,7 @@ class _Loaidng implements VerifyOtpState {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Loaidng);
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Loaidng);
 }
 
 
@@ -245,7 +244,7 @@ int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-    return 'VerifyOtpState.loading()';
+  return 'VerifyOtpState.loading()';
 }
 
 
@@ -273,18 +272,16 @@ _$AuthenticatedCopyWith<_Authenticated> get copyWith => __$AuthenticatedCopyWith
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Authenticated&&(identical(other.userProfile, userProfile) || other.userProfile == userProfile));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Authenticated&&(identical(other.userProfile, userProfile) || other.userProfile == userProfile));
 }
 
 
 @override
-int get hashCode {
-    return Object.hash(runtimeType,userProfile);
-}
+int get hashCode => Object.hash(runtimeType,userProfile);
 
 @override
 String toString() {
-    return 'VerifyOtpState.authenticated(userProfile: $userProfile)';
+  return 'VerifyOtpState.authenticated(userProfile: $userProfile)';
 }
 
 
@@ -341,18 +338,16 @@ _$ErrorCopyWith<_Error> get copyWith => __$ErrorCopyWithImpl<_Error>(this, _$ide
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Error&&(identical(other.message, message) || other.message == message));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Error&&(identical(other.message, message) || other.message == message));
 }
 
 
 @override
-int get hashCode {
-    return Object.hash(runtimeType,message);
-}
+int get hashCode => Object.hash(runtimeType,message);
 
 @override
 String toString() {
-    return 'VerifyOtpState.error(message: $message)';
+  return 'VerifyOtpState.error(message: $message)';
 }
 
 
@@ -404,21 +399,16 @@ $VerifyOtpEventCopyWith<VerifyOtpEvent> get copyWith => _$VerifyOtpEventCopyWith
 
 @override
 bool operator ==(Object other) {
-  final _this = this as VerifyOtpEvent;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is VerifyOtpEvent&&(identical(other.phone, _this.phone) || other.phone == _this.phone)&&(identical(other.code, _this.code) || other.code == _this.code));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is VerifyOtpEvent&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.code, code) || other.code == code));
 }
 
 
 @override
-int get hashCode {
-  final _this = this as VerifyOtpEvent;
-  return Object.hash(runtimeType,_this.phone,_this.code);
-}
+int get hashCode => Object.hash(runtimeType,phone,code);
 
 @override
 String toString() {
-  final _this = this as VerifyOtpEvent;
-  return 'VerifyOtpEvent(phone: ${_this.phone}, code: ${_this.code})';
+  return 'VerifyOtpEvent(phone: $phone, code: $code)';
 }
 
 
@@ -447,7 +437,7 @@ class _$VerifyOtpEventCopyWithImpl<$Res>
 /// Create a copy of VerifyOtpEvent
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') @override $Res call({Object? phone = null,Object? code = null,}) {
-  return _then(VerifyOtpEvent.verifyOtpRequested(
+  return _then(_self.copyWith(
 phone: null == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
 as String,code: null == code ? _self.code : code // ignore: cast_nullable_to_non_nullable
 as String,
@@ -607,18 +597,16 @@ $VerifyOtpRequestedCopyWith<VerifyOtpRequested> get copyWith => _$VerifyOtpReque
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is VerifyOtpRequested&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.code, code) || other.code == code));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is VerifyOtpRequested&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.code, code) || other.code == code));
 }
 
 
 @override
-int get hashCode {
-    return Object.hash(runtimeType,phone,code);
-}
+int get hashCode => Object.hash(runtimeType,phone,code);
 
 @override
 String toString() {
-    return 'VerifyOtpEvent.verifyOtpRequested(phone: $phone, code: $code)';
+  return 'VerifyOtpEvent.verifyOtpRequested(phone: $phone, code: $code)';
 }
 
 
