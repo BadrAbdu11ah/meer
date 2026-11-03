@@ -1,113 +1,372 @@
+import 'package:meer_server/src/generated/protocol.dart';
 import 'package:serverpod/serverpod.dart';
-import '../generated/protocol.dart';
+import 'package:serverpod_auth_idp_server/core.dart';
 
-// Endpoint لإدارة الطلبات وتغيير حالتها في تطبيق مِيْر
 class OrderEndpoint extends Endpoint {
-  // 1. إنشاء طلب جديد مع إدراج جميع عناصره (OrderItems)
+  @override
+  bool get requireLogin => true;
+
+  /// استخراج ملف المستخدم الحالي من جلسة المصادقة.
+  Future<MeerUserProfile> _getCurrentProfile(
+    Session session,
+  ) async {
+    final authUserId = session.authenticated?.authUserId;
+
+    if (authUserId == null) {
+      throw Exception('يجب تسجيل الدخول أولاً.');
+    }
+
+    final profile = await MeerUserProfile.db.findFirstRow(
+      session,
+      where: (p) => p.authUserId.equals(authUserId),
+    );
+
+    if (profile == null || profile.id == null) {
+      throw Exception(
+        'لم يتم العثور على ملف المستخدم.',
+      );
+    }
+
+    return profile;
+  }
+
+  // --------------------------------------------------
+  // 1. إنشاء طلب جديد
+  // --------------------------------------------------
+
   Future<OrderInfo> createOrder(
     Session session,
-    OrderInfo order,
-    List<OrderItem> items,
+    List<OrderItemRequest> requestedItems,
+    String deliveryAddress,
+    double? deliveryLatitude,
+    double? deliveryLongitude,
   ) async {
-    if (items.isEmpty) {
-      throw FormatException('لا يمكن إنشاء طلب بدون منتجات');
+    final customer = await _getCurrentProfile(session);
+
+    if (requestedItems.isEmpty) {
+      throw FormatException(
+        'لا يمكن إنشاء طلب بدون منتجات.',
+      );
     }
 
-    // تعيين زمن الإنشاء والحالة المبدئية
-    order.createdAt = DateTime.now();
-    order.status = 'pending'; // معلق بانتظار موافقة الأسرة المنتجة
+    final normalizedAddress = deliveryAddress.trim();
 
-    // حفظ رئيس الطلب (OrderInfo)
-    var createdOrder = await OrderInfo.db.insertRow(session, order);
-
-    // ربط العناصر برقم الطلب وحفظها
-    for (var item in items) {
-      item.orderId = createdOrder.id!;
-      await OrderItem.db.insertRow(session, item);
+    if (normalizedAddress.isEmpty) {
+      throw FormatException(
+        'عنوان التوصيل مطلوب.',
+      );
     }
 
-    return createdOrder;
+    // يجب إرسال الإحداثيين معًا أو تركهما فارغين.
+    if ((deliveryLatitude == null) != (deliveryLongitude == null)) {
+      throw FormatException(
+        'يجب تحديد إحداثيات الموقع كاملة.',
+      );
+    }
+
+    if (deliveryLatitude != null &&
+        (!deliveryLatitude.isFinite ||
+            deliveryLatitude < -90 ||
+            deliveryLatitude > 90)) {
+      throw FormatException('خط العرض غير صحيح.');
+    }
+
+    if (deliveryLongitude != null &&
+        (!deliveryLongitude.isFinite ||
+            deliveryLongitude < -180 ||
+            deliveryLongitude > 180)) {
+      throw FormatException('خط الطول غير صحيح.');
+    }
+
+    // تجميع الكميات المكررة للمنتج نفسه.
+    final quantities = <int, int>{};
+
+    for (final item in requestedItems) {
+      if (item.productId <= 0) {
+        throw FormatException(
+          'معرّف أحد المنتجات غير صحيح.',
+        );
+      }
+
+      if (item.quantity <= 0) {
+        throw FormatException(
+          'يجب أن تكون كمية المنتج أكبر من صفر.',
+        );
+      }
+
+      final newQuantity = (quantities[item.productId] ?? 0) + item.quantity;
+
+      if (newQuantity > 2147483647) {
+        throw FormatException('كمية المنتج غير صحيحة.');
+      }
+
+      quantities[item.productId] = newQuantity;
+    }
+
+    // حفظ الطلب وعناصره كوحدة واحدة.
+    return await session.db.transaction(
+      (transaction) async {
+        final validatedProducts = <Product>[];
+
+        int? sellerId;
+        double totalAmount = 0;
+
+        // جلب المنتجات والتحقق منها من قاعدة البيانات.
+        for (final productId in quantities.keys) {
+          final product = await Product.db.findById(
+            session,
+            productId,
+            transaction: transaction,
+          );
+
+          if (product == null) {
+            throw Exception(
+              'أحد المنتجات لم يعد موجودًا.',
+            );
+          }
+
+          if (!product.isAvailable) {
+            throw Exception(
+              'المنتج "${product.name}" غير متاح للبيع حاليًا.',
+            );
+          }
+
+          if (!product.price.isFinite || product.price <= 0) {
+            throw Exception(
+              'سعر المنتج "${product.name}" غير صالح.',
+            );
+          }
+
+          // الطلب الواحد يجب أن يكون من أسرة واحدة.
+          sellerId ??= product.sellerId;
+
+          if (sellerId != product.sellerId) {
+            throw FormatException(
+              'يجب أن تحتوي السلة على منتجات أسرة واحدة.',
+            );
+          }
+
+          final quantity = quantities[productId]!;
+          final lineTotal = product.price * quantity;
+
+          if (!lineTotal.isFinite) {
+            throw FormatException(
+              'قيمة أحد عناصر الطلب غير صالحة.',
+            );
+          }
+
+          totalAmount += lineTotal;
+
+          if (!totalAmount.isFinite) {
+            throw FormatException(
+              'إجمالي الطلب غير صالح.',
+            );
+          }
+
+          validatedProducts.add(product);
+        }
+
+        if (sellerId == null) {
+          throw Exception('تعذر تحديد الأسرة المنتجة.');
+        }
+
+        // التحقق من أن صاحب المنتجات لا يزال بائعًا.
+        final seller = await MeerUserProfile.db.findById(
+          session,
+          sellerId,
+          transaction: transaction,
+        );
+
+        if (seller == null || !seller.isSeller) {
+          throw Exception(
+            'الأسرة المنتجة غير متاحة لاستقبال الطلبات.',
+          );
+        }
+
+        // الخادم يحدد جميع البيانات الحساسة.
+        final order = OrderInfo(
+          customerId: customer.id!,
+          sellerId: sellerId,
+          status: 'pending',
+          totalAmount: totalAmount,
+          deliveryAddress: normalizedAddress,
+          deliveryLatitude: deliveryLatitude,
+          deliveryLongitude: deliveryLongitude,
+          createdAt: DateTime.now().toUtc(),
+        );
+
+        final createdOrder = await OrderInfo.db.insertRow(
+          session,
+          order,
+          transaction: transaction,
+        );
+
+        // حفظ تفاصيل المنتجات مع تثبيت السعر وقت الطلب.
+        for (final product in validatedProducts) {
+          await OrderItem.db.insertRow(
+            session,
+            OrderItem(
+              orderId: createdOrder.id!,
+              productId: product.id!,
+              quantity: quantities[product.id]!,
+              price: product.price,
+            ),
+            transaction: transaction,
+          );
+        }
+
+        return createdOrder;
+      },
+      settings: TransactionSettings(
+        isolationLevel: IsolationLevel.serializable,
+      ),
+    );
   }
 
-  // 2. جلب الطلبات الخاصة بالمشتري (Customer)
-  Future<List<OrderInfo>> getCustomerOrders(
+  // --------------------------------------------------
+  // 2. جلب طلبات المشتري الحالي
+  // --------------------------------------------------
+
+  Future<List<OrderInfo>> getMyCustomerOrders(
     Session session,
-    int customerId,
   ) async {
+    final customer = await _getCurrentProfile(session);
+
     return await OrderInfo.db.find(
       session,
-      where: (o) => o.customerId.equals(customerId),
+      where: (o) => o.customerId.equals(customer.id!),
       orderBy: (o) => o.createdAt.desc(),
     );
   }
 
-  // 3. جلب الطلبات الخاصة بالأسرة المنتجة (Seller)
-  Future<List<OrderInfo>> getSellerOrders(Session session, int sellerId) async {
-    return await OrderInfo.db.find(
-      session,
-      where: (o) => o.sellerId.equals(sellerId),
-      orderBy: (o) => o.createdAt.desc(),
-    );
-  }
+  // --------------------------------------------------
+  // 3. جلب الطلبات الواردة للأسرة الحالية
+  // --------------------------------------------------
 
-  // 4. جلب الطلبات المتاحة للمناديب (الطلبات الجاهزة للتوصيل)
-  Future<List<OrderInfo>> getAvailableOrdersForDrivers(Session session) async {
-    return await OrderInfo.db.find(
-      session,
-      where: (o) => o.status.equals('ready') & o.driverId.equals(null),
-      orderBy: (o) => o.createdAt.desc(),
-    );
-  }
-
-  // 5. قبول المندوب للطلب
-  Future<bool> acceptOrderAsDriver(
+  Future<List<OrderInfo>> getMySellerOrders(
     Session session,
-    int orderId,
-    int driverId,
   ) async {
-    var order = await OrderInfo.db.findById(session, orderId);
-    if (order == null || order.driverId != null) {
-      return false; // الطلب غير موجود أو تم قبوله من مندوب آخر
+    final seller = await _getCurrentProfile(session);
+
+    if (!seller.isSeller) {
+      throw Exception('يجب تفعيل صلاحية البيع أولاً.');
     }
 
-    order.driverId = driverId;
-    order.status = 'delivering'; // جاري التوصيل
-    await OrderInfo.db.updateRow(session, order);
-    return true;
-  }
-
-  // 6. تحديث حالة الطلب العامة (pending -> preparing -> ready -> delivering -> completed -> cancelled)
-  Future<bool> updateOrderStatus(
-    Session session,
-    int orderId,
-    String newStatus,
-  ) async {
-    var order = await OrderInfo.db.findById(session, orderId);
-    if (order == null) {
-      return false;
-    }
-
-    order.status = newStatus;
-    await OrderInfo.db.updateRow(session, order);
-    return true;
-  }
-
-  // استرجاع تفاصيل طلب محدد بالكامل مع المشتري والمنتجات
-  Future<OrderInfo?> getOrderWithDetails(Session session, int orderId) async {
-    // ربط طبقة البيانات بالمتحكم
-    return await OrderInfo.db.findById(
+    return await OrderInfo.db.find(
       session,
-      orderId,
-      // تحديد العلاقات المُراد تضمينها في النتيجة
+      where: (o) => o.sellerId.equals(seller.id!),
+      orderBy: (o) => o.createdAt.desc(),
       include: OrderInfo.include(
-        customer: User.include(), // جلب بيانات المشتري
-        seller: User.include(), // جلب بيانات الأسرة المنتجة
         items: OrderItem.includeList(
-          // جلب قائمة عناصر الطلب
           include: OrderItem.include(
-            product: Product.include(), // جلب تفاصيل المنتج لكل عنصر
+            product: Product.include(),
           ),
         ),
+      ),
+    );
+  }
+
+  // --------------------------------------------------
+  // 4. قبول الطلب
+  // pending -> preparing
+  // --------------------------------------------------
+
+  Future<bool> acceptMyOrder(
+    Session session,
+    int orderId,
+  ) async {
+    return _changeMyOrderStatus(
+      session,
+      orderId,
+      expectedStatus: 'pending',
+      newStatus: 'preparing',
+    );
+  }
+
+  // --------------------------------------------------
+  // 5. رفض الطلب
+  // pending -> cancelled
+  // --------------------------------------------------
+
+  Future<bool> rejectMyOrder(
+    Session session,
+    int orderId,
+  ) async {
+    return _changeMyOrderStatus(
+      session,
+      orderId,
+      expectedStatus: 'pending',
+      newStatus: 'cancelled',
+    );
+  }
+
+  // --------------------------------------------------
+  // 6. تأكيد جاهزية الطلب
+  // preparing -> ready
+  // --------------------------------------------------
+
+  Future<bool> markMyOrderReady(
+    Session session,
+    int orderId,
+  ) async {
+    return _changeMyOrderStatus(
+      session,
+      orderId,
+      expectedStatus: 'preparing',
+      newStatus: 'ready',
+    );
+  }
+
+  // --------------------------------------------------
+  // دالة داخلية لتغيير حالة طلب الأسرة الحالية
+  // --------------------------------------------------
+
+  Future<bool> _changeMyOrderStatus(
+    Session session,
+    int orderId, {
+    required String expectedStatus,
+    required String newStatus,
+  }) async {
+    final seller = await _getCurrentProfile(session);
+
+    if (!seller.isSeller) {
+      throw Exception('يجب تفعيل صلاحية البيع أولاً.');
+    }
+
+    return await session.db.transaction(
+      (transaction) async {
+        final order = await OrderInfo.db.findById(
+          session,
+          orderId,
+          transaction: transaction,
+        );
+
+        if (order == null) {
+          return false;
+        }
+
+        // منع الأسرة من تعديل طلب أسرة أخرى.
+        if (order.sellerId != seller.id) {
+          throw Exception('هذا الطلب لا يخص متجرك.');
+        }
+
+        // لا نسمح بتجاوز مراحل الطلب.
+        if (order.status != expectedStatus) {
+          return false;
+        }
+
+        order.status = newStatus;
+
+        await OrderInfo.db.updateRow(
+          session,
+          order,
+          transaction: transaction,
+        );
+
+        return true;
+      },
+      settings: TransactionSettings(
+        isolationLevel: IsolationLevel.serializable,
       ),
     );
   }

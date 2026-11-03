@@ -3,4 +3,4 @@ fields:
   success: bool
   keyId: int?
   key: String?
-  user: User?
+  user: MeerUserProfile?

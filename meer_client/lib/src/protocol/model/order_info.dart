@@ -12,8 +12,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:meer_client/src/protocol/protocol.dart' as _ihjszy8t;
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
+import '../model/MeerUserProfile.dart' as _i1ouw8su;
 import '../model/order_item.dart' as _ixwt4bxc;
-import '../model/user.dart' as _ii4paws6;
 
 abstract class OrderInfo
     implements _isc.SerializableModel, _isc.ProtocolSerialization {
@@ -36,9 +36,9 @@ abstract class OrderInfo
   factory OrderInfo({
     int? id,
     required int customerId,
-    _ii4paws6.User? customer,
+    _i1ouw8su.MeerUserProfile? customer,
     required int sellerId,
-    _ii4paws6.User? seller,
+    _i1ouw8su.MeerUserProfile? seller,
     int? driverId,
     required String status,
     required double totalAmount,
@@ -55,13 +55,13 @@ abstract class OrderInfo
       customerId: jsonSerialization['customerId'] as int,
       customer: jsonSerialization['customer'] == null
           ? null
-          : _ihjszy8t.Protocol().deserialize<_ii4paws6.User>(
+          : _ihjszy8t.Protocol().deserialize<_i1ouw8su.MeerUserProfile>(
               jsonSerialization['customer'],
             ),
       sellerId: jsonSerialization['sellerId'] as int,
       seller: jsonSerialization['seller'] == null
           ? null
-          : _ihjszy8t.Protocol().deserialize<_ii4paws6.User>(
+          : _ihjszy8t.Protocol().deserialize<_i1ouw8su.MeerUserProfile>(
               jsonSerialization['seller'],
             ),
       driverId: jsonSerialization['driverId'] as int?,
@@ -90,11 +90,11 @@ abstract class OrderInfo
 
   int customerId;
 
-  _ii4paws6.User? customer;
+  _i1ouw8su.MeerUserProfile? customer;
 
   int sellerId;
 
-  _ii4paws6.User? seller;
+  _i1ouw8su.MeerUserProfile? seller;
 
   int? driverId;
 
@@ -118,9 +118,9 @@ abstract class OrderInfo
   OrderInfo copyWith({
     int? id,
     int? customerId,
-    _ii4paws6.User? customer,
+    _i1ouw8su.MeerUserProfile? customer,
     int? sellerId,
-    _ii4paws6.User? seller,
+    _i1ouw8su.MeerUserProfile? seller,
     int? driverId,
     String? status,
     double? totalAmount,
@@ -183,9 +183,9 @@ class _OrderInfoImpl extends OrderInfo {
   _OrderInfoImpl({
     int? id,
     required int customerId,
-    _ii4paws6.User? customer,
+    _i1ouw8su.MeerUserProfile? customer,
     required int sellerId,
-    _ii4paws6.User? seller,
+    _i1ouw8su.MeerUserProfile? seller,
     int? driverId,
     required String status,
     required double totalAmount,
@@ -232,11 +232,13 @@ class _OrderInfoImpl extends OrderInfo {
     return OrderInfo(
       id: id is int? ? id : this.id,
       customerId: customerId ?? this.customerId,
-      customer: customer is _ii4paws6.User?
+      customer: customer is _i1ouw8su.MeerUserProfile?
           ? customer
           : this.customer?.copyWith(),
       sellerId: sellerId ?? this.sellerId,
-      seller: seller is _ii4paws6.User? ? seller : this.seller?.copyWith(),
+      seller: seller is _i1ouw8su.MeerUserProfile?
+          ? seller
+          : this.seller?.copyWith(),
       driverId: driverId is int? ? driverId : this.driverId,
       status: status ?? this.status,
       totalAmount: totalAmount ?? this.totalAmount,

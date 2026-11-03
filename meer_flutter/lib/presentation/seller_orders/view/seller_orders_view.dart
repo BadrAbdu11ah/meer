@@ -1,0 +1,90 @@
+import 'package:flutter/material.dart';
+import 'package:meer_client/meer_client.dart';
+import 'package:meer_flutter/presentation/seller_orders/view/widgets/seller_order_card.dart';
+
+class SellerOrdersView extends StatelessWidget {
+  final VoidCallback? onRefreshRequested;
+
+  final List<OrderInfo> orders;
+  final Set<int> updatingOrderIds;
+  final ValueChanged<int> onAccept;
+  final ValueChanged<int> onReject;
+  final ValueChanged<int> onMarkReady;
+
+  const SellerOrdersView({
+    super.key,
+    required this.orders,
+    required this.updatingOrderIds,
+    required this.onAccept,
+    required this.onReject,
+    required this.onMarkReady,
+    this.onRefreshRequested,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (orders.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.receipt_long_outlined,
+                size: 64,
+                color: Colors.grey,
+              ),
+              SizedBox(height: 16),
+              Text(
+                'لا توجد طلبات واردة حاليًا.',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'ستظهر طلبات عملائك هنا عند استلام طلب جديد.',
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () async {
+        // سيتم ربط إعادة التحميل من الشاشة.
+        onRefreshRequested?.call();
+      },
+      child: ListView.separated(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(16),
+        itemCount: orders.length,
+        separatorBuilder: (_, _) => const SizedBox(height: 12),
+        itemBuilder: (context, index) {
+          final order = orders[index];
+          final orderId = order.id;
+
+          return SellerOrderCard(
+            order: order,
+            isUpdating: orderId != null && updatingOrderIds.contains(orderId),
+            onAccept: () {
+              if (orderId != null) onAccept(orderId);
+            },
+            onReject: () {
+              if (orderId != null) onReject(orderId);
+            },
+            onMarkReady: () {
+              if (orderId != null) onMarkReady(orderId);
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  // يُمرر من الشاشة عند اكتمال ربط التحديث.
+}

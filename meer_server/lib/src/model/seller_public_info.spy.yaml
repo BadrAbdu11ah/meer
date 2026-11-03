@@ -1,0 +1,6 @@
+class: SellerPublicInfo
+fields:
+  sellerId: int
+  storeName: String
+  storeDescription: String?
+  storeAddress: String?

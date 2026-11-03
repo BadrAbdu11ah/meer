@@ -38,7 +38,7 @@ class VerifyOtpScreen extends StatelessWidget {
               );
               Navigator.pushNamedAndRemoveUntil(
                 context,
-                AppRoute.homeScreen,
+                AppRoute.mainScreen,
                 (route) => false,
               );
             },

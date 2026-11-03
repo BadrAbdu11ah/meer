@@ -8,4 +8,6 @@ workspace:
   - meer_client
   - meer_server
   - meer_flutter
+dependencies:
+  hive_ce_flutter: ^2.5.0
 

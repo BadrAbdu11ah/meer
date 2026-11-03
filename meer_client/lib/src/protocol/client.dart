@@ -13,9 +13,14 @@
 import 'dart:async' as _ida;
 import 'package:http/http.dart' as _i85jenna;
 import 'package:meer_client/src/protocol/greetings/greeting.dart' as _iqfsds6k;
+import 'package:meer_client/src/protocol/model/MeerUserProfile.dart'
+    as _ihcobg5g;
 import 'package:meer_client/src/protocol/model/order_info.dart' as _iiv379dz;
-import 'package:meer_client/src/protocol/model/order_item.dart' as _iharcat9;
-import 'package:meer_client/src/protocol/model/user.dart' as _iihl4vea;
+import 'package:meer_client/src/protocol/model/order_item_request.dart'
+    as _ix7syfm6;
+import 'package:meer_client/src/protocol/model/product.dart' as _i90cwas4;
+import 'package:meer_client/src/protocol/model/seller_public_info.dart'
+    as _ioi0o382;
 import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i312scxx;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _iacc;
@@ -153,15 +158,15 @@ class EndpointAppAuth extends _isc.EndpointRef {
     authenticated: false,
   );
 
-  _ida.Future<_iihl4vea.User> syncCurrentUser() =>
-      caller.callServerEndpoint<_iihl4vea.User>(
+  _ida.Future<_ihcobg5g.MeerUserProfile> syncCurrentUser() =>
+      caller.callServerEndpoint<_ihcobg5g.MeerUserProfile>(
         'appAuth',
         'syncCurrentUser',
         {},
       );
 
-  _ida.Future<_iihl4vea.User> syncGoogleUser() =>
-      caller.callServerEndpoint<_iihl4vea.User>(
+  _ida.Future<_ihcobg5g.MeerUserProfile> syncGoogleUser() =>
+      caller.callServerEndpoint<_ihcobg5g.MeerUserProfile>(
         'appAuth',
         'syncGoogleUser',
         {},
@@ -176,67 +181,170 @@ class EndpointOrder extends _isc.EndpointRef {
   String get name => 'order';
 
   _ida.Future<_iiv379dz.OrderInfo> createOrder(
-    _iiv379dz.OrderInfo order,
-    List<_iharcat9.OrderItem> items,
+    List<_ix7syfm6.OrderItemRequest> requestedItems,
+    String deliveryAddress,
+    double? deliveryLatitude,
+    double? deliveryLongitude,
   ) => caller.callServerEndpoint<_iiv379dz.OrderInfo>(
     'order',
     'createOrder',
     {
-      'order': order,
-      'items': items,
+      'requestedItems': requestedItems,
+      'deliveryAddress': deliveryAddress,
+      'deliveryLatitude': deliveryLatitude,
+      'deliveryLongitude': deliveryLongitude,
     },
   );
 
-  _ida.Future<List<_iiv379dz.OrderInfo>> getCustomerOrders(int customerId) =>
+  _ida.Future<List<_iiv379dz.OrderInfo>> getMyCustomerOrders() =>
       caller.callServerEndpoint<List<_iiv379dz.OrderInfo>>(
         'order',
-        'getCustomerOrders',
-        {'customerId': customerId},
-      );
-
-  _ida.Future<List<_iiv379dz.OrderInfo>> getSellerOrders(int sellerId) =>
-      caller.callServerEndpoint<List<_iiv379dz.OrderInfo>>(
-        'order',
-        'getSellerOrders',
-        {'sellerId': sellerId},
-      );
-
-  _ida.Future<List<_iiv379dz.OrderInfo>> getAvailableOrdersForDrivers() =>
-      caller.callServerEndpoint<List<_iiv379dz.OrderInfo>>(
-        'order',
-        'getAvailableOrdersForDrivers',
+        'getMyCustomerOrders',
         {},
       );
 
-  _ida.Future<bool> acceptOrderAsDriver(
-    int orderId,
-    int driverId,
-  ) => caller.callServerEndpoint<bool>(
-    'order',
-    'acceptOrderAsDriver',
-    {
-      'orderId': orderId,
-      'driverId': driverId,
-    },
-  );
-
-  _ida.Future<bool> updateOrderStatus(
-    int orderId,
-    String newStatus,
-  ) => caller.callServerEndpoint<bool>(
-    'order',
-    'updateOrderStatus',
-    {
-      'orderId': orderId,
-      'newStatus': newStatus,
-    },
-  );
-
-  _ida.Future<_iiv379dz.OrderInfo?> getOrderWithDetails(int orderId) =>
-      caller.callServerEndpoint<_iiv379dz.OrderInfo?>(
+  _ida.Future<List<_iiv379dz.OrderInfo>> getMySellerOrders() =>
+      caller.callServerEndpoint<List<_iiv379dz.OrderInfo>>(
         'order',
-        'getOrderWithDetails',
+        'getMySellerOrders',
+        {},
+      );
+
+  _ida.Future<bool> acceptMyOrder(int orderId) =>
+      caller.callServerEndpoint<bool>(
+        'order',
+        'acceptMyOrder',
         {'orderId': orderId},
+      );
+
+  _ida.Future<bool> rejectMyOrder(int orderId) =>
+      caller.callServerEndpoint<bool>(
+        'order',
+        'rejectMyOrder',
+        {'orderId': orderId},
+      );
+
+  _ida.Future<bool> markMyOrderReady(int orderId) =>
+      caller.callServerEndpoint<bool>(
+        'order',
+        'markMyOrderReady',
+        {'orderId': orderId},
+      );
+}
+
+/// إدارة منتجات الأسر المنتجة في تطبيق مِيْر.
+/// {@category Endpoint}
+class EndpointProduct extends _isc.EndpointRef {
+  EndpointProduct(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'product';
+
+  _ida.Future<_i90cwas4.Product> addProduct(_i90cwas4.Product product) =>
+      caller.callServerEndpoint<_i90cwas4.Product>(
+        'product',
+        'addProduct',
+        {'product': product},
+      );
+
+  _ida.Future<List<_i90cwas4.Product>> getAllAvailableProducts() =>
+      caller.callServerEndpoint<List<_i90cwas4.Product>>(
+        'product',
+        'getAllAvailableProducts',
+        {},
+      );
+
+  _ida.Future<List<_i90cwas4.Product>> getProductsBySeller(int sellerId) =>
+      caller.callServerEndpoint<List<_i90cwas4.Product>>(
+        'product',
+        'getProductsBySeller',
+        {'sellerId': sellerId},
+      );
+
+  _ida.Future<List<_i90cwas4.Product>> getMyProducts() =>
+      caller.callServerEndpoint<List<_i90cwas4.Product>>(
+        'product',
+        'getMyProducts',
+        {},
+      );
+
+  _ida.Future<bool> toggleProductAvailability(
+    int productId,
+    bool isAvailable,
+  ) => caller.callServerEndpoint<bool>(
+    'product',
+    'toggleProductAvailability',
+    {
+      'productId': productId,
+      'isAvailable': isAvailable,
+    },
+  );
+
+  /// البحث في أسماء المنتجات وأوصافها.
+  _ida.Future<List<_i90cwas4.Product>> searchProducts(String search) =>
+      caller.callServerEndpoint<List<_i90cwas4.Product>>(
+        'product',
+        'searchProducts',
+        {'search': search},
+      );
+
+  /// 7. تعديل منتج
+  _ida.Future<_i90cwas4.Product> updateProduct(_i90cwas4.Product input) =>
+      caller.callServerEndpoint<_i90cwas4.Product>(
+        'product',
+        'updateProduct',
+        {'input': input},
+      );
+
+  /// 8. حذف منتج
+  _ida.Future<bool> deleteProduct(int productId) =>
+      caller.callServerEndpoint<bool>(
+        'product',
+        'deleteProduct',
+        {'productId': productId},
+      );
+}
+
+/// {@category Endpoint}
+class EndpointSeller extends _isc.EndpointRef {
+  EndpointSeller(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'seller';
+
+  /// جلب المعلومات العامة لأسرة منتجة.
+  _ida.Future<_ioi0o382.SellerPublicInfo> getPublicSellerInfo(int sellerId) =>
+      caller.callServerEndpoint<_ioi0o382.SellerPublicInfo>(
+        'seller',
+        'getPublicSellerInfo',
+        {'sellerId': sellerId},
+      );
+
+  /// تفعيل البيع وحفظ بيانات المتجر للمستخدم الحالي.
+  _ida.Future<_ihcobg5g.MeerUserProfile> activateSeller(
+    String storeName,
+    String? storeDescription,
+    String storeAddress,
+    double latitude,
+    double longitude,
+  ) => caller.callServerEndpoint<_ihcobg5g.MeerUserProfile>(
+    'seller',
+    'activateSeller',
+    {
+      'storeName': storeName,
+      'storeDescription': storeDescription,
+      'storeAddress': storeAddress,
+      'latitude': latitude,
+      'longitude': longitude,
+    },
+  );
+
+  /// جلب ملف المستخدم الحالي.
+  _ida.Future<_ihcobg5g.MeerUserProfile> getMyProfile() =>
+      caller.callServerEndpoint<_ihcobg5g.MeerUserProfile>(
+        'seller',
+        'getMyProfile',
+        {},
       );
 }
 
@@ -303,6 +411,8 @@ class Client extends _isc.ServerpodClientShared {
     jwtRefresh = EndpointJwtRefresh(this);
     appAuth = EndpointAppAuth(this);
     order = EndpointOrder(this);
+    product = EndpointProduct(this);
+    seller = EndpointSeller(this);
     greeting = EndpointGreeting(this);
     modules = Modules(this);
   }
@@ -315,6 +425,10 @@ class Client extends _isc.ServerpodClientShared {
 
   late final EndpointOrder order;
 
+  late final EndpointProduct product;
+
+  late final EndpointSeller seller;
+
   late final EndpointGreeting greeting;
 
   late final Modules modules;
@@ -325,6 +439,8 @@ class Client extends _isc.ServerpodClientShared {
     'jwtRefresh': jwtRefresh,
     'appAuth': appAuth,
     'order': order,
+    'product': product,
+    'seller': seller,
     'greeting': greeting,
   };
 

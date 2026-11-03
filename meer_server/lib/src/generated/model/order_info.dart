@@ -13,8 +13,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:meer_server/src/generated/protocol.dart' as _i58zzwu7;
 import 'package:serverpod/serverpod.dart' as _is;
+import '../model/MeerUserProfile.dart' as _i1ouw8su;
 import '../model/order_item.dart' as _ixwt4bxc;
-import '../model/user.dart' as _ii4paws6;
 
 abstract class OrderInfo
     implements _is.TableRow<int?>, _is.ProtocolSerialization {
@@ -37,9 +37,9 @@ abstract class OrderInfo
   factory OrderInfo({
     int? id,
     required int customerId,
-    _ii4paws6.User? customer,
+    _i1ouw8su.MeerUserProfile? customer,
     required int sellerId,
-    _ii4paws6.User? seller,
+    _i1ouw8su.MeerUserProfile? seller,
     int? driverId,
     required String status,
     required double totalAmount,
@@ -56,13 +56,13 @@ abstract class OrderInfo
       customerId: jsonSerialization['customerId'] as int,
       customer: jsonSerialization['customer'] == null
           ? null
-          : _i58zzwu7.Protocol().deserialize<_ii4paws6.User>(
+          : _i58zzwu7.Protocol().deserialize<_i1ouw8su.MeerUserProfile>(
               jsonSerialization['customer'],
             ),
       sellerId: jsonSerialization['sellerId'] as int,
       seller: jsonSerialization['seller'] == null
           ? null
-          : _i58zzwu7.Protocol().deserialize<_ii4paws6.User>(
+          : _i58zzwu7.Protocol().deserialize<_i1ouw8su.MeerUserProfile>(
               jsonSerialization['seller'],
             ),
       driverId: jsonSerialization['driverId'] as int?,
@@ -93,11 +93,11 @@ abstract class OrderInfo
 
   int customerId;
 
-  _ii4paws6.User? customer;
+  _i1ouw8su.MeerUserProfile? customer;
 
   int sellerId;
 
-  _ii4paws6.User? seller;
+  _i1ouw8su.MeerUserProfile? seller;
 
   int? driverId;
 
@@ -124,9 +124,9 @@ abstract class OrderInfo
   OrderInfo copyWith({
     int? id,
     int? customerId,
-    _ii4paws6.User? customer,
+    _i1ouw8su.MeerUserProfile? customer,
     int? sellerId,
-    _ii4paws6.User? seller,
+    _i1ouw8su.MeerUserProfile? seller,
     int? driverId,
     String? status,
     double? totalAmount,
@@ -178,8 +178,8 @@ abstract class OrderInfo
   }
 
   static OrderInfoInclude include({
-    _ii4paws6.UserInclude? customer,
-    _ii4paws6.UserInclude? seller,
+    _i1ouw8su.MeerUserProfileInclude? customer,
+    _i1ouw8su.MeerUserProfileInclude? seller,
     _ixwt4bxc.OrderItemIncludeList? items,
   }) {
     return OrderInfoInclude._(
@@ -219,9 +219,9 @@ class _OrderInfoImpl extends OrderInfo {
   _OrderInfoImpl({
     int? id,
     required int customerId,
-    _ii4paws6.User? customer,
+    _i1ouw8su.MeerUserProfile? customer,
     required int sellerId,
-    _ii4paws6.User? seller,
+    _i1ouw8su.MeerUserProfile? seller,
     int? driverId,
     required String status,
     required double totalAmount,
@@ -268,11 +268,13 @@ class _OrderInfoImpl extends OrderInfo {
     return OrderInfo(
       id: id is int? ? id : this.id,
       customerId: customerId ?? this.customerId,
-      customer: customer is _ii4paws6.User?
+      customer: customer is _i1ouw8su.MeerUserProfile?
           ? customer
           : this.customer?.copyWith(),
       sellerId: sellerId ?? this.sellerId,
-      seller: seller is _ii4paws6.User? ? seller : this.seller?.copyWith(),
+      seller: seller is _i1ouw8su.MeerUserProfile?
+          ? seller
+          : this.seller?.copyWith(),
       driverId: driverId is int? ? driverId : this.driverId,
       status: status ?? this.status,
       totalAmount: totalAmount ?? this.totalAmount,
@@ -389,11 +391,11 @@ class OrderInfoTable extends _is.Table<int?> {
 
   late final _is.ColumnInt customerId;
 
-  _ii4paws6.UserTable? _customer;
+  _i1ouw8su.MeerUserProfileTable? _customer;
 
   late final _is.ColumnInt sellerId;
 
-  _ii4paws6.UserTable? _seller;
+  _i1ouw8su.MeerUserProfileTable? _seller;
 
   late final _is.ColumnInt driverId;
 
@@ -413,28 +415,28 @@ class OrderInfoTable extends _is.Table<int?> {
 
   _is.ManyRelation<_ixwt4bxc.OrderItemTable>? _items;
 
-  _ii4paws6.UserTable get customer {
+  _i1ouw8su.MeerUserProfileTable get customer {
     if (_customer != null) return _customer!;
     _customer = _is.createRelationTable(
       relationFieldName: 'customer',
       field: OrderInfo.t.customerId,
-      foreignField: _ii4paws6.User.t.id,
+      foreignField: _i1ouw8su.MeerUserProfile.t.id,
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
-          _ii4paws6.UserTable(tableRelation: foreignTableRelation),
+          _i1ouw8su.MeerUserProfileTable(tableRelation: foreignTableRelation),
     );
     return _customer!;
   }
 
-  _ii4paws6.UserTable get seller {
+  _i1ouw8su.MeerUserProfileTable get seller {
     if (_seller != null) return _seller!;
     _seller = _is.createRelationTable(
       relationFieldName: 'seller',
       field: OrderInfo.t.sellerId,
-      foreignField: _ii4paws6.User.t.id,
+      foreignField: _i1ouw8su.MeerUserProfile.t.id,
       tableRelation: tableRelation,
       createTable: (foreignTableRelation) =>
-          _ii4paws6.UserTable(tableRelation: foreignTableRelation),
+          _i1ouw8su.MeerUserProfileTable(tableRelation: foreignTableRelation),
     );
     return _seller!;
   }
@@ -502,8 +504,8 @@ class OrderInfoTable extends _is.Table<int?> {
 
 class OrderInfoInclude extends _is.IncludeObject {
   OrderInfoInclude._({
-    _ii4paws6.UserInclude? customer,
-    _ii4paws6.UserInclude? seller,
+    _i1ouw8su.MeerUserProfileInclude? customer,
+    _i1ouw8su.MeerUserProfileInclude? seller,
     _ixwt4bxc.OrderItemIncludeList? items,
   }) {
     _customer = customer;
@@ -511,9 +513,9 @@ class OrderInfoInclude extends _is.IncludeObject {
     _items = items;
   }
 
-  _ii4paws6.UserInclude? _customer;
+  _i1ouw8su.MeerUserProfileInclude? _customer;
 
-  _ii4paws6.UserInclude? _seller;
+  _i1ouw8su.MeerUserProfileInclude? _seller;
 
   _ixwt4bxc.OrderItemIncludeList? _items;
 
@@ -984,12 +986,12 @@ class OrderInfoAttachRepository {
 class OrderInfoAttachRowRepository {
   const OrderInfoAttachRowRepository._();
 
-  /// Creates a relation between the given [OrderInfo] and [User]
-  /// by setting the [OrderInfo]'s foreign key `customerId` to refer to the [User].
+  /// Creates a relation between the given [OrderInfo] and [MeerUserProfile]
+  /// by setting the [OrderInfo]'s foreign key `customerId` to refer to the [MeerUserProfile].
   Future<void> customer(
     _is.DatabaseSession session,
     OrderInfo orderInfo,
-    _ii4paws6.User customer, {
+    _i1ouw8su.MeerUserProfile customer, {
     _is.Transaction? transaction,
   }) async {
     if (orderInfo.id == null) {
@@ -1007,12 +1009,12 @@ class OrderInfoAttachRowRepository {
     );
   }
 
-  /// Creates a relation between the given [OrderInfo] and [User]
-  /// by setting the [OrderInfo]'s foreign key `sellerId` to refer to the [User].
+  /// Creates a relation between the given [OrderInfo] and [MeerUserProfile]
+  /// by setting the [OrderInfo]'s foreign key `sellerId` to refer to the [MeerUserProfile].
   Future<void> seller(
     _is.DatabaseSession session,
     OrderInfo orderInfo,
-    _ii4paws6.User seller, {
+    _i1ouw8su.MeerUserProfile seller, {
     _is.Transaction? transaction,
   }) async {
     if (orderInfo.id == null) {

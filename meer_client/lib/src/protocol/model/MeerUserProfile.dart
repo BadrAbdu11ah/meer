@@ -15,9 +15,9 @@ import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _iacc;
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
 
-abstract class User
+abstract class MeerUserProfile
     implements _isc.SerializableModel, _isc.ProtocolSerialization {
-  User._({
+  MeerUserProfile._({
     this.id,
     this.authUserId,
     this.authUser,
@@ -25,13 +25,19 @@ abstract class User
     required this.phone,
     this.email,
     required this.role,
+    bool? isSeller,
     this.address,
     this.latitude,
     this.longitude,
+    this.storeName,
+    this.storeDescription,
+    this.storeAddress,
+    this.storeLatitude,
+    this.storeLongitude,
     required this.createdAt,
-  });
+  }) : isSeller = isSeller ?? false;
 
-  factory User({
+  factory MeerUserProfile({
     int? id,
     _isc.UuidValue? authUserId,
     _iacc.AuthUser? authUser,
@@ -39,14 +45,20 @@ abstract class User
     required String phone,
     String? email,
     required String role,
+    bool? isSeller,
     String? address,
     double? latitude,
     double? longitude,
+    String? storeName,
+    String? storeDescription,
+    String? storeAddress,
+    double? storeLatitude,
+    double? storeLongitude,
     required DateTime createdAt,
-  }) = _UserImpl;
+  }) = _MeerUserProfileImpl;
 
-  factory User.fromJson(Map<String, dynamic> jsonSerialization) {
-    return User(
+  factory MeerUserProfile.fromJson(Map<String, dynamic> jsonSerialization) {
+    return MeerUserProfile(
       id: jsonSerialization['id'] as int?,
       authUserId: jsonSerialization['authUserId'] == null
           ? null
@@ -62,9 +74,17 @@ abstract class User
       phone: jsonSerialization['phone'] as String,
       email: jsonSerialization['email'] as String?,
       role: jsonSerialization['role'] as String,
+      isSeller: jsonSerialization['isSeller'] == null
+          ? null
+          : _isc.BoolJsonExtension.fromJson(jsonSerialization['isSeller']),
       address: jsonSerialization['address'] as String?,
       latitude: (jsonSerialization['latitude'] as num?)?.toDouble(),
       longitude: (jsonSerialization['longitude'] as num?)?.toDouble(),
+      storeName: jsonSerialization['storeName'] as String?,
+      storeDescription: jsonSerialization['storeDescription'] as String?,
+      storeAddress: jsonSerialization['storeAddress'] as String?,
+      storeLatitude: (jsonSerialization['storeLatitude'] as num?)?.toDouble(),
+      storeLongitude: (jsonSerialization['storeLongitude'] as num?)?.toDouble(),
       createdAt: _isc.DateTimeJsonExtension.fromJson(
         jsonSerialization['createdAt'],
       ),
@@ -78,7 +98,6 @@ abstract class User
 
   _isc.UuidValue? authUserId;
 
-  /// ربط المستخدم بحساب المصادقة في Serverpod
   _iacc.AuthUser? authUser;
 
   String fullName;
@@ -89,18 +108,30 @@ abstract class User
 
   String role;
 
+  bool isSeller;
+
   String? address;
 
   double? latitude;
 
   double? longitude;
 
+  String? storeName;
+
+  String? storeDescription;
+
+  String? storeAddress;
+
+  double? storeLatitude;
+
+  double? storeLongitude;
+
   DateTime createdAt;
 
-  /// Returns a shallow copy of this [User]
+  /// Returns a shallow copy of this [MeerUserProfile]
   /// with some or all fields replaced by the given arguments.
   @_isc.useResult
-  User copyWith({
+  MeerUserProfile copyWith({
     int? id,
     _isc.UuidValue? authUserId,
     _iacc.AuthUser? authUser,
@@ -108,15 +139,21 @@ abstract class User
     String? phone,
     String? email,
     String? role,
+    bool? isSeller,
     String? address,
     double? latitude,
     double? longitude,
+    String? storeName,
+    String? storeDescription,
+    String? storeAddress,
+    double? storeLatitude,
+    double? storeLongitude,
     DateTime? createdAt,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
-      '__className__': 'User',
+      '__className__': 'MeerUserProfile',
       if (id != null) 'id': id,
       if (authUserId != null) 'authUserId': authUserId?.toJson(),
       if (authUser != null) 'authUser': authUser?.toJson(),
@@ -124,9 +161,15 @@ abstract class User
       'phone': phone,
       if (email != null) 'email': email,
       'role': role,
+      'isSeller': isSeller,
       if (address != null) 'address': address,
       if (latitude != null) 'latitude': latitude,
       if (longitude != null) 'longitude': longitude,
+      if (storeName != null) 'storeName': storeName,
+      if (storeDescription != null) 'storeDescription': storeDescription,
+      if (storeAddress != null) 'storeAddress': storeAddress,
+      if (storeLatitude != null) 'storeLatitude': storeLatitude,
+      if (storeLongitude != null) 'storeLongitude': storeLongitude,
       'createdAt': createdAt.toJson(),
     };
   }
@@ -134,7 +177,7 @@ abstract class User
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
-      '__className__': 'User',
+      '__className__': 'MeerUserProfile',
       if (id != null) 'id': id,
       if (authUserId != null) 'authUserId': authUserId?.toJson(),
       if (authUser != null) 'authUser': authUser?.toJson(),
@@ -142,9 +185,15 @@ abstract class User
       'phone': phone,
       if (email != null) 'email': email,
       'role': role,
+      'isSeller': isSeller,
       if (address != null) 'address': address,
       if (latitude != null) 'latitude': latitude,
       if (longitude != null) 'longitude': longitude,
+      if (storeName != null) 'storeName': storeName,
+      if (storeDescription != null) 'storeDescription': storeDescription,
+      if (storeAddress != null) 'storeAddress': storeAddress,
+      if (storeLatitude != null) 'storeLatitude': storeLatitude,
+      if (storeLongitude != null) 'storeLongitude': storeLongitude,
       'createdAt': createdAt.toJson(),
     };
   }
@@ -157,8 +206,8 @@ abstract class User
 
 class _Undefined {}
 
-class _UserImpl extends User {
-  _UserImpl({
+class _MeerUserProfileImpl extends MeerUserProfile {
+  _MeerUserProfileImpl({
     int? id,
     _isc.UuidValue? authUserId,
     _iacc.AuthUser? authUser,
@@ -166,9 +215,15 @@ class _UserImpl extends User {
     required String phone,
     String? email,
     required String role,
+    bool? isSeller,
     String? address,
     double? latitude,
     double? longitude,
+    String? storeName,
+    String? storeDescription,
+    String? storeAddress,
+    double? storeLatitude,
+    double? storeLongitude,
     required DateTime createdAt,
   }) : super._(
          id: id,
@@ -178,17 +233,23 @@ class _UserImpl extends User {
          phone: phone,
          email: email,
          role: role,
+         isSeller: isSeller,
          address: address,
          latitude: latitude,
          longitude: longitude,
+         storeName: storeName,
+         storeDescription: storeDescription,
+         storeAddress: storeAddress,
+         storeLatitude: storeLatitude,
+         storeLongitude: storeLongitude,
          createdAt: createdAt,
        );
 
-  /// Returns a shallow copy of this [User]
+  /// Returns a shallow copy of this [MeerUserProfile]
   /// with some or all fields replaced by the given arguments.
   @_isc.useResult
   @override
-  User copyWith({
+  MeerUserProfile copyWith({
     Object? id = _Undefined,
     Object? authUserId = _Undefined,
     Object? authUser = _Undefined,
@@ -196,12 +257,18 @@ class _UserImpl extends User {
     String? phone,
     Object? email = _Undefined,
     String? role,
+    bool? isSeller,
     Object? address = _Undefined,
     Object? latitude = _Undefined,
     Object? longitude = _Undefined,
+    Object? storeName = _Undefined,
+    Object? storeDescription = _Undefined,
+    Object? storeAddress = _Undefined,
+    Object? storeLatitude = _Undefined,
+    Object? storeLongitude = _Undefined,
     DateTime? createdAt,
   }) {
-    return User(
+    return MeerUserProfile(
       id: id is int? ? id : this.id,
       authUserId: authUserId is _isc.UuidValue? ? authUserId : this.authUserId,
       authUser: authUser is _iacc.AuthUser?
@@ -211,9 +278,21 @@ class _UserImpl extends User {
       phone: phone ?? this.phone,
       email: email is String? ? email : this.email,
       role: role ?? this.role,
+      isSeller: isSeller ?? this.isSeller,
       address: address is String? ? address : this.address,
       latitude: latitude is double? ? latitude : this.latitude,
       longitude: longitude is double? ? longitude : this.longitude,
+      storeName: storeName is String? ? storeName : this.storeName,
+      storeDescription: storeDescription is String?
+          ? storeDescription
+          : this.storeDescription,
+      storeAddress: storeAddress is String? ? storeAddress : this.storeAddress,
+      storeLatitude: storeLatitude is double?
+          ? storeLatitude
+          : this.storeLatitude,
+      storeLongitude: storeLongitude is double?
+          ? storeLongitude
+          : this.storeLongitude,
       createdAt: createdAt ?? this.createdAt,
     );
   }

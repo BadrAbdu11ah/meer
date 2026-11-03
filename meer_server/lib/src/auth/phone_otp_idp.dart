@@ -30,7 +30,7 @@ class PhoneOtpIdp implements IdentityProvider {
         );
 
         // 2. البحث عن سجل المستخدم التجاري في مِيْر.
-        var appUser = await User.db.findFirstRow(
+        var appUser = await MeerUserProfile.db.findFirstRow(
           session,
           where: (t) => t.phone.equals(phone),
           transaction: transaction,
@@ -90,7 +90,7 @@ class PhoneOtpIdp implements IdentityProvider {
 
         // 5. إنشاء سجل مِيْر أو ربط السجل القديم بالحساب.
         if (appUser == null) {
-          appUser = User(
+          appUser = MeerUserProfile(
             authUserId: authUser.id,
             phone: phone,
             fullName: 'مستخدم $phone',
@@ -98,7 +98,7 @@ class PhoneOtpIdp implements IdentityProvider {
             createdAt: DateTime.now().toUtc(),
           );
 
-          await User.db.insertRow(
+          await MeerUserProfile.db.insertRow(
             session,
             appUser,
             transaction: transaction,
@@ -106,7 +106,7 @@ class PhoneOtpIdp implements IdentityProvider {
         } else if (appUser.authUserId == null) {
           appUser.authUserId = authUser.id;
 
-          await User.db.updateRow(
+          await MeerUserProfile.db.updateRow(
             session,
             appUser,
             transaction: transaction,
@@ -141,7 +141,7 @@ class PhoneOtpIdp implements IdentityProvider {
       transaction: transaction,
     );
 
-    await User.db.updateWhere(
+    await MeerUserProfile.db.updateWhere(
       session,
       where: (t) => t.authUserId.equals(userToRemoveId),
       columnValues: (t) => [

@@ -12,11 +12,23 @@ appAuth:
   - syncGoogleUser:
 order:
   - createOrder:
-  - getCustomerOrders:
-  - getSellerOrders:
-  - getAvailableOrdersForDrivers:
-  - acceptOrderAsDriver:
-  - updateOrderStatus:
-  - getOrderWithDetails:
+  - getMyCustomerOrders:
+  - getMySellerOrders:
+  - acceptMyOrder:
+  - rejectMyOrder:
+  - markMyOrderReady:
+product:
+  - addProduct:
+  - getAllAvailableProducts:
+  - getProductsBySeller:
+  - getMyProducts:
+  - toggleProductAvailability:
+  - searchProducts:
+  - updateProduct:
+  - deleteProduct:
+seller:
+  - getPublicSellerInfo:
+  - activateSeller:
+  - getMyProfile:
 greeting:
   - hello:

@@ -128,7 +128,7 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( User userProfile)?  authenticated,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( MeerUserProfile userProfile)?  authenticated,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case _Loaidng() when loading != null:
@@ -152,7 +152,7 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( User userProfile)  authenticated,required TResult Function( String message)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( MeerUserProfile userProfile)  authenticated,required TResult Function( String message)  error,}) {final _that = this;
 switch (_that) {
 case _Initial():
 return initial();case _Loaidng():
@@ -175,7 +175,7 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( User userProfile)?  authenticated,TResult? Function( String message)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( MeerUserProfile userProfile)?  authenticated,TResult? Function( String message)?  error,}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case _Loaidng() when loading != null:
@@ -260,7 +260,7 @@ class _Authenticated implements VerifyOtpState {
   const _Authenticated(this.userProfile);
   
 
- final  User userProfile;
+ final  MeerUserProfile userProfile;
 
 /// Create a copy of VerifyOtpState
 /// with the given fields replaced by the non-null parameter values.
@@ -292,7 +292,7 @@ abstract mixin class _$AuthenticatedCopyWith<$Res> implements $VerifyOtpStateCop
   factory _$AuthenticatedCopyWith(_Authenticated value, $Res Function(_Authenticated) _then) = __$AuthenticatedCopyWithImpl;
 @useResult
 $Res call({
- User userProfile
+ MeerUserProfile userProfile
 });
 
 
@@ -312,7 +312,7 @@ class __$AuthenticatedCopyWithImpl<$Res>
 @pragma('vm:prefer-inline') $Res call({Object? userProfile = null,}) {
   return _then(_Authenticated(
 null == userProfile ? _self.userProfile : userProfile // ignore: cast_nullable_to_non_nullable
-as User,
+as MeerUserProfile,
   ));
 }
 

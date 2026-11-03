@@ -12,7 +12,9 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:meer_server/src/generated/model/order_info.dart' as _i8hwzj5x;
-import 'package:meer_server/src/generated/model/order_item.dart' as _ixsojegs;
+import 'package:meer_server/src/generated/model/order_item_request.dart'
+    as _i4g4bzck;
+import 'package:meer_server/src/generated/model/product.dart' as _iq8dxf2n;
 import 'package:serverpod/protocol.dart' as _isp;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
@@ -21,19 +23,23 @@ import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _iais;
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i1n3uhu0;
 import 'greetings/greeting.dart' as _izw8z7ou;
+import 'model/MeerUserProfile.dart' as _ii0ycxhg;
 import 'model/order_info.dart' as _ig93noqx;
 import 'model/order_item.dart' as _iae72vfi;
+import 'model/order_item_request.dart' as _i52izl0k;
 import 'model/phone_auth_account.dart' as _iv7s17wm;
 import 'model/phone_auth_result.dart' as _iu539ble;
 import 'model/product.dart' as _igfqb4xa;
-import 'model/user.dart' as _iiow43ez;
+import 'model/seller_public_info.dart' as _iigi60b2;
 export 'greetings/greeting.dart';
+export 'model/MeerUserProfile.dart';
 export 'model/order_info.dart';
 export 'model/order_item.dart';
+export 'model/order_item_request.dart';
 export 'model/phone_auth_account.dart';
 export 'model/phone_auth_result.dart';
 export 'model/product.dart';
-export 'model/user.dart';
+export 'model/seller_public_info.dart';
 
 class Protocol extends _is.DatabaseSerializationManager {
   Protocol._();
@@ -343,7 +349,7 @@ class Protocol extends _is.DatabaseSerializationManager {
     ),
     _isp.TableDefinition(
       name: 'user',
-      dartName: 'User',
+      dartName: 'MeerUserProfile',
       schema: 'public',
       module: 'meer',
       columns: [
@@ -385,6 +391,13 @@ class Protocol extends _is.DatabaseSerializationManager {
           dartType: 'String',
         ),
         _isp.ColumnDefinition(
+          name: 'isSeller',
+          columnType: _isp.ColumnType.boolean,
+          isNullable: false,
+          dartType: 'bool',
+          columnDefault: 'false',
+        ),
+        _isp.ColumnDefinition(
           name: 'address',
           columnType: _isp.ColumnType.text,
           isNullable: true,
@@ -398,6 +411,36 @@ class Protocol extends _is.DatabaseSerializationManager {
         ),
         _isp.ColumnDefinition(
           name: 'longitude',
+          columnType: _isp.ColumnType.doublePrecision,
+          isNullable: true,
+          dartType: 'double?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'storeName',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'storeDescription',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'storeAddress',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'storeLatitude',
+          columnType: _isp.ColumnType.doublePrecision,
+          isNullable: true,
+          dartType: 'double?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'storeLongitude',
           columnType: _isp.ColumnType.doublePrecision,
           isNullable: true,
           dartType: 'double?',
@@ -474,11 +517,17 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
     }
+    if (t == _ii0ycxhg.MeerUserProfile) {
+      return _ii0ycxhg.MeerUserProfile.fromJson(data) as T;
+    }
     if (t == _ig93noqx.OrderInfo) {
       return _ig93noqx.OrderInfo.fromJson(data) as T;
     }
     if (t == _iae72vfi.OrderItem) {
       return _iae72vfi.OrderItem.fromJson(data) as T;
+    }
+    if (t == _i52izl0k.OrderItemRequest) {
+      return _i52izl0k.OrderItemRequest.fromJson(data) as T;
     }
     if (t == _iv7s17wm.PhoneAuthAccount) {
       return _iv7s17wm.PhoneAuthAccount.fromJson(data) as T;
@@ -489,17 +538,25 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _igfqb4xa.Product) {
       return _igfqb4xa.Product.fromJson(data) as T;
     }
-    if (t == _iiow43ez.User) {
-      return _iiow43ez.User.fromJson(data) as T;
+    if (t == _iigi60b2.SellerPublicInfo) {
+      return _iigi60b2.SellerPublicInfo.fromJson(data) as T;
     }
     if (t == _is.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_ii0ycxhg.MeerUserProfile?>()) {
+      return (data != null ? _ii0ycxhg.MeerUserProfile.fromJson(data) : null)
+          as T;
     }
     if (t == _is.getType<_ig93noqx.OrderInfo?>()) {
       return (data != null ? _ig93noqx.OrderInfo.fromJson(data) : null) as T;
     }
     if (t == _is.getType<_iae72vfi.OrderItem?>()) {
       return (data != null ? _iae72vfi.OrderItem.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_i52izl0k.OrderItemRequest?>()) {
+      return (data != null ? _i52izl0k.OrderItemRequest.fromJson(data) : null)
+          as T;
     }
     if (t == _is.getType<_iv7s17wm.PhoneAuthAccount?>()) {
       return (data != null ? _iv7s17wm.PhoneAuthAccount.fromJson(data) : null)
@@ -512,8 +569,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _is.getType<_igfqb4xa.Product?>()) {
       return (data != null ? _igfqb4xa.Product.fromJson(data) : null) as T;
     }
-    if (t == _is.getType<_iiow43ez.User?>()) {
-      return (data != null ? _iiow43ez.User.fromJson(data) : null) as T;
+    if (t == _is.getType<_iigi60b2.SellerPublicInfo?>()) {
+      return (data != null ? _iigi60b2.SellerPublicInfo.fromJson(data) : null)
+          as T;
     }
     if (t == List<_iae72vfi.OrderItem>) {
       return (data as List)
@@ -529,15 +587,21 @@ class Protocol extends _is.DatabaseSerializationManager {
               : null)
           as T;
     }
-    if (t == List<_ixsojegs.OrderItem>) {
+    if (t == List<_i4g4bzck.OrderItemRequest>) {
       return (data as List)
-              .map((e) => deserialize<_ixsojegs.OrderItem>(e))
+              .map((e) => deserialize<_i4g4bzck.OrderItemRequest>(e))
               .toList()
           as T;
     }
     if (t == List<_i8hwzj5x.OrderInfo>) {
       return (data as List)
               .map((e) => deserialize<_i8hwzj5x.OrderInfo>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_iq8dxf2n.Product>) {
+      return (data as List)
+              .map((e) => deserialize<_iq8dxf2n.Product>(e))
               .toList()
           as T;
     }
@@ -559,12 +623,14 @@ class Protocol extends _is.DatabaseSerializationManager {
   static String? getClassNameForType(Type type) {
     return switch (type) {
       _izw8z7ou.Greeting => 'Greeting',
+      _ii0ycxhg.MeerUserProfile => 'MeerUserProfile',
       _ig93noqx.OrderInfo => 'OrderInfo',
       _iae72vfi.OrderItem => 'OrderItem',
+      _i52izl0k.OrderItemRequest => 'OrderItemRequest',
       _iv7s17wm.PhoneAuthAccount => 'PhoneAuthAccount',
       _iu539ble.PhoneAuthResult => 'PhoneAuthResult',
       _igfqb4xa.Product => 'Product',
-      _iiow43ez.User => 'User',
+      _iigi60b2.SellerPublicInfo => 'SellerPublicInfo',
       _ => null,
     };
   }
@@ -581,18 +647,22 @@ class Protocol extends _is.DatabaseSerializationManager {
     switch (data) {
       case _izw8z7ou.Greeting():
         return 'Greeting';
+      case _ii0ycxhg.MeerUserProfile():
+        return 'MeerUserProfile';
       case _ig93noqx.OrderInfo():
         return 'OrderInfo';
       case _iae72vfi.OrderItem():
         return 'OrderItem';
+      case _i52izl0k.OrderItemRequest():
+        return 'OrderItemRequest';
       case _iv7s17wm.PhoneAuthAccount():
         return 'PhoneAuthAccount';
       case _iu539ble.PhoneAuthResult():
         return 'PhoneAuthResult';
       case _igfqb4xa.Product():
         return 'Product';
-      case _iiow43ez.User():
-        return 'User';
+      case _iigi60b2.SellerPublicInfo():
+        return 'SellerPublicInfo';
     }
     className = _iais.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -626,11 +696,17 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);
     }
+    if (dataClassName == 'MeerUserProfile') {
+      return deserialize<_ii0ycxhg.MeerUserProfile>(data['data']);
+    }
     if (dataClassName == 'OrderInfo') {
       return deserialize<_ig93noqx.OrderInfo>(data['data']);
     }
     if (dataClassName == 'OrderItem') {
       return deserialize<_iae72vfi.OrderItem>(data['data']);
+    }
+    if (dataClassName == 'OrderItemRequest') {
+      return deserialize<_i52izl0k.OrderItemRequest>(data['data']);
     }
     if (dataClassName == 'PhoneAuthAccount') {
       return deserialize<_iv7s17wm.PhoneAuthAccount>(data['data']);
@@ -641,8 +717,8 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (dataClassName == 'Product') {
       return deserialize<_igfqb4xa.Product>(data['data']);
     }
-    if (dataClassName == 'User') {
-      return deserialize<_iiow43ez.User>(data['data']);
+    if (dataClassName == 'SellerPublicInfo') {
+      return deserialize<_iigi60b2.SellerPublicInfo>(data['data']);
     }
     if (dataClassName.startsWith('serverpod_auth_idp.')) {
       data['className'] = dataClassName.substring(19);
@@ -696,6 +772,8 @@ class Protocol extends _is.DatabaseSerializationManager {
       }
     }
     switch (t) {
+      case _ii0ycxhg.MeerUserProfile:
+        return _ii0ycxhg.MeerUserProfile.t;
       case _ig93noqx.OrderInfo:
         return _ig93noqx.OrderInfo.t;
       case _iae72vfi.OrderItem:
@@ -704,8 +782,6 @@ class Protocol extends _is.DatabaseSerializationManager {
         return _iv7s17wm.PhoneAuthAccount.t;
       case _igfqb4xa.Product:
         return _igfqb4xa.Product.t;
-      case _iiow43ez.User:
-        return _iiow43ez.User.t;
     }
     return null;
   }

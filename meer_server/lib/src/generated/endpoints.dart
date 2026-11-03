@@ -10,8 +10,9 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:meer_server/src/generated/model/order_info.dart' as _i8hwzj5x;
-import 'package:meer_server/src/generated/model/order_item.dart' as _ixsojegs;
+import 'package:meer_server/src/generated/model/order_item_request.dart'
+    as _i4g4bzck;
+import 'package:meer_server/src/generated/model/product.dart' as _iq8dxf2n;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
@@ -22,6 +23,8 @@ import '../auth/google_idp_endpoint.dart' as _i71axiz0;
 import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
 import '../endpoints/app_auth_endpoint.dart' as _ifrhcmrx;
 import '../endpoints/order_endpoint.dart' as _itwfdqvf;
+import '../endpoints/product_endpoint.dart' as _im5j1753;
+import '../endpoints/seller_endpoint.dart' as _ifhnucmp;
 import '../greetings/greeting_endpoint.dart' as _il624ik7;
 
 class Endpoints extends _is.EndpointDispatch {
@@ -50,6 +53,18 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'order',
+          null,
+        ),
+      'product': _im5j1753.ProductEndpoint()
+        ..initialize(
+          server,
+          'product',
+          null,
+        ),
+      'seller': _ifhnucmp.SellerEndpoint()
+        ..initialize(
+          server,
+          'seller',
           null,
         ),
       'greeting': _il624ik7.GreetingEndpoint()
@@ -244,15 +259,25 @@ class Endpoints extends _is.EndpointDispatch {
         'createOrder': _is.MethodConnector(
           name: 'createOrder',
           params: {
-            'order': _is.ParameterDescription(
-              name: 'order',
-              type: _is.getType<_i8hwzj5x.OrderInfo>(),
+            'requestedItems': _is.ParameterDescription(
+              name: 'requestedItems',
+              type: _is.getType<List<_i4g4bzck.OrderItemRequest>>(),
               nullable: false,
             ),
-            'items': _is.ParameterDescription(
-              name: 'items',
-              type: _is.getType<List<_ixsojegs.OrderItem>>(),
+            'deliveryAddress': _is.ParameterDescription(
+              name: 'deliveryAddress',
+              type: _is.getType<String>(),
               nullable: false,
+            ),
+            'deliveryLatitude': _is.ParameterDescription(
+              name: 'deliveryLatitude',
+              type: _is.getType<double?>(),
+              nullable: true,
+            ),
+            'deliveryLongitude': _is.ParameterDescription(
+              name: 'deliveryLongitude',
+              type: _is.getType<double?>(),
+              nullable: true,
             ),
           },
           call:
@@ -262,15 +287,75 @@ class Endpoints extends _is.EndpointDispatch {
               ) async =>
                   (endpoints['order'] as _itwfdqvf.OrderEndpoint).createOrder(
                     session,
-                    params['order'],
-                    params['items'],
+                    params['requestedItems'],
+                    params['deliveryAddress'],
+                    params['deliveryLatitude'],
+                    params['deliveryLongitude'],
                   ),
         ),
-        'getCustomerOrders': _is.MethodConnector(
-          name: 'getCustomerOrders',
+        'getMyCustomerOrders': _is.MethodConnector(
+          name: 'getMyCustomerOrders',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['order'] as _itwfdqvf.OrderEndpoint)
+                  .getMyCustomerOrders(session),
+        ),
+        'getMySellerOrders': _is.MethodConnector(
+          name: 'getMySellerOrders',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['order'] as _itwfdqvf.OrderEndpoint)
+                  .getMySellerOrders(session),
+        ),
+        'acceptMyOrder': _is.MethodConnector(
+          name: 'acceptMyOrder',
           params: {
-            'customerId': _is.ParameterDescription(
-              name: 'customerId',
+            'orderId': _is.ParameterDescription(
+              name: 'orderId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['order'] as _itwfdqvf.OrderEndpoint).acceptMyOrder(
+                    session,
+                    params['orderId'],
+                  ),
+        ),
+        'rejectMyOrder': _is.MethodConnector(
+          name: 'rejectMyOrder',
+          params: {
+            'orderId': _is.ParameterDescription(
+              name: 'orderId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['order'] as _itwfdqvf.OrderEndpoint).rejectMyOrder(
+                    session,
+                    params['orderId'],
+                  ),
+        ),
+        'markMyOrderReady': _is.MethodConnector(
+          name: 'markMyOrderReady',
+          params: {
+            'orderId': _is.ParameterDescription(
+              name: 'orderId',
               type: _is.getType<int>(),
               nullable: false,
             ),
@@ -280,13 +365,48 @@ class Endpoints extends _is.EndpointDispatch {
                 _is.Session session,
                 Map<String, dynamic> params,
               ) async => (endpoints['order'] as _itwfdqvf.OrderEndpoint)
-                  .getCustomerOrders(
+                  .markMyOrderReady(
                     session,
-                    params['customerId'],
+                    params['orderId'],
                   ),
         ),
-        'getSellerOrders': _is.MethodConnector(
-          name: 'getSellerOrders',
+      },
+    );
+    connectors['product'] = _is.EndpointConnector(
+      name: 'product',
+      endpoint: endpoints['product']!,
+      methodConnectors: {
+        'addProduct': _is.MethodConnector(
+          name: 'addProduct',
+          params: {
+            'product': _is.ParameterDescription(
+              name: 'product',
+              type: _is.getType<_iq8dxf2n.Product>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['product'] as _im5j1753.ProductEndpoint)
+                  .addProduct(
+                    session,
+                    params['product'],
+                  ),
+        ),
+        'getAllAvailableProducts': _is.MethodConnector(
+          name: 'getAllAvailableProducts',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['product'] as _im5j1753.ProductEndpoint)
+                  .getAllAvailableProducts(session),
+        ),
+        'getProductsBySeller': _is.MethodConnector(
+          name: 'getProductsBySeller',
           params: {
             'sellerId': _is.ParameterDescription(
               name: 'sellerId',
@@ -298,33 +418,33 @@ class Endpoints extends _is.EndpointDispatch {
               (
                 _is.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['order'] as _itwfdqvf.OrderEndpoint)
-                  .getSellerOrders(
+              ) async => (endpoints['product'] as _im5j1753.ProductEndpoint)
+                  .getProductsBySeller(
                     session,
                     params['sellerId'],
                   ),
         ),
-        'getAvailableOrdersForDrivers': _is.MethodConnector(
-          name: 'getAvailableOrdersForDrivers',
+        'getMyProducts': _is.MethodConnector(
+          name: 'getMyProducts',
           params: {},
           call:
               (
                 _is.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['order'] as _itwfdqvf.OrderEndpoint)
-                  .getAvailableOrdersForDrivers(session),
+              ) async => (endpoints['product'] as _im5j1753.ProductEndpoint)
+                  .getMyProducts(session),
         ),
-        'acceptOrderAsDriver': _is.MethodConnector(
-          name: 'acceptOrderAsDriver',
+        'toggleProductAvailability': _is.MethodConnector(
+          name: 'toggleProductAvailability',
           params: {
-            'orderId': _is.ParameterDescription(
-              name: 'orderId',
+            'productId': _is.ParameterDescription(
+              name: 'productId',
               type: _is.getType<int>(),
               nullable: false,
             ),
-            'driverId': _is.ParameterDescription(
-              name: 'driverId',
-              type: _is.getType<int>(),
+            'isAvailable': _is.ParameterDescription(
+              name: 'isAvailable',
+              type: _is.getType<bool>(),
               nullable: false,
             ),
           },
@@ -332,23 +452,18 @@ class Endpoints extends _is.EndpointDispatch {
               (
                 _is.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['order'] as _itwfdqvf.OrderEndpoint)
-                  .acceptOrderAsDriver(
+              ) async => (endpoints['product'] as _im5j1753.ProductEndpoint)
+                  .toggleProductAvailability(
                     session,
-                    params['orderId'],
-                    params['driverId'],
+                    params['productId'],
+                    params['isAvailable'],
                   ),
         ),
-        'updateOrderStatus': _is.MethodConnector(
-          name: 'updateOrderStatus',
+        'searchProducts': _is.MethodConnector(
+          name: 'searchProducts',
           params: {
-            'orderId': _is.ParameterDescription(
-              name: 'orderId',
-              type: _is.getType<int>(),
-              nullable: false,
-            ),
-            'newStatus': _is.ParameterDescription(
-              name: 'newStatus',
+            'search': _is.ParameterDescription(
+              name: 'search',
               type: _is.getType<String>(),
               nullable: false,
             ),
@@ -357,18 +472,36 @@ class Endpoints extends _is.EndpointDispatch {
               (
                 _is.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['order'] as _itwfdqvf.OrderEndpoint)
-                  .updateOrderStatus(
+              ) async => (endpoints['product'] as _im5j1753.ProductEndpoint)
+                  .searchProducts(
                     session,
-                    params['orderId'],
-                    params['newStatus'],
+                    params['search'],
                   ),
         ),
-        'getOrderWithDetails': _is.MethodConnector(
-          name: 'getOrderWithDetails',
+        'updateProduct': _is.MethodConnector(
+          name: 'updateProduct',
           params: {
-            'orderId': _is.ParameterDescription(
-              name: 'orderId',
+            'input': _is.ParameterDescription(
+              name: 'input',
+              type: _is.getType<_iq8dxf2n.Product>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['product'] as _im5j1753.ProductEndpoint)
+                  .updateProduct(
+                    session,
+                    params['input'],
+                  ),
+        ),
+        'deleteProduct': _is.MethodConnector(
+          name: 'deleteProduct',
+          params: {
+            'productId': _is.ParameterDescription(
+              name: 'productId',
               type: _is.getType<int>(),
               nullable: false,
             ),
@@ -377,11 +510,89 @@ class Endpoints extends _is.EndpointDispatch {
               (
                 _is.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['order'] as _itwfdqvf.OrderEndpoint)
-                  .getOrderWithDetails(
+              ) async => (endpoints['product'] as _im5j1753.ProductEndpoint)
+                  .deleteProduct(
                     session,
-                    params['orderId'],
+                    params['productId'],
                   ),
+        ),
+      },
+    );
+    connectors['seller'] = _is.EndpointConnector(
+      name: 'seller',
+      endpoint: endpoints['seller']!,
+      methodConnectors: {
+        'getPublicSellerInfo': _is.MethodConnector(
+          name: 'getPublicSellerInfo',
+          params: {
+            'sellerId': _is.ParameterDescription(
+              name: 'sellerId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['seller'] as _ifhnucmp.SellerEndpoint)
+                  .getPublicSellerInfo(
+                    session,
+                    params['sellerId'],
+                  ),
+        ),
+        'activateSeller': _is.MethodConnector(
+          name: 'activateSeller',
+          params: {
+            'storeName': _is.ParameterDescription(
+              name: 'storeName',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'storeDescription': _is.ParameterDescription(
+              name: 'storeDescription',
+              type: _is.getType<String?>(),
+              nullable: true,
+            ),
+            'storeAddress': _is.ParameterDescription(
+              name: 'storeAddress',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'latitude': _is.ParameterDescription(
+              name: 'latitude',
+              type: _is.getType<double>(),
+              nullable: false,
+            ),
+            'longitude': _is.ParameterDescription(
+              name: 'longitude',
+              type: _is.getType<double>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['seller'] as _ifhnucmp.SellerEndpoint)
+                  .activateSeller(
+                    session,
+                    params['storeName'],
+                    params['storeDescription'],
+                    params['storeAddress'],
+                    params['latitude'],
+                    params['longitude'],
+                  ),
+        ),
+        'getMyProfile': _is.MethodConnector(
+          name: 'getMyProfile',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['seller'] as _ifhnucmp.SellerEndpoint)
+                  .getMyProfile(session),
         ),
       },
     );

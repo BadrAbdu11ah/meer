@@ -79,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
               );
               Navigator.pushNamedAndRemoveUntil(
                 context,
-                AppRoute.homeScreen,
+                AppRoute.mainScreen,
                 (route) => false,
               );
             },

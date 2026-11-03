@@ -9,7 +9,8 @@ class LoginState with _$LoginState {
   const factory LoginState.otpSent() = _OtpSent;
 
   // // حالة نجاح المصادقة (سواء بجوجل أو رقم الهاتف)
-  const factory LoginState.authenticated(User userProfile) = _Authenticated;
+  const factory LoginState.authenticated(MeerUserProfile userProfile) =
+      _Authenticated;
 
   // // حالة حدوث خطأ
   const factory LoginState.error(String message) = _LoginError;

@@ -6,7 +6,7 @@ import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 
 class AuthRepository {
   /// تسجيل الدخول بحساب جوجل وإرجاع ملف تعريف المستخدم (UserProfileModel)
-  Future<Either<Failure, User>> signInWithGoogle() async {
+  Future<Either<Failure, MeerUserProfile>> signInWithGoogle() async {
     try {
       final googleController = GoogleAuthController(
         client: client,
@@ -50,7 +50,7 @@ class AuthRepository {
     }
   }
 
-  Future<Either<Failure, User>> verifyOtp({
+  Future<Either<Failure, MeerUserProfile>> verifyOtp({
     required String phone,
     required String code,
   }) async {

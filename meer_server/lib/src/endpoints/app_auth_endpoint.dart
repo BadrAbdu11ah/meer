@@ -74,14 +74,14 @@ class AppAuthEndpoint extends Endpoint {
   }
 
   // جلب حساب مِيْر بعد نجاح المصادقة الحديثة.
-  Future<User> syncCurrentUser(Session session) async {
+  Future<MeerUserProfile> syncCurrentUser(Session session) async {
     final authUserId = session.authenticated?.authUserId;
 
     if (authUserId == null) {
       throw Exception('المستخدم غير مسجل الدخول');
     }
 
-    final appUser = await User.db.findFirstRow(
+    final appUser = await MeerUserProfile.db.findFirstRow(
       session,
       where: (t) => t.authUserId.equals(authUserId),
     );
@@ -94,7 +94,7 @@ class AppAuthEndpoint extends Endpoint {
   }
 
   // 3. مزامنة أو جلب بيانات المستخدم المخصص بعد نجاح تسجيل الدخول بجوجل
-  Future<User> syncGoogleUser(Session session) async {
+  Future<MeerUserProfile> syncGoogleUser(Session session) async {
     // 1. الحصول على معرف المستخدم (UuidValue) من جلسة Serverpod النشطة
     final authUserId = session.authenticated?.authUserId;
     if (authUserId == null) {
@@ -102,7 +102,7 @@ class AppAuthEndpoint extends Endpoint {
     }
 
     // 2. البحث عن المستخدم في جدولنا المخصص عبر authUserId
-    var appUser = await User.db.findFirstRow(
+    var appUser = await MeerUserProfile.db.findFirstRow(
       session,
       where: (t) => t.authUserId.equals(authUserId),
     );
@@ -112,7 +112,7 @@ class AppAuthEndpoint extends Endpoint {
       // جلب معلومات الحساب من Serverpod Auth Core
       final userProfile = await session.authenticated?.userProfile(session);
 
-      appUser = User(
+      appUser = MeerUserProfile(
         authUserId: authUserId,
         fullName: userProfile?.fullName ?? 'مستخدم جوجل',
         phone: '',
@@ -120,7 +120,7 @@ class AppAuthEndpoint extends Endpoint {
         role: 'customer',
         createdAt: DateTime.now(),
       );
-      appUser = await User.db.insertRow(session, appUser);
+      appUser = await MeerUserProfile.db.insertRow(session, appUser);
     }
 
     return appUser;

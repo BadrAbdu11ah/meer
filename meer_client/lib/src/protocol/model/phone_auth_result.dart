@@ -12,7 +12,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:meer_client/src/protocol/protocol.dart' as _ihjszy8t;
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
-import '../model/user.dart' as _ii4paws6;
+import '../model/MeerUserProfile.dart' as _i1ouw8su;
 
 abstract class PhoneAuthResult
     implements _isc.SerializableModel, _isc.ProtocolSerialization {
@@ -27,7 +27,7 @@ abstract class PhoneAuthResult
     required bool success,
     int? keyId,
     String? key,
-    _ii4paws6.User? user,
+    _i1ouw8su.MeerUserProfile? user,
   }) = _PhoneAuthResultImpl;
 
   factory PhoneAuthResult.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -37,7 +37,7 @@ abstract class PhoneAuthResult
       key: jsonSerialization['key'] as String?,
       user: jsonSerialization['user'] == null
           ? null
-          : _ihjszy8t.Protocol().deserialize<_ii4paws6.User>(
+          : _ihjszy8t.Protocol().deserialize<_i1ouw8su.MeerUserProfile>(
               jsonSerialization['user'],
             ),
     );
@@ -49,7 +49,7 @@ abstract class PhoneAuthResult
 
   String? key;
 
-  _ii4paws6.User? user;
+  _i1ouw8su.MeerUserProfile? user;
 
   /// Returns a shallow copy of this [PhoneAuthResult]
   /// with some or all fields replaced by the given arguments.
@@ -58,7 +58,7 @@ abstract class PhoneAuthResult
     bool? success,
     int? keyId,
     String? key,
-    _ii4paws6.User? user,
+    _i1ouw8su.MeerUserProfile? user,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -95,7 +95,7 @@ class _PhoneAuthResultImpl extends PhoneAuthResult {
     required bool success,
     int? keyId,
     String? key,
-    _ii4paws6.User? user,
+    _i1ouw8su.MeerUserProfile? user,
   }) : super._(
          success: success,
          keyId: keyId,
@@ -117,7 +117,7 @@ class _PhoneAuthResultImpl extends PhoneAuthResult {
       success: success ?? this.success,
       keyId: keyId is int? ? keyId : this.keyId,
       key: key is String? ? key : this.key,
-      user: user is _ii4paws6.User? ? user : this.user?.copyWith(),
+      user: user is _i1ouw8su.MeerUserProfile? ? user : this.user?.copyWith(),
     );
   }
 }

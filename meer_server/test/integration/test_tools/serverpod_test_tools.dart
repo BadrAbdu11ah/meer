@@ -14,9 +14,14 @@
 import 'dart:async' as _ida;
 import 'dart:io' as _idi;
 import 'package:meer_server/src/generated/greetings/greeting.dart' as _ih6ywnp4;
+import 'package:meer_server/src/generated/model/MeerUserProfile.dart'
+    as _iy43oh7i;
 import 'package:meer_server/src/generated/model/order_info.dart' as _i8hwzj5x;
-import 'package:meer_server/src/generated/model/order_item.dart' as _ixsojegs;
-import 'package:meer_server/src/generated/model/user.dart' as _ilw9oyll;
+import 'package:meer_server/src/generated/model/order_item_request.dart'
+    as _i4g4bzck;
+import 'package:meer_server/src/generated/model/product.dart' as _iq8dxf2n;
+import 'package:meer_server/src/generated/model/seller_public_info.dart'
+    as _ilv77xsv;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
@@ -162,6 +167,10 @@ class TestEndpoints {
 
   late final _OrderEndpoint order;
 
+  late final _ProductEndpoint product;
+
+  late final _SellerEndpoint seller;
+
   late final _GreetingEndpoint greeting;
 }
 
@@ -185,6 +194,14 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     order = _OrderEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    product = _ProductEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    seller = _SellerEndpoint(
       endpoints,
       serializationManager,
     );
@@ -452,7 +469,7 @@ class _AppAuthEndpoint {
     });
   }
 
-  _ida.Future<_ilw9oyll.User> syncCurrentUser(
+  _ida.Future<_iy43oh7i.MeerUserProfile> syncCurrentUser(
     _ist.TestSessionBuilder sessionBuilder,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
@@ -474,7 +491,7 @@ class _AppAuthEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _ida.Future<_ilw9oyll.User>);
+                as _ida.Future<_iy43oh7i.MeerUserProfile>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -482,7 +499,7 @@ class _AppAuthEndpoint {
     });
   }
 
-  _ida.Future<_ilw9oyll.User> syncGoogleUser(
+  _ida.Future<_iy43oh7i.MeerUserProfile> syncGoogleUser(
     _ist.TestSessionBuilder sessionBuilder,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
@@ -504,7 +521,7 @@ class _AppAuthEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _ida.Future<_ilw9oyll.User>);
+                as _ida.Future<_iy43oh7i.MeerUserProfile>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -525,8 +542,10 @@ class _OrderEndpoint {
 
   _ida.Future<_i8hwzj5x.OrderInfo> createOrder(
     _ist.TestSessionBuilder sessionBuilder,
-    _i8hwzj5x.OrderInfo order,
-    List<_ixsojegs.OrderItem> items,
+    List<_i4g4bzck.OrderItemRequest> requestedItems,
+    String deliveryAddress,
+    double? deliveryLatitude,
+    double? deliveryLongitude,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -540,8 +559,10 @@ class _OrderEndpoint {
           endpointPath: 'order',
           methodName: 'createOrder',
           parameters: _ist.testObjectToJson({
-            'order': order,
-            'items': items,
+            'requestedItems': requestedItems,
+            'deliveryAddress': deliveryAddress,
+            'deliveryLatitude': deliveryLatitude,
+            'deliveryLongitude': deliveryLongitude,
           }),
           serializationManager: _serializationManager,
         );
@@ -558,82 +579,20 @@ class _OrderEndpoint {
     });
   }
 
-  _ida.Future<List<_i8hwzj5x.OrderInfo>> getCustomerOrders(
-    _ist.TestSessionBuilder sessionBuilder,
-    int customerId,
-  ) async {
-    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
-      var _localUniqueSession =
-          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'order',
-            method: 'getCustomerOrders',
-          );
-      try {
-        var _localCallContext = await _endpointDispatch.getMethodCallContext(
-          createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'order',
-          methodName: 'getCustomerOrders',
-          parameters: _ist.testObjectToJson({'customerId': customerId}),
-          serializationManager: _serializationManager,
-        );
-        var _localReturnValue =
-            await (_localCallContext.method.call(
-                  _localUniqueSession,
-                  _localCallContext.arguments,
-                )
-                as _ida.Future<List<_i8hwzj5x.OrderInfo>>);
-        return _localReturnValue;
-      } finally {
-        await _localUniqueSession.close();
-      }
-    });
-  }
-
-  _ida.Future<List<_i8hwzj5x.OrderInfo>> getSellerOrders(
-    _ist.TestSessionBuilder sessionBuilder,
-    int sellerId,
-  ) async {
-    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
-      var _localUniqueSession =
-          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'order',
-            method: 'getSellerOrders',
-          );
-      try {
-        var _localCallContext = await _endpointDispatch.getMethodCallContext(
-          createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'order',
-          methodName: 'getSellerOrders',
-          parameters: _ist.testObjectToJson({'sellerId': sellerId}),
-          serializationManager: _serializationManager,
-        );
-        var _localReturnValue =
-            await (_localCallContext.method.call(
-                  _localUniqueSession,
-                  _localCallContext.arguments,
-                )
-                as _ida.Future<List<_i8hwzj5x.OrderInfo>>);
-        return _localReturnValue;
-      } finally {
-        await _localUniqueSession.close();
-      }
-    });
-  }
-
-  _ida.Future<List<_i8hwzj5x.OrderInfo>> getAvailableOrdersForDrivers(
+  _ida.Future<List<_i8hwzj5x.OrderInfo>> getMyCustomerOrders(
     _ist.TestSessionBuilder sessionBuilder,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'order',
-            method: 'getAvailableOrdersForDrivers',
+            method: 'getMyCustomerOrders',
           );
       try {
         var _localCallContext = await _endpointDispatch.getMethodCallContext(
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'order',
-          methodName: 'getAvailableOrdersForDrivers',
+          methodName: 'getMyCustomerOrders',
           parameters: _ist.testObjectToJson({}),
           serializationManager: _serializationManager,
         );
@@ -650,26 +609,21 @@ class _OrderEndpoint {
     });
   }
 
-  _ida.Future<bool> acceptOrderAsDriver(
+  _ida.Future<List<_i8hwzj5x.OrderInfo>> getMySellerOrders(
     _ist.TestSessionBuilder sessionBuilder,
-    int orderId,
-    int driverId,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'order',
-            method: 'acceptOrderAsDriver',
+            method: 'getMySellerOrders',
           );
       try {
         var _localCallContext = await _endpointDispatch.getMethodCallContext(
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'order',
-          methodName: 'acceptOrderAsDriver',
-          parameters: _ist.testObjectToJson({
-            'orderId': orderId,
-            'driverId': driverId,
-          }),
+          methodName: 'getMySellerOrders',
+          parameters: _ist.testObjectToJson({}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -677,7 +631,7 @@ class _OrderEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _ida.Future<bool>);
+                as _ida.Future<List<_i8hwzj5x.OrderInfo>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -685,42 +639,7 @@ class _OrderEndpoint {
     });
   }
 
-  _ida.Future<bool> updateOrderStatus(
-    _ist.TestSessionBuilder sessionBuilder,
-    int orderId,
-    String newStatus,
-  ) async {
-    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
-      var _localUniqueSession =
-          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
-            endpoint: 'order',
-            method: 'updateOrderStatus',
-          );
-      try {
-        var _localCallContext = await _endpointDispatch.getMethodCallContext(
-          createSessionCallback: (_) => _localUniqueSession,
-          endpointPath: 'order',
-          methodName: 'updateOrderStatus',
-          parameters: _ist.testObjectToJson({
-            'orderId': orderId,
-            'newStatus': newStatus,
-          }),
-          serializationManager: _serializationManager,
-        );
-        var _localReturnValue =
-            await (_localCallContext.method.call(
-                  _localUniqueSession,
-                  _localCallContext.arguments,
-                )
-                as _ida.Future<bool>);
-        return _localReturnValue;
-      } finally {
-        await _localUniqueSession.close();
-      }
-    });
-  }
-
-  _ida.Future<_i8hwzj5x.OrderInfo?> getOrderWithDetails(
+  _ida.Future<bool> acceptMyOrder(
     _ist.TestSessionBuilder sessionBuilder,
     int orderId,
   ) async {
@@ -728,13 +647,13 @@ class _OrderEndpoint {
       var _localUniqueSession =
           (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
             endpoint: 'order',
-            method: 'getOrderWithDetails',
+            method: 'acceptMyOrder',
           );
       try {
         var _localCallContext = await _endpointDispatch.getMethodCallContext(
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'order',
-          methodName: 'getOrderWithDetails',
+          methodName: 'acceptMyOrder',
           parameters: _ist.testObjectToJson({'orderId': orderId}),
           serializationManager: _serializationManager,
         );
@@ -743,7 +662,443 @@ class _OrderEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _ida.Future<_i8hwzj5x.OrderInfo?>);
+                as _ida.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<bool> rejectMyOrder(
+    _ist.TestSessionBuilder sessionBuilder,
+    int orderId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'order',
+            method: 'rejectMyOrder',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'order',
+          methodName: 'rejectMyOrder',
+          parameters: _ist.testObjectToJson({'orderId': orderId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<bool> markMyOrderReady(
+    _ist.TestSessionBuilder sessionBuilder,
+    int orderId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'order',
+            method: 'markMyOrderReady',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'order',
+          methodName: 'markMyOrderReady',
+          parameters: _ist.testObjectToJson({'orderId': orderId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _ProductEndpoint {
+  _ProductEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<_iq8dxf2n.Product> addProduct(
+    _ist.TestSessionBuilder sessionBuilder,
+    _iq8dxf2n.Product product,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'product',
+            method: 'addProduct',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'product',
+          methodName: 'addProduct',
+          parameters: _ist.testObjectToJson({'product': product}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_iq8dxf2n.Product>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<List<_iq8dxf2n.Product>> getAllAvailableProducts(
+    _ist.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'product',
+            method: 'getAllAvailableProducts',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'product',
+          methodName: 'getAllAvailableProducts',
+          parameters: _ist.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<List<_iq8dxf2n.Product>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<List<_iq8dxf2n.Product>> getProductsBySeller(
+    _ist.TestSessionBuilder sessionBuilder,
+    int sellerId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'product',
+            method: 'getProductsBySeller',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'product',
+          methodName: 'getProductsBySeller',
+          parameters: _ist.testObjectToJson({'sellerId': sellerId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<List<_iq8dxf2n.Product>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<List<_iq8dxf2n.Product>> getMyProducts(
+    _ist.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'product',
+            method: 'getMyProducts',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'product',
+          methodName: 'getMyProducts',
+          parameters: _ist.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<List<_iq8dxf2n.Product>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<bool> toggleProductAvailability(
+    _ist.TestSessionBuilder sessionBuilder,
+    int productId,
+    bool isAvailable,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'product',
+            method: 'toggleProductAvailability',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'product',
+          methodName: 'toggleProductAvailability',
+          parameters: _ist.testObjectToJson({
+            'productId': productId,
+            'isAvailable': isAvailable,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<List<_iq8dxf2n.Product>> searchProducts(
+    _ist.TestSessionBuilder sessionBuilder,
+    String search,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'product',
+            method: 'searchProducts',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'product',
+          methodName: 'searchProducts',
+          parameters: _ist.testObjectToJson({'search': search}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<List<_iq8dxf2n.Product>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_iq8dxf2n.Product> updateProduct(
+    _ist.TestSessionBuilder sessionBuilder,
+    _iq8dxf2n.Product input,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'product',
+            method: 'updateProduct',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'product',
+          methodName: 'updateProduct',
+          parameters: _ist.testObjectToJson({'input': input}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_iq8dxf2n.Product>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<bool> deleteProduct(
+    _ist.TestSessionBuilder sessionBuilder,
+    int productId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'product',
+            method: 'deleteProduct',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'product',
+          methodName: 'deleteProduct',
+          parameters: _ist.testObjectToJson({'productId': productId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _SellerEndpoint {
+  _SellerEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<_ilv77xsv.SellerPublicInfo> getPublicSellerInfo(
+    _ist.TestSessionBuilder sessionBuilder,
+    int sellerId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'seller',
+            method: 'getPublicSellerInfo',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'seller',
+          methodName: 'getPublicSellerInfo',
+          parameters: _ist.testObjectToJson({'sellerId': sellerId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_ilv77xsv.SellerPublicInfo>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_iy43oh7i.MeerUserProfile> activateSeller(
+    _ist.TestSessionBuilder sessionBuilder,
+    String storeName,
+    String? storeDescription,
+    String storeAddress,
+    double latitude,
+    double longitude,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'seller',
+            method: 'activateSeller',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'seller',
+          methodName: 'activateSeller',
+          parameters: _ist.testObjectToJson({
+            'storeName': storeName,
+            'storeDescription': storeDescription,
+            'storeAddress': storeAddress,
+            'latitude': latitude,
+            'longitude': longitude,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_iy43oh7i.MeerUserProfile>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_iy43oh7i.MeerUserProfile> getMyProfile(
+    _ist.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'seller',
+            method: 'getMyProfile',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'seller',
+          methodName: 'getMyProfile',
+          parameters: _ist.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_iy43oh7i.MeerUserProfile>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
