@@ -3,7 +3,7 @@ import 'package:meer_client/meer_client.dart';
 import 'package:meer_flutter/presentation/seller_orders/view/widgets/seller_order_card.dart';
 
 class SellerOrdersView extends StatelessWidget {
-  final VoidCallback? onRefreshRequested;
+  final Future<void> Function()? onRefreshRequested;
 
   final List<OrderInfo> orders;
   final Set<int> updatingOrderIds;
@@ -23,43 +23,45 @@ class SellerOrdersView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (orders.isEmpty) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.receipt_long_outlined,
-                size: 64,
-                color: Colors.grey,
-              ),
-              SizedBox(height: 16),
-              Text(
-                'لا توجد طلبات واردة حاليًا.',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 8),
-              Text(
-                'ستظهر طلبات عملائك هنا عند استلام طلب جديد.',
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      );
-    }
+    final Widget content;
 
-    return RefreshIndicator(
-      onRefresh: () async {
-        // سيتم ربط إعادة التحميل من الشاشة.
-        onRefreshRequested?.call();
-      },
-      child: ListView.separated(
+    if (orders.isEmpty) {
+      content = ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(24),
+        children: const [
+          SizedBox(
+            height: 350,
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.receipt_long_outlined,
+                    size: 64,
+                    color: Colors.grey,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'لا توجد طلبات واردة حاليًا.',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'ستظهر طلبات عملائك هنا عند استلام طلب جديد.',
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
+    } else {
+      content = ListView.separated(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16),
         itemCount: orders.length,
@@ -82,9 +84,14 @@ class SellerOrdersView extends StatelessWidget {
             },
           );
         },
-      ),
+      );
+    }
+
+    return RefreshIndicator(
+      onRefresh: () async {
+        await onRefreshRequested?.call();
+      },
+      child: content,
     );
   }
-
-  // يُمرر من الشاشة عند اكتمال ربط التحديث.
 }

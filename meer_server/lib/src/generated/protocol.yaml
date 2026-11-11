@@ -10,6 +10,17 @@ appAuth:
   - verifyOtp:
   - syncCurrentUser:
   - syncGoogleUser:
+cart:
+  - getMyCart:
+  - addItem:
+  - updateQuantity:
+  - removeItem:
+  - clearCart:
+favorite:
+  - getMyFavorites:
+  - addFavorite:
+  - removeFavorite:
+  - clearMyFavorites:
 order:
   - createOrder:
   - getMyCustomerOrders:

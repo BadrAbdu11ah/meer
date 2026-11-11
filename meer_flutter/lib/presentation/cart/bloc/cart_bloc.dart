@@ -1,41 +1,109 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:meer_client/meer_client.dart';
+import 'package:meer_flutter/core/class/failure.dart';
 import 'package:meer_flutter/presentation/cart/models/cart_item.dart';
-import 'package:meer_flutter/repository/local/cart_local_repository.dart';
+import 'package:meer_flutter/repository/cart_repository.dart';
 
 part 'cart_event.dart';
 part 'cart_state.dart';
 part 'cart_bloc.freezed.dart';
 
 class CartBloc extends Bloc<CartEvent, CartState> {
-  CartBloc(
-    this._cartLocalRepository, {
-    List<CartItem> initialItems = const [],
-  }) : super(
-         CartState(items: List.unmodifiable(initialItems)),
-       ) {
+  CartBloc(this._cartRepository) : super(const CartState()) {
+    on<CartLoadRequested>(_onLoadRequested);
     on<CartProductAdded>(_onProductAdded);
     on<CartQuantityIncreased>(_onQuantityIncreased);
     on<CartQuantityDecreased>(_onQuantityDecreased);
     on<CartProductRemoved>(_onProductRemoved);
     on<CartCleared>(_onCleared);
     on<CartMessageCleared>(_onMessageCleared);
+    on<CartResetRequested>(_onResetRequested);
   }
 
-  final CartLocalRepository _cartLocalRepository;
+  final CartRepository _cartRepository;
+
+  int _sessionGeneration = 0;
+
+  bool _isSessionCurrent(
+    int sessionGeneration,
+    Emitter<CartState> emit,
+  ) {
+    return sessionGeneration == _sessionGeneration && !emit.isDone;
+  }
+
+  /// معالجة نتيجة عملية السلة وإصدار الحالة المناسبة.
+  void _handleResult(
+    Either<Failure, List<CartItem>> result,
+    Emitter<CartState> emit, {
+    required String errorMessage,
+    String? successMessage,
+  }) {
+    result.fold(
+      (failure) {
+        addError(failure, StackTrace.current);
+
+        emit(
+          state.copyWith(
+            isLoading: false,
+            message: errorMessage,
+          ),
+        );
+      },
+      (items) {
+        emit(
+          state.copyWith(
+            items: List.unmodifiable(items),
+            isLoading: false,
+            message: successMessage,
+          ),
+        );
+      },
+    );
+  }
+
+  /// تحميل السلة الخاصة بالمستخدم الحالي.
+  Future<void> _onLoadRequested(
+    CartLoadRequested event,
+    Emitter<CartState> emit,
+  ) async {
+    if (state.isLoading) return;
+
+    final sessionGeneration = _sessionGeneration;
+
+    emit(
+      state.copyWith(
+        isLoading: true,
+        message: null,
+      ),
+    );
+
+    final result = await _cartRepository.getMyCart();
+
+    // تجاهل استجابة الجلسة السابقة.
+    if (!_isSessionCurrent(sessionGeneration, emit)) {
+      return;
+    }
+
+    _handleResult(
+      result,
+      emit,
+      errorMessage: 'تعذر تحميل السلة.',
+    );
+  }
 
   /// إضافة منتج إلى السلة.
   Future<void> _onProductAdded(
     CartProductAdded event,
     Emitter<CartState> emit,
   ) async {
+    if (state.isLoading) return;
+
     final product = event.product;
 
     if (product.id == null) {
-      emit(
-        state.copyWith(message: 'تعذر إضافة المنتج.'),
-      );
+      emit(state.copyWith(message: 'تعذر إضافة المنتج.'));
       return;
     }
 
@@ -60,33 +128,21 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       );
       return;
     }
+    final sessionGeneration = _sessionGeneration;
 
-    final items = List<CartItem>.from(state.items);
+    emit(state.copyWith(isLoading: true, message: null));
 
-    final existingIndex = items.indexWhere(
-      (item) => item.product.id == product.id,
-    );
-
-    if (existingIndex != -1) {
-      final existingItem = items[existingIndex];
-
-      items[existingIndex] = existingItem.copyWith(
-        quantity: existingItem.quantity + 1,
-      );
-    } else {
-      items.add(
-        CartItem(product: product),
-      );
+    final result = await _cartRepository.addItem(product);
+    // تجاهل استجابة الجلسة السابقة.
+    if (!_isSessionCurrent(sessionGeneration, emit)) {
+      return;
     }
-
-    emit(
-      state.copyWith(
-        items: items,
-        message: 'تمت إضافة المنتج إلى السلة.',
-      ),
+    _handleResult(
+      result,
+      emit,
+      errorMessage: 'تعذر إضافة المنتج إلى السلة.',
+      successMessage: 'تمت إضافة المنتج إلى السلة.',
     );
-
-    await _persistItems(items, emit);
   }
 
   /// زيادة كمية منتج.
@@ -94,26 +150,42 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     CartQuantityIncreased event,
     Emitter<CartState> emit,
   ) async {
-    final items = List<CartItem>.from(state.items);
+    if (state.isLoading) return;
 
-    final index = items.indexWhere(
+    final index = state.items.indexWhere(
       (item) => item.product.id == event.productId,
     );
 
     if (index == -1) return;
 
-    items[index] = items[index].copyWith(
-      quantity: items[index].quantity + 1,
-    );
+    final item = state.items[index];
 
-    emit(
-      state.copyWith(
-        items: items,
-        message: null,
-      ),
-    );
+    if (!item.product.isAvailable) {
+      emit(
+        state.copyWith(
+          message: 'هذا المنتج غير متاح للبيع حاليًا.',
+        ),
+      );
+      return;
+    }
+    final sessionGeneration = _sessionGeneration;
 
-    await _persistItems(items, emit);
+    emit(state.copyWith(isLoading: true, message: null));
+
+    final result = await _cartRepository.updateQuantity(
+      productId: event.productId,
+      quantity: item.quantity + 1,
+    );
+    // تجاهل استجابة الجلسة السابقة.
+    if (!_isSessionCurrent(sessionGeneration, emit)) {
+      return;
+    }
+
+    _handleResult(
+      result,
+      emit,
+      errorMessage: 'تعذر زيادة كمية المنتج.',
+    );
   }
 
   /// تقليل كمية منتج.
@@ -121,30 +193,38 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     CartQuantityDecreased event,
     Emitter<CartState> emit,
   ) async {
-    final items = List<CartItem>.from(state.items);
+    if (state.isLoading) return;
 
-    final index = items.indexWhere(
+    final index = state.items.indexWhere(
       (item) => item.product.id == event.productId,
     );
 
     if (index == -1) return;
 
-    if (items[index].quantity <= 1) {
-      items.removeAt(index);
-    } else {
-      items[index] = items[index].copyWith(
-        quantity: items[index].quantity - 1,
-      );
+    final item = state.items[index];
+
+    final sessionGeneration = _sessionGeneration;
+
+    emit(state.copyWith(isLoading: true, message: null));
+
+    // إذا كانت الكمية واحدًا، نحذف المنتج من السلة.
+    final result = item.quantity <= 1
+        ? await _cartRepository.removeItem(event.productId)
+        : await _cartRepository.updateQuantity(
+            productId: event.productId,
+            quantity: item.quantity - 1,
+          );
+
+    // تجاهل استجابة الجلسة السابقة.
+    if (!_isSessionCurrent(sessionGeneration, emit)) {
+      return;
     }
 
-    emit(
-      state.copyWith(
-        items: items,
-        message: null,
-      ),
+    _handleResult(
+      result,
+      emit,
+      errorMessage: 'تعذر تقليل كمية المنتج.',
     );
-
-    await _persistItems(items, emit);
   }
 
   /// حذف منتج من السلة.
@@ -152,20 +232,23 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     CartProductRemoved event,
     Emitter<CartState> emit,
   ) async {
-    final items = state.items
-        .where(
-          (item) => item.product.id != event.productId,
-        )
-        .toList();
+    if (state.isLoading) return;
 
-    emit(
-      state.copyWith(
-        items: items,
-        message: null,
-      ),
+    final sessionGeneration = _sessionGeneration;
+
+    emit(state.copyWith(isLoading: true, message: null));
+
+    final result = await _cartRepository.removeItem(event.productId);
+    // تجاهل استجابة الجلسة السابقة.
+    if (!_isSessionCurrent(sessionGeneration, emit)) {
+      return;
+    }
+
+    _handleResult(
+      result,
+      emit,
+      errorMessage: 'تعذر حذف المنتج من السلة.',
     );
-
-    await _persistItems(items, emit);
   }
 
   /// إفراغ السلة بالكامل.
@@ -173,19 +256,24 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     CartCleared event,
     Emitter<CartState> emit,
   ) async {
-    emit(const CartState());
+    if (state.isLoading) return;
 
-    try {
-      await _cartLocalRepository.clear();
-    } catch (error, stackTrace) {
-      addError(error, stackTrace);
+    final sessionGeneration = _sessionGeneration;
 
-      emit(
-        state.copyWith(
-          message: 'تم إفراغ السلة مؤقتًا، لكن تعذر حذف بياناتها المحفوظة.',
-        ),
-      );
+    emit(state.copyWith(isLoading: true, message: null));
+
+    final result = await _cartRepository.clearCart();
+
+    // تجاهل استجابة الجلسة السابقة.
+    if (!_isSessionCurrent(sessionGeneration, emit)) {
+      return;
     }
+    _handleResult(
+      result,
+      emit,
+      errorMessage: 'تعذر إفراغ السلة.',
+      successMessage: 'تم إفراغ السلة.',
+    );
   }
 
   /// مسح رسالة التنبيه.
@@ -193,26 +281,15 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     CartMessageCleared event,
     Emitter<CartState> emit,
   ) {
-    emit(
-      state.copyWith(message: null),
-    );
+    emit(state.copyWith(message: null));
   }
 
-  /// حفظ أحدث نسخة من السلة محليًا.
-  Future<void> _persistItems(
-    List<CartItem> items,
+  void _onResetRequested(
+    CartResetRequested event,
     Emitter<CartState> emit,
-  ) async {
-    try {
-      await _cartLocalRepository.saveItems(items);
-    } catch (error, stackTrace) {
-      addError(error, stackTrace);
+  ) {
+    _sessionGeneration++;
 
-      emit(
-        state.copyWith(
-          message: 'تغيرت السلة، لكن تعذر حفظها على الجهاز.',
-        ),
-      );
-    }
+    emit(const CartState());
   }
 }

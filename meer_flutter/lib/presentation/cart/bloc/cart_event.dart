@@ -2,6 +2,8 @@ part of 'cart_bloc.dart';
 
 @freezed
 sealed class CartEvent with _$CartEvent {
+  const factory CartEvent.loadRequested() = CartLoadRequested;
+
   const factory CartEvent.productAdded({
     required Product product,
   }) = CartProductAdded;
@@ -21,4 +23,5 @@ sealed class CartEvent with _$CartEvent {
   const factory CartEvent.cleared() = CartCleared;
 
   const factory CartEvent.messageCleared() = CartMessageCleared;
+  const factory CartEvent.reset() = CartResetRequested;
 }

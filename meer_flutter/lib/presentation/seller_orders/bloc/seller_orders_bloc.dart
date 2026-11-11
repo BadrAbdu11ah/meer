@@ -30,29 +30,50 @@ class SellerOrdersBloc extends Bloc<SellerOrdersEvent, SellerOrdersState> {
     SellerOrdersLoadRequested event,
     Emitter<SellerOrdersState> emit,
   ) async {
-    await _loadOrders(emit);
+    await _loadOrders(emit, showLoading: true);
   }
 
   Future<void> _onRefreshRequested(
     SellerOrdersRefreshRequested event,
     Emitter<SellerOrdersState> emit,
   ) async {
-    await _loadOrders(emit);
+    await _loadOrders(emit, showLoading: false);
   }
 
   Future<void> _loadOrders(
-    Emitter<SellerOrdersState> emit,
-  ) async {
-    emit(const SellerOrdersState.loading());
+    Emitter<SellerOrdersState> emit, {
+    required bool showLoading,
+  }) async {
+    final previousOrders = _currentOrders();
+
+    if (showLoading || previousOrders == null) {
+      emit(const SellerOrdersState.loading());
+    }
 
     final result = await _orderRepository.getMySellerOrders();
 
     result.fold(
       (failure) {
-        emit(SellerOrdersState.error(failure.message));
+        if (previousOrders == null) {
+          emit(SellerOrdersState.error(failure.message));
+          return;
+        }
+
+        emit(
+          SellerOrdersState.loaded(
+            orders: _currentOrders() ?? previousOrders,
+            updatingOrderIds: _currentUpdatingIds(),
+            message: failure.message,
+          ),
+        );
       },
       (orders) {
-        emit(SellerOrdersState.loaded(orders: orders));
+        emit(
+          SellerOrdersState.loaded(
+            orders: orders,
+            updatingOrderIds: _currentUpdatingIds(),
+          ),
+        );
       },
     );
   }

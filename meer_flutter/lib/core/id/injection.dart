@@ -1,7 +1,6 @@
 import 'package:get_it/get_it.dart';
 // import 'package:meer_flutter/client.dart';
 import 'package:meer_flutter/core/services/app_service.dart';
-import 'package:meer_flutter/core/storage/hive/hive_service.dart';
 import 'package:meer_flutter/presentation/account/bloc/account_bloc.dart';
 import 'package:meer_flutter/presentation/auth/login/bloc/login_bloc.dart';
 import 'package:meer_flutter/presentation/auth/verify_otp/bloc/verify_otp_bloc.dart';
@@ -17,10 +16,9 @@ import 'package:meer_flutter/presentation/seller_details/bloc/seller_details_blo
 import 'package:meer_flutter/presentation/seller_orders/bloc/seller_orders_bloc.dart';
 import 'package:meer_flutter/presentation/seller_products/bloc/seller_products_bloc.dart';
 import 'package:meer_flutter/presentation/seller_setup/bloc/seller_setup_bloc.dart';
-// import 'package:meer_flutter/presentation/search/bloc/search_bloc.dart';
 import 'package:meer_flutter/repository/auth_repository.dart';
-import 'package:meer_flutter/repository/local/cart_local_repository.dart';
-import 'package:meer_flutter/repository/local/favorites_local_repository.dart';
+import 'package:meer_flutter/repository/cart_repository.dart';
+import 'package:meer_flutter/repository/favorites_repository.dart';
 import 'package:meer_flutter/repository/order_repository.dart';
 import 'package:meer_flutter/repository/product_repository.dart';
 import 'package:meer_flutter/repository/search_repository.dart';
@@ -44,21 +42,12 @@ Future<void> initGetIt() async {
   sl.registerLazySingleton(
     () => OrderRepository(),
   );
-
-  // 3. Local Repository
-  sl.registerLazySingleton<CartLocalRepository>(
-    () => CartLocalRepository(
-      HiveService().cartBox,
-    ),
+  sl.registerLazySingleton(() => CartRepository());
+  sl.registerLazySingleton(
+    () => FavoritesRepository(),
   );
 
-  sl.registerLazySingleton<FavoritesLocalRepository>(
-    () => FavoritesLocalRepository(
-      HiveService().favoritesBox,
-    ),
-  );
-
-  // 4. Blocs
+  // 3. Blocs
 
   // // 1. Auth Blocs
   sl.registerFactory(() => LoginBloc(sl<AuthRepository>()));
@@ -102,15 +91,10 @@ Future<void> initGetIt() async {
     ),
   );
 
-  // // 9. Cart BloC
-  // استعادة السلة قبل بدء التطبيق.
-  final savedCartItems = await sl<CartLocalRepository>().loadItems();
-
-  // Cart Bloc: نسخة واحدة مشتركة على مستوى التطبيق.
+  // 9. Cart Bloc
   sl.registerLazySingleton<CartBloc>(
     () => CartBloc(
-      sl<CartLocalRepository>(),
-      initialItems: savedCartItems,
+      sl<CartRepository>(),
     ),
   );
 
@@ -142,13 +126,10 @@ Future<void> initGetIt() async {
     ),
   );
 
-  // // 14. Favorites BloC
-  final savedFavorites = await sl<FavoritesLocalRepository>().loadFavorites();
-
+  // // 14. Favorites Bloc
   sl.registerLazySingleton<FavoritesBloc>(
     () => FavoritesBloc(
-      sl<FavoritesLocalRepository>(),
-      initialFavorites: savedFavorites,
+      sl<FavoritesRepository>(),
     ),
   );
 }

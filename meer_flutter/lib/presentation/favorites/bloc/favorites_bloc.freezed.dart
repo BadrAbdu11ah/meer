@@ -55,13 +55,15 @@ extension FavoritesEventPatterns on FavoritesEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( FavoriteProductToggled value)?  productToggled,TResult Function( FavoritesCleared value)?  cleared,TResult Function( FavoritesMessageCleared value)?  messageCleared,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( FavoritesLoadRequested value)?  loadRequested,TResult Function( FavoriteProductToggled value)?  productToggled,TResult Function( FavoritesCleared value)?  cleared,TResult Function( FavoritesMessageCleared value)?  messageCleared,TResult Function( FavoritesResetRequested value)?  reset,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case FavoriteProductToggled() when productToggled != null:
+case FavoritesLoadRequested() when loadRequested != null:
+return loadRequested(_that);case FavoriteProductToggled() when productToggled != null:
 return productToggled(_that);case FavoritesCleared() when cleared != null:
 return cleared(_that);case FavoritesMessageCleared() when messageCleared != null:
-return messageCleared(_that);case _:
+return messageCleared(_that);case FavoritesResetRequested() when reset != null:
+return reset(_that);case _:
   return orElse();
 
 }
@@ -79,13 +81,15 @@ return messageCleared(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( FavoriteProductToggled value)  productToggled,required TResult Function( FavoritesCleared value)  cleared,required TResult Function( FavoritesMessageCleared value)  messageCleared,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( FavoritesLoadRequested value)  loadRequested,required TResult Function( FavoriteProductToggled value)  productToggled,required TResult Function( FavoritesCleared value)  cleared,required TResult Function( FavoritesMessageCleared value)  messageCleared,required TResult Function( FavoritesResetRequested value)  reset,}){
 final _that = this;
 switch (_that) {
-case FavoriteProductToggled():
+case FavoritesLoadRequested():
+return loadRequested(_that);case FavoriteProductToggled():
 return productToggled(_that);case FavoritesCleared():
 return cleared(_that);case FavoritesMessageCleared():
-return messageCleared(_that);}
+return messageCleared(_that);case FavoritesResetRequested():
+return reset(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
 ///
@@ -99,13 +103,15 @@ return messageCleared(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( FavoriteProductToggled value)?  productToggled,TResult? Function( FavoritesCleared value)?  cleared,TResult? Function( FavoritesMessageCleared value)?  messageCleared,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( FavoritesLoadRequested value)?  loadRequested,TResult? Function( FavoriteProductToggled value)?  productToggled,TResult? Function( FavoritesCleared value)?  cleared,TResult? Function( FavoritesMessageCleared value)?  messageCleared,TResult? Function( FavoritesResetRequested value)?  reset,}){
 final _that = this;
 switch (_that) {
-case FavoriteProductToggled() when productToggled != null:
+case FavoritesLoadRequested() when loadRequested != null:
+return loadRequested(_that);case FavoriteProductToggled() when productToggled != null:
 return productToggled(_that);case FavoritesCleared() when cleared != null:
 return cleared(_that);case FavoritesMessageCleared() when messageCleared != null:
-return messageCleared(_that);case _:
+return messageCleared(_that);case FavoritesResetRequested() when reset != null:
+return reset(_that);case _:
   return null;
 
 }
@@ -122,12 +128,14 @@ return messageCleared(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( Product product)?  productToggled,TResult Function()?  cleared,TResult Function()?  messageCleared,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  loadRequested,TResult Function( Product product)?  productToggled,TResult Function()?  cleared,TResult Function()?  messageCleared,TResult Function()?  reset,required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case FavoriteProductToggled() when productToggled != null:
+case FavoritesLoadRequested() when loadRequested != null:
+return loadRequested();case FavoriteProductToggled() when productToggled != null:
 return productToggled(_that.product);case FavoritesCleared() when cleared != null:
 return cleared();case FavoritesMessageCleared() when messageCleared != null:
-return messageCleared();case _:
+return messageCleared();case FavoritesResetRequested() when reset != null:
+return reset();case _:
   return orElse();
 
 }
@@ -145,12 +153,14 @@ return messageCleared();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( Product product)  productToggled,required TResult Function()  cleared,required TResult Function()  messageCleared,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  loadRequested,required TResult Function( Product product)  productToggled,required TResult Function()  cleared,required TResult Function()  messageCleared,required TResult Function()  reset,}) {final _that = this;
 switch (_that) {
-case FavoriteProductToggled():
+case FavoritesLoadRequested():
+return loadRequested();case FavoriteProductToggled():
 return productToggled(_that.product);case FavoritesCleared():
 return cleared();case FavoritesMessageCleared():
-return messageCleared();}
+return messageCleared();case FavoritesResetRequested():
+return reset();}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -164,18 +174,52 @@ return messageCleared();}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( Product product)?  productToggled,TResult? Function()?  cleared,TResult? Function()?  messageCleared,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  loadRequested,TResult? Function( Product product)?  productToggled,TResult? Function()?  cleared,TResult? Function()?  messageCleared,TResult? Function()?  reset,}) {final _that = this;
 switch (_that) {
-case FavoriteProductToggled() when productToggled != null:
+case FavoritesLoadRequested() when loadRequested != null:
+return loadRequested();case FavoriteProductToggled() when productToggled != null:
 return productToggled(_that.product);case FavoritesCleared() when cleared != null:
 return cleared();case FavoritesMessageCleared() when messageCleared != null:
-return messageCleared();case _:
+return messageCleared();case FavoritesResetRequested() when reset != null:
+return reset();case _:
   return null;
 
 }
 }
 
 }
+
+/// @nodoc
+
+
+class FavoritesLoadRequested implements FavoritesEvent {
+  const FavoritesLoadRequested();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FavoritesLoadRequested);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'FavoritesEvent.loadRequested()';
+}
+
+
+}
+
+
+
 
 /// @nodoc
 
@@ -308,9 +352,41 @@ String toString() {
 
 
 /// @nodoc
+
+
+class FavoritesResetRequested implements FavoritesEvent {
+  const FavoritesResetRequested();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FavoritesResetRequested);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'FavoritesEvent.reset()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
 mixin _$FavoritesState {
 
- List<Product> get products; String? get message;
+ List<Product> get products; bool get isLoading; String? get message;
 /// Create a copy of FavoritesState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -321,16 +397,16 @@ $FavoritesStateCopyWith<FavoritesState> get copyWith => _$FavoritesStateCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is FavoritesState&&const DeepCollectionEquality().equals(other.products, products)&&(identical(other.message, message) || other.message == message));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is FavoritesState&&const DeepCollectionEquality().equals(other.products, products)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.message, message) || other.message == message));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(products),message);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(products),isLoading,message);
 
 @override
 String toString() {
-  return 'FavoritesState(products: $products, message: $message)';
+  return 'FavoritesState(products: $products, isLoading: $isLoading, message: $message)';
 }
 
 
@@ -341,7 +417,7 @@ abstract mixin class $FavoritesStateCopyWith<$Res>  {
   factory $FavoritesStateCopyWith(FavoritesState value, $Res Function(FavoritesState) _then) = _$FavoritesStateCopyWithImpl;
 @useResult
 $Res call({
- List<Product> products, String? message
+ List<Product> products, bool isLoading, String? message
 });
 
 
@@ -358,10 +434,11 @@ class _$FavoritesStateCopyWithImpl<$Res>
 
 /// Create a copy of FavoritesState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? products = null,Object? message = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? products = null,Object? isLoading = null,Object? message = freezed,}) {
   return _then(_self.copyWith(
 products: null == products ? _self.products : products // ignore: cast_nullable_to_non_nullable
-as List<Product>,message: freezed == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as List<Product>,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
+as bool,message: freezed == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -444,10 +521,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<Product> products,  String? message)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<Product> products,  bool isLoading,  String? message)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FavoritesState() when $default != null:
-return $default(_that.products,_that.message);case _:
+return $default(_that.products,_that.isLoading,_that.message);case _:
   return orElse();
 
 }
@@ -465,10 +542,10 @@ return $default(_that.products,_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<Product> products,  String? message)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<Product> products,  bool isLoading,  String? message)  $default,) {final _that = this;
 switch (_that) {
 case _FavoritesState():
-return $default(_that.products,_that.message);}
+return $default(_that.products,_that.isLoading,_that.message);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -482,10 +559,10 @@ return $default(_that.products,_that.message);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<Product> products,  String? message)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<Product> products,  bool isLoading,  String? message)?  $default,) {final _that = this;
 switch (_that) {
 case _FavoritesState() when $default != null:
-return $default(_that.products,_that.message);case _:
+return $default(_that.products,_that.isLoading,_that.message);case _:
   return null;
 
 }
@@ -497,7 +574,7 @@ return $default(_that.products,_that.message);case _:
 
 
 class _FavoritesState implements FavoritesState {
-  const _FavoritesState({final  List<Product> products = const <Product>[], this.message}): _products = products;
+  const _FavoritesState({final  List<Product> products = const <Product>[], this.isLoading = false, this.message}): _products = products;
   
 
  final  List<Product> _products;
@@ -507,6 +584,7 @@ class _FavoritesState implements FavoritesState {
   return EqualUnmodifiableListView(_products);
 }
 
+@override@JsonKey() final  bool isLoading;
 @override final  String? message;
 
 /// Create a copy of FavoritesState
@@ -519,16 +597,16 @@ _$FavoritesStateCopyWith<_FavoritesState> get copyWith => __$FavoritesStateCopyW
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FavoritesState&&const DeepCollectionEquality().equals(other._products, _products)&&(identical(other.message, message) || other.message == message));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _FavoritesState&&const DeepCollectionEquality().equals(other._products, _products)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.message, message) || other.message == message));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_products),message);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_products),isLoading,message);
 
 @override
 String toString() {
-  return 'FavoritesState(products: $products, message: $message)';
+  return 'FavoritesState(products: $products, isLoading: $isLoading, message: $message)';
 }
 
 
@@ -539,7 +617,7 @@ abstract mixin class _$FavoritesStateCopyWith<$Res> implements $FavoritesStateCo
   factory _$FavoritesStateCopyWith(_FavoritesState value, $Res Function(_FavoritesState) _then) = __$FavoritesStateCopyWithImpl;
 @override @useResult
 $Res call({
- List<Product> products, String? message
+ List<Product> products, bool isLoading, String? message
 });
 
 
@@ -556,10 +634,11 @@ class __$FavoritesStateCopyWithImpl<$Res>
 
 /// Create a copy of FavoritesState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? products = null,Object? message = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? products = null,Object? isLoading = null,Object? message = freezed,}) {
   return _then(_FavoritesState(
 products: null == products ? _self._products : products // ignore: cast_nullable_to_non_nullable
-as List<Product>,message: freezed == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as List<Product>,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
+as bool,message: freezed == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

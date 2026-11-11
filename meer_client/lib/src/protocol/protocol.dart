@@ -11,6 +11,10 @@
 // ignore_for_file: dead_code, unnecessary_type_check
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:meer_client/src/protocol/model/cart_item_record.dart'
+    as _iivmvpvv;
+import 'package:meer_client/src/protocol/model/favorite_product.dart'
+    as _iztphn1q;
 import 'package:meer_client/src/protocol/model/order_info.dart' as _iiv379dz;
 import 'package:meer_client/src/protocol/model/order_item_request.dart'
     as _ix7syfm6;
@@ -22,6 +26,8 @@ import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
     as _iaic;
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
 import 'greetings/greeting.dart' as _izw8z7ou;
+import 'model/cart_item_record.dart' as _ivirwujx;
+import 'model/favorite_product.dart' as _i8l2y79r;
 import 'model/MeerUserProfile.dart' as _ii0ycxhg;
 import 'model/order_info.dart' as _ig93noqx;
 import 'model/order_item.dart' as _iae72vfi;
@@ -31,6 +37,8 @@ import 'model/product.dart' as _igfqb4xa;
 import 'model/seller_public_info.dart' as _iigi60b2;
 export 'greetings/greeting.dart';
 export 'model/MeerUserProfile.dart';
+export 'model/cart_item_record.dart';
+export 'model/favorite_product.dart';
 export 'model/order_info.dart';
 export 'model/order_item.dart';
 export 'model/order_item_request.dart';
@@ -79,6 +87,12 @@ class Protocol extends _isc.SerializationManager {
     if (t == _ii0ycxhg.MeerUserProfile) {
       return _ii0ycxhg.MeerUserProfile.fromJson(data) as T;
     }
+    if (t == _ivirwujx.CartItemRecord) {
+      return _ivirwujx.CartItemRecord.fromJson(data) as T;
+    }
+    if (t == _i8l2y79r.FavoriteProduct) {
+      return _i8l2y79r.FavoriteProduct.fromJson(data) as T;
+    }
     if (t == _ig93noqx.OrderInfo) {
       return _ig93noqx.OrderInfo.fromJson(data) as T;
     }
@@ -102,6 +116,14 @@ class Protocol extends _isc.SerializationManager {
     }
     if (t == _isc.getType<_ii0ycxhg.MeerUserProfile?>()) {
       return (data != null ? _ii0ycxhg.MeerUserProfile.fromJson(data) : null)
+          as T;
+    }
+    if (t == _isc.getType<_ivirwujx.CartItemRecord?>()) {
+      return (data != null ? _ivirwujx.CartItemRecord.fromJson(data) : null)
+          as T;
+    }
+    if (t == _isc.getType<_i8l2y79r.FavoriteProduct?>()) {
+      return (data != null ? _i8l2y79r.FavoriteProduct.fromJson(data) : null)
           as T;
     }
     if (t == _isc.getType<_ig93noqx.OrderInfo?>()) {
@@ -139,6 +161,18 @@ class Protocol extends _isc.SerializationManager {
               : null)
           as T;
     }
+    if (t == List<_iivmvpvv.CartItemRecord>) {
+      return (data as List)
+              .map((e) => deserialize<_iivmvpvv.CartItemRecord>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_iztphn1q.FavoriteProduct>) {
+      return (data as List)
+              .map((e) => deserialize<_iztphn1q.FavoriteProduct>(e))
+              .toList()
+          as T;
+    }
     if (t == List<_ix7syfm6.OrderItemRequest>) {
       return (data as List)
               .map((e) => deserialize<_ix7syfm6.OrderItemRequest>(e))
@@ -173,6 +207,8 @@ class Protocol extends _isc.SerializationManager {
     return switch (type) {
       _izw8z7ou.Greeting => 'Greeting',
       _ii0ycxhg.MeerUserProfile => 'MeerUserProfile',
+      _ivirwujx.CartItemRecord => 'CartItemRecord',
+      _i8l2y79r.FavoriteProduct => 'FavoriteProduct',
       _ig93noqx.OrderInfo => 'OrderInfo',
       _iae72vfi.OrderItem => 'OrderItem',
       _i52izl0k.OrderItemRequest => 'OrderItemRequest',
@@ -197,6 +233,10 @@ class Protocol extends _isc.SerializationManager {
         return 'Greeting';
       case _ii0ycxhg.MeerUserProfile():
         return 'MeerUserProfile';
+      case _ivirwujx.CartItemRecord():
+        return 'CartItemRecord';
+      case _i8l2y79r.FavoriteProduct():
+        return 'FavoriteProduct';
       case _ig93noqx.OrderInfo():
         return 'OrderInfo';
       case _iae72vfi.OrderItem():
@@ -240,6 +280,12 @@ class Protocol extends _isc.SerializationManager {
     }
     if (dataClassName == 'MeerUserProfile') {
       return deserialize<_ii0ycxhg.MeerUserProfile>(data['data']);
+    }
+    if (dataClassName == 'CartItemRecord') {
+      return deserialize<_ivirwujx.CartItemRecord>(data['data']);
+    }
+    if (dataClassName == 'FavoriteProduct') {
+      return deserialize<_i8l2y79r.FavoriteProduct>(data['data']);
     }
     if (dataClassName == 'OrderInfo') {
       return deserialize<_ig93noqx.OrderInfo>(data['data']);

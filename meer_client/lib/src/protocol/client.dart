@@ -13,6 +13,10 @@
 import 'dart:async' as _ida;
 import 'package:http/http.dart' as _i85jenna;
 import 'package:meer_client/src/protocol/greetings/greeting.dart' as _iqfsds6k;
+import 'package:meer_client/src/protocol/model/cart_item_record.dart'
+    as _iivmvpvv;
+import 'package:meer_client/src/protocol/model/favorite_product.dart'
+    as _iztphn1q;
 import 'package:meer_client/src/protocol/model/MeerUserProfile.dart'
     as _ihcobg5g;
 import 'package:meer_client/src/protocol/model/order_info.dart' as _iiv379dz;
@@ -171,6 +175,97 @@ class EndpointAppAuth extends _isc.EndpointRef {
         'syncGoogleUser',
         {},
       );
+}
+
+/// {@category Endpoint}
+class EndpointCart extends _isc.EndpointRef {
+  EndpointCart(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'cart';
+
+  _ida.Future<List<_iivmvpvv.CartItemRecord>> getMyCart() =>
+      caller.callServerEndpoint<List<_iivmvpvv.CartItemRecord>>(
+        'cart',
+        'getMyCart',
+        {},
+      );
+
+  _ida.Future<_iivmvpvv.CartItemRecord> addItem(
+    int productId,
+    int quantity,
+  ) => caller.callServerEndpoint<_iivmvpvv.CartItemRecord>(
+    'cart',
+    'addItem',
+    {
+      'productId': productId,
+      'quantity': quantity,
+    },
+  );
+
+  _ida.Future<bool> updateQuantity(
+    int productId,
+    int quantity,
+  ) => caller.callServerEndpoint<bool>(
+    'cart',
+    'updateQuantity',
+    {
+      'productId': productId,
+      'quantity': quantity,
+    },
+  );
+
+  _ida.Future<bool> removeItem(int productId) =>
+      caller.callServerEndpoint<bool>(
+        'cart',
+        'removeItem',
+        {'productId': productId},
+      );
+
+  _ida.Future<void> clearCart() => caller.callServerEndpoint<void>(
+    'cart',
+    'clearCart',
+    {},
+  );
+}
+
+/// {@category Endpoint}
+class EndpointFavorite extends _isc.EndpointRef {
+  EndpointFavorite(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'favorite';
+
+  /// جلب مفضلة المستخدم الحالي مع بيانات المنتجات.
+  _ida.Future<List<_iztphn1q.FavoriteProduct>> getMyFavorites() =>
+      caller.callServerEndpoint<List<_iztphn1q.FavoriteProduct>>(
+        'favorite',
+        'getMyFavorites',
+        {},
+      );
+
+  /// إضافة منتج إلى المفضلة.
+  _ida.Future<bool> addFavorite(int productId) =>
+      caller.callServerEndpoint<bool>(
+        'favorite',
+        'addFavorite',
+        {'productId': productId},
+      );
+
+  /// إزالة منتج من مفضلة المستخدم الحالي.
+  _ida.Future<bool> removeFavorite(int productId) =>
+      caller.callServerEndpoint<bool>(
+        'favorite',
+        'removeFavorite',
+        {'productId': productId},
+      );
+
+  /// إفراغ مفضلة المستخدم الحالي فقط.
+  _ida.Future<void> clearMyFavorites() => caller.callServerEndpoint<void>(
+    'favorite',
+    'clearMyFavorites',
+    {},
+  );
 }
 
 /// {@category Endpoint}
@@ -410,6 +505,8 @@ class Client extends _isc.ServerpodClientShared {
     googleIdp = EndpointGoogleIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
     appAuth = EndpointAppAuth(this);
+    cart = EndpointCart(this);
+    favorite = EndpointFavorite(this);
     order = EndpointOrder(this);
     product = EndpointProduct(this);
     seller = EndpointSeller(this);
@@ -422,6 +519,10 @@ class Client extends _isc.ServerpodClientShared {
   late final EndpointJwtRefresh jwtRefresh;
 
   late final EndpointAppAuth appAuth;
+
+  late final EndpointCart cart;
+
+  late final EndpointFavorite favorite;
 
   late final EndpointOrder order;
 
@@ -438,6 +539,8 @@ class Client extends _isc.ServerpodClientShared {
     'googleIdp': googleIdp,
     'jwtRefresh': jwtRefresh,
     'appAuth': appAuth,
+    'cart': cart,
+    'favorite': favorite,
     'order': order,
     'product': product,
     'seller': seller,

@@ -4,8 +4,6 @@ import 'package:meer_flutter/client.dart';
 import 'package:meer_flutter/core/constant/app_route.dart';
 import 'package:meer_flutter/presentation/account/bloc/account_bloc.dart';
 import 'package:meer_flutter/presentation/account/view/account_view.dart';
-import 'package:meer_flutter/presentation/cart/bloc/cart_bloc.dart';
-import 'package:meer_flutter/presentation/favorites/bloc/favorites_bloc.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 
 class AccountScreen extends StatefulWidget {
@@ -18,24 +16,8 @@ class AccountScreen extends StatefulWidget {
 class _AccountScreenState extends State<AccountScreen> {
   Future<void> signOut() async {
     try {
+      // أولًا: تسجيل الخروج من Serverpod.
       await client.auth.signOutDevice();
-
-      if (!mounted) return;
-
-      // مسح البيانات المحلية حتى لا تختلط حسابات المستخدمين.
-      context.read<CartBloc>().add(
-        const CartEvent.cleared(),
-      );
-
-      context.read<FavoritesBloc>().add(
-        const FavoritesEvent.cleared(),
-      );
-
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        AppRoute.loginScreen,
-        (route) => false,
-      );
     } catch (error) {
       if (!mounted) return;
 
@@ -44,7 +26,17 @@ class _AccountScreenState extends State<AccountScreen> {
           content: Text('تعذر تسجيل الخروج. حاول مرة أخرى.'),
         ),
       );
+      return;
     }
+
+    if (!mounted) return;
+
+    // ثالثًا: الانتقال إلى تسجيل الدخول.
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      AppRoute.loginScreen,
+      (route) => false,
+    );
   }
 
   @override

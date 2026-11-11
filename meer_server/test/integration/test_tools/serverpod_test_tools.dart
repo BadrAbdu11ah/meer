@@ -14,6 +14,10 @@
 import 'dart:async' as _ida;
 import 'dart:io' as _idi;
 import 'package:meer_server/src/generated/greetings/greeting.dart' as _ih6ywnp4;
+import 'package:meer_server/src/generated/model/cart_item_record.dart'
+    as _igx9tmzj;
+import 'package:meer_server/src/generated/model/favorite_product.dart'
+    as _ieqdpo46;
 import 'package:meer_server/src/generated/model/MeerUserProfile.dart'
     as _iy43oh7i;
 import 'package:meer_server/src/generated/model/order_info.dart' as _i8hwzj5x;
@@ -165,6 +169,10 @@ class TestEndpoints {
 
   late final _AppAuthEndpoint appAuth;
 
+  late final _CartEndpoint cart;
+
+  late final _FavoriteEndpoint favorite;
+
   late final _OrderEndpoint order;
 
   late final _ProductEndpoint product;
@@ -190,6 +198,14 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     appAuth = _AppAuthEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    cart = _CartEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    favorite = _FavoriteEndpoint(
       endpoints,
       serializationManager,
     );
@@ -522,6 +538,309 @@ class _AppAuthEndpoint {
                   _localCallContext.arguments,
                 )
                 as _ida.Future<_iy43oh7i.MeerUserProfile>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _CartEndpoint {
+  _CartEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<List<_igx9tmzj.CartItemRecord>> getMyCart(
+    _ist.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'cart',
+            method: 'getMyCart',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'cart',
+          methodName: 'getMyCart',
+          parameters: _ist.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<List<_igx9tmzj.CartItemRecord>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_igx9tmzj.CartItemRecord> addItem(
+    _ist.TestSessionBuilder sessionBuilder,
+    int productId,
+    int quantity,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'cart',
+            method: 'addItem',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'cart',
+          methodName: 'addItem',
+          parameters: _ist.testObjectToJson({
+            'productId': productId,
+            'quantity': quantity,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_igx9tmzj.CartItemRecord>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<bool> updateQuantity(
+    _ist.TestSessionBuilder sessionBuilder,
+    int productId,
+    int quantity,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'cart',
+            method: 'updateQuantity',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'cart',
+          methodName: 'updateQuantity',
+          parameters: _ist.testObjectToJson({
+            'productId': productId,
+            'quantity': quantity,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<bool> removeItem(
+    _ist.TestSessionBuilder sessionBuilder,
+    int productId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'cart',
+            method: 'removeItem',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'cart',
+          methodName: 'removeItem',
+          parameters: _ist.testObjectToJson({'productId': productId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<void> clearCart(_ist.TestSessionBuilder sessionBuilder) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'cart',
+            method: 'clearCart',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'cart',
+          methodName: 'clearCart',
+          parameters: _ist.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _FavoriteEndpoint {
+  _FavoriteEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<List<_ieqdpo46.FavoriteProduct>> getMyFavorites(
+    _ist.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'favorite',
+            method: 'getMyFavorites',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'favorite',
+          methodName: 'getMyFavorites',
+          parameters: _ist.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<List<_ieqdpo46.FavoriteProduct>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<bool> addFavorite(
+    _ist.TestSessionBuilder sessionBuilder,
+    int productId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'favorite',
+            method: 'addFavorite',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'favorite',
+          methodName: 'addFavorite',
+          parameters: _ist.testObjectToJson({'productId': productId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<bool> removeFavorite(
+    _ist.TestSessionBuilder sessionBuilder,
+    int productId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'favorite',
+            method: 'removeFavorite',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'favorite',
+          methodName: 'removeFavorite',
+          parameters: _ist.testObjectToJson({'productId': productId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<void> clearMyFavorites(
+    _ist.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'favorite',
+            method: 'clearMyFavorites',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'favorite',
+          methodName: 'clearMyFavorites',
+          parameters: _ist.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<void>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

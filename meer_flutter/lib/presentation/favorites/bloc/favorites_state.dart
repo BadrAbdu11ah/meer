@@ -4,6 +4,7 @@ part of 'favorites_bloc.dart';
 sealed class FavoritesState with _$FavoritesState {
   const factory FavoritesState({
     @Default(<Product>[]) List<Product> products,
+    @Default(false) bool isLoading,
     String? message,
   }) = _FavoritesState;
 }

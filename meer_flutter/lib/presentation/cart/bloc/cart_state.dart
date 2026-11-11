@@ -4,6 +4,7 @@ part of 'cart_bloc.dart';
 sealed class CartState with _$CartState {
   const factory CartState({
     @Default(<CartItem>[]) List<CartItem> items,
+    @Default(false) bool isLoading,
     String? message,
   }) = _CartState;
 }

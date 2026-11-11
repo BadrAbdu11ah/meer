@@ -1,0 +1,15 @@
+class: CartItemRecord
+table: cart_item
+
+fields:
+  userId: int, relation(parent=user, onDelete=Cascade)
+  productId: int
+  product: Product?, relation(field=productId, onDelete=Cascade)
+  quantity: int
+  createdAt: DateTime
+  updatedAt: DateTime
+
+indexes:
+  cart_item_user_product_unique_idx:
+    fields: userId, productId
+    unique: true

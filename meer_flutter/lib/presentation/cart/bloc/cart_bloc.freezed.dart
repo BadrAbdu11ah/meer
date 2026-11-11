@@ -55,16 +55,18 @@ extension CartEventPatterns on CartEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( CartProductAdded value)?  productAdded,TResult Function( CartQuantityIncreased value)?  quantityIncreased,TResult Function( CartQuantityDecreased value)?  quantityDecreased,TResult Function( CartProductRemoved value)?  productRemoved,TResult Function( CartCleared value)?  cleared,TResult Function( CartMessageCleared value)?  messageCleared,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( CartLoadRequested value)?  loadRequested,TResult Function( CartProductAdded value)?  productAdded,TResult Function( CartQuantityIncreased value)?  quantityIncreased,TResult Function( CartQuantityDecreased value)?  quantityDecreased,TResult Function( CartProductRemoved value)?  productRemoved,TResult Function( CartCleared value)?  cleared,TResult Function( CartMessageCleared value)?  messageCleared,TResult Function( CartResetRequested value)?  reset,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case CartProductAdded() when productAdded != null:
+case CartLoadRequested() when loadRequested != null:
+return loadRequested(_that);case CartProductAdded() when productAdded != null:
 return productAdded(_that);case CartQuantityIncreased() when quantityIncreased != null:
 return quantityIncreased(_that);case CartQuantityDecreased() when quantityDecreased != null:
 return quantityDecreased(_that);case CartProductRemoved() when productRemoved != null:
 return productRemoved(_that);case CartCleared() when cleared != null:
 return cleared(_that);case CartMessageCleared() when messageCleared != null:
-return messageCleared(_that);case _:
+return messageCleared(_that);case CartResetRequested() when reset != null:
+return reset(_that);case _:
   return orElse();
 
 }
@@ -82,16 +84,18 @@ return messageCleared(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( CartProductAdded value)  productAdded,required TResult Function( CartQuantityIncreased value)  quantityIncreased,required TResult Function( CartQuantityDecreased value)  quantityDecreased,required TResult Function( CartProductRemoved value)  productRemoved,required TResult Function( CartCleared value)  cleared,required TResult Function( CartMessageCleared value)  messageCleared,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( CartLoadRequested value)  loadRequested,required TResult Function( CartProductAdded value)  productAdded,required TResult Function( CartQuantityIncreased value)  quantityIncreased,required TResult Function( CartQuantityDecreased value)  quantityDecreased,required TResult Function( CartProductRemoved value)  productRemoved,required TResult Function( CartCleared value)  cleared,required TResult Function( CartMessageCleared value)  messageCleared,required TResult Function( CartResetRequested value)  reset,}){
 final _that = this;
 switch (_that) {
-case CartProductAdded():
+case CartLoadRequested():
+return loadRequested(_that);case CartProductAdded():
 return productAdded(_that);case CartQuantityIncreased():
 return quantityIncreased(_that);case CartQuantityDecreased():
 return quantityDecreased(_that);case CartProductRemoved():
 return productRemoved(_that);case CartCleared():
 return cleared(_that);case CartMessageCleared():
-return messageCleared(_that);}
+return messageCleared(_that);case CartResetRequested():
+return reset(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
 ///
@@ -105,16 +109,18 @@ return messageCleared(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( CartProductAdded value)?  productAdded,TResult? Function( CartQuantityIncreased value)?  quantityIncreased,TResult? Function( CartQuantityDecreased value)?  quantityDecreased,TResult? Function( CartProductRemoved value)?  productRemoved,TResult? Function( CartCleared value)?  cleared,TResult? Function( CartMessageCleared value)?  messageCleared,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( CartLoadRequested value)?  loadRequested,TResult? Function( CartProductAdded value)?  productAdded,TResult? Function( CartQuantityIncreased value)?  quantityIncreased,TResult? Function( CartQuantityDecreased value)?  quantityDecreased,TResult? Function( CartProductRemoved value)?  productRemoved,TResult? Function( CartCleared value)?  cleared,TResult? Function( CartMessageCleared value)?  messageCleared,TResult? Function( CartResetRequested value)?  reset,}){
 final _that = this;
 switch (_that) {
-case CartProductAdded() when productAdded != null:
+case CartLoadRequested() when loadRequested != null:
+return loadRequested(_that);case CartProductAdded() when productAdded != null:
 return productAdded(_that);case CartQuantityIncreased() when quantityIncreased != null:
 return quantityIncreased(_that);case CartQuantityDecreased() when quantityDecreased != null:
 return quantityDecreased(_that);case CartProductRemoved() when productRemoved != null:
 return productRemoved(_that);case CartCleared() when cleared != null:
 return cleared(_that);case CartMessageCleared() when messageCleared != null:
-return messageCleared(_that);case _:
+return messageCleared(_that);case CartResetRequested() when reset != null:
+return reset(_that);case _:
   return null;
 
 }
@@ -131,15 +137,17 @@ return messageCleared(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( Product product)?  productAdded,TResult Function( int productId)?  quantityIncreased,TResult Function( int productId)?  quantityDecreased,TResult Function( int productId)?  productRemoved,TResult Function()?  cleared,TResult Function()?  messageCleared,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  loadRequested,TResult Function( Product product)?  productAdded,TResult Function( int productId)?  quantityIncreased,TResult Function( int productId)?  quantityDecreased,TResult Function( int productId)?  productRemoved,TResult Function()?  cleared,TResult Function()?  messageCleared,TResult Function()?  reset,required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case CartProductAdded() when productAdded != null:
+case CartLoadRequested() when loadRequested != null:
+return loadRequested();case CartProductAdded() when productAdded != null:
 return productAdded(_that.product);case CartQuantityIncreased() when quantityIncreased != null:
 return quantityIncreased(_that.productId);case CartQuantityDecreased() when quantityDecreased != null:
 return quantityDecreased(_that.productId);case CartProductRemoved() when productRemoved != null:
 return productRemoved(_that.productId);case CartCleared() when cleared != null:
 return cleared();case CartMessageCleared() when messageCleared != null:
-return messageCleared();case _:
+return messageCleared();case CartResetRequested() when reset != null:
+return reset();case _:
   return orElse();
 
 }
@@ -157,15 +165,17 @@ return messageCleared();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( Product product)  productAdded,required TResult Function( int productId)  quantityIncreased,required TResult Function( int productId)  quantityDecreased,required TResult Function( int productId)  productRemoved,required TResult Function()  cleared,required TResult Function()  messageCleared,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  loadRequested,required TResult Function( Product product)  productAdded,required TResult Function( int productId)  quantityIncreased,required TResult Function( int productId)  quantityDecreased,required TResult Function( int productId)  productRemoved,required TResult Function()  cleared,required TResult Function()  messageCleared,required TResult Function()  reset,}) {final _that = this;
 switch (_that) {
-case CartProductAdded():
+case CartLoadRequested():
+return loadRequested();case CartProductAdded():
 return productAdded(_that.product);case CartQuantityIncreased():
 return quantityIncreased(_that.productId);case CartQuantityDecreased():
 return quantityDecreased(_that.productId);case CartProductRemoved():
 return productRemoved(_that.productId);case CartCleared():
 return cleared();case CartMessageCleared():
-return messageCleared();}
+return messageCleared();case CartResetRequested():
+return reset();}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -179,21 +189,55 @@ return messageCleared();}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( Product product)?  productAdded,TResult? Function( int productId)?  quantityIncreased,TResult? Function( int productId)?  quantityDecreased,TResult? Function( int productId)?  productRemoved,TResult? Function()?  cleared,TResult? Function()?  messageCleared,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  loadRequested,TResult? Function( Product product)?  productAdded,TResult? Function( int productId)?  quantityIncreased,TResult? Function( int productId)?  quantityDecreased,TResult? Function( int productId)?  productRemoved,TResult? Function()?  cleared,TResult? Function()?  messageCleared,TResult? Function()?  reset,}) {final _that = this;
 switch (_that) {
-case CartProductAdded() when productAdded != null:
+case CartLoadRequested() when loadRequested != null:
+return loadRequested();case CartProductAdded() when productAdded != null:
 return productAdded(_that.product);case CartQuantityIncreased() when quantityIncreased != null:
 return quantityIncreased(_that.productId);case CartQuantityDecreased() when quantityDecreased != null:
 return quantityDecreased(_that.productId);case CartProductRemoved() when productRemoved != null:
 return productRemoved(_that.productId);case CartCleared() when cleared != null:
 return cleared();case CartMessageCleared() when messageCleared != null:
-return messageCleared();case _:
+return messageCleared();case CartResetRequested() when reset != null:
+return reset();case _:
   return null;
 
 }
 }
 
 }
+
+/// @nodoc
+
+
+class CartLoadRequested implements CartEvent {
+  const CartLoadRequested();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CartLoadRequested);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'CartEvent.loadRequested()';
+}
+
+
+}
+
+
+
 
 /// @nodoc
 
@@ -524,9 +568,41 @@ String toString() {
 
 
 /// @nodoc
+
+
+class CartResetRequested implements CartEvent {
+  const CartResetRequested();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CartResetRequested);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'CartEvent.reset()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
 mixin _$CartState {
 
- List<CartItem> get items; String? get message;
+ List<CartItem> get items; bool get isLoading; String? get message;
 /// Create a copy of CartState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -537,16 +613,16 @@ $CartStateCopyWith<CartState> get copyWith => _$CartStateCopyWithImpl<CartState>
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CartState&&const DeepCollectionEquality().equals(other.items, items)&&(identical(other.message, message) || other.message == message));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CartState&&const DeepCollectionEquality().equals(other.items, items)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.message, message) || other.message == message));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(items),message);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(items),isLoading,message);
 
 @override
 String toString() {
-  return 'CartState(items: $items, message: $message)';
+  return 'CartState(items: $items, isLoading: $isLoading, message: $message)';
 }
 
 
@@ -557,7 +633,7 @@ abstract mixin class $CartStateCopyWith<$Res>  {
   factory $CartStateCopyWith(CartState value, $Res Function(CartState) _then) = _$CartStateCopyWithImpl;
 @useResult
 $Res call({
- List<CartItem> items, String? message
+ List<CartItem> items, bool isLoading, String? message
 });
 
 
@@ -574,10 +650,11 @@ class _$CartStateCopyWithImpl<$Res>
 
 /// Create a copy of CartState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? items = null,Object? message = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? items = null,Object? isLoading = null,Object? message = freezed,}) {
   return _then(_self.copyWith(
 items: null == items ? _self.items : items // ignore: cast_nullable_to_non_nullable
-as List<CartItem>,message: freezed == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as List<CartItem>,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
+as bool,message: freezed == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -660,10 +737,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<CartItem> items,  String? message)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<CartItem> items,  bool isLoading,  String? message)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CartState() when $default != null:
-return $default(_that.items,_that.message);case _:
+return $default(_that.items,_that.isLoading,_that.message);case _:
   return orElse();
 
 }
@@ -681,10 +758,10 @@ return $default(_that.items,_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<CartItem> items,  String? message)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<CartItem> items,  bool isLoading,  String? message)  $default,) {final _that = this;
 switch (_that) {
 case _CartState():
-return $default(_that.items,_that.message);}
+return $default(_that.items,_that.isLoading,_that.message);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -698,10 +775,10 @@ return $default(_that.items,_that.message);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<CartItem> items,  String? message)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<CartItem> items,  bool isLoading,  String? message)?  $default,) {final _that = this;
 switch (_that) {
 case _CartState() when $default != null:
-return $default(_that.items,_that.message);case _:
+return $default(_that.items,_that.isLoading,_that.message);case _:
   return null;
 
 }
@@ -713,7 +790,7 @@ return $default(_that.items,_that.message);case _:
 
 
 class _CartState implements CartState {
-  const _CartState({final  List<CartItem> items = const <CartItem>[], this.message}): _items = items;
+  const _CartState({final  List<CartItem> items = const <CartItem>[], this.isLoading = false, this.message}): _items = items;
   
 
  final  List<CartItem> _items;
@@ -723,6 +800,7 @@ class _CartState implements CartState {
   return EqualUnmodifiableListView(_items);
 }
 
+@override@JsonKey() final  bool isLoading;
 @override final  String? message;
 
 /// Create a copy of CartState
@@ -735,16 +813,16 @@ _$CartStateCopyWith<_CartState> get copyWith => __$CartStateCopyWithImpl<_CartSt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CartState&&const DeepCollectionEquality().equals(other._items, _items)&&(identical(other.message, message) || other.message == message));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _CartState&&const DeepCollectionEquality().equals(other._items, _items)&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.message, message) || other.message == message));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_items),message);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_items),isLoading,message);
 
 @override
 String toString() {
-  return 'CartState(items: $items, message: $message)';
+  return 'CartState(items: $items, isLoading: $isLoading, message: $message)';
 }
 
 
@@ -755,7 +833,7 @@ abstract mixin class _$CartStateCopyWith<$Res> implements $CartStateCopyWith<$Re
   factory _$CartStateCopyWith(_CartState value, $Res Function(_CartState) _then) = __$CartStateCopyWithImpl;
 @override @useResult
 $Res call({
- List<CartItem> items, String? message
+ List<CartItem> items, bool isLoading, String? message
 });
 
 
@@ -772,10 +850,11 @@ class __$CartStateCopyWithImpl<$Res>
 
 /// Create a copy of CartState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? items = null,Object? message = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? items = null,Object? isLoading = null,Object? message = freezed,}) {
   return _then(_CartState(
 items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
-as List<CartItem>,message: freezed == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as List<CartItem>,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
+as bool,message: freezed == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

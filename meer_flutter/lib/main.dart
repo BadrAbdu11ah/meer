@@ -9,7 +9,6 @@ import 'package:meer_flutter/presentation/cart/bloc/cart_bloc.dart';
 import 'package:meer_flutter/presentation/favorites/bloc/favorites_bloc.dart';
 import 'package:meer_flutter/presentation/search/bloc/search_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:meer_flutter/core/storage/hive/hive_service.dart';
 
 import 'client.dart';
 
@@ -17,7 +16,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await initialService();
-  await HiveService().init();
   await initializeClient();
   await initGetIt();
 

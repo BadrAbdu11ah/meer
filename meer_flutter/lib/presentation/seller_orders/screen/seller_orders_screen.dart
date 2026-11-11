@@ -8,6 +8,24 @@ class SellerOrdersScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Future<void> refreshOrders() async {
+      final bloc = context.read<SellerOrdersBloc>();
+
+      final completed = bloc.stream.firstWhere(
+        (state) => state.maybeWhen(
+          loaded: (_, _, _) => true,
+          error: (_) => true,
+          orElse: () => false,
+        ),
+      );
+
+      bloc.add(
+        const SellerOrdersEvent.refreshRequested(),
+      );
+
+      await completed;
+    }
+
     return BlocConsumer<SellerOrdersBloc, SellerOrdersState>(
       listenWhen: (previous, current) {
         final previousMessage = previous.maybeWhen(
@@ -85,11 +103,7 @@ class SellerOrdersScreen extends StatelessWidget {
                     SellerOrdersEvent.markReadyRequested(orderId: id),
                   );
                 },
-                onRefreshRequested: () {
-                  context.read<SellerOrdersBloc>().add(
-                    const SellerOrdersEvent.refreshRequested(),
-                  );
-                },
+                onRefreshRequested: refreshOrders,
               );
             },
             error: (message) => Center(

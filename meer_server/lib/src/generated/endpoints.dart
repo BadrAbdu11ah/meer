@@ -22,6 +22,8 @@ import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i1n3uhu0;
 import '../auth/google_idp_endpoint.dart' as _i71axiz0;
 import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
 import '../endpoints/app_auth_endpoint.dart' as _ifrhcmrx;
+import '../endpoints/cart_endpoint.dart' as _i4pgg4av;
+import '../endpoints/favorite_endpoint.dart' as _i5chwg2z;
 import '../endpoints/order_endpoint.dart' as _itwfdqvf;
 import '../endpoints/product_endpoint.dart' as _im5j1753;
 import '../endpoints/seller_endpoint.dart' as _ifhnucmp;
@@ -47,6 +49,18 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'appAuth',
+          null,
+        ),
+      'cart': _i4pgg4av.CartEndpoint()
+        ..initialize(
+          server,
+          'cart',
+          null,
+        ),
+      'favorite': _i5chwg2z.FavoriteEndpoint()
+        ..initialize(
+          server,
+          'favorite',
           null,
         ),
       'order': _itwfdqvf.OrderEndpoint()
@@ -249,6 +263,164 @@ class Endpoints extends _is.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async => (endpoints['appAuth'] as _ifrhcmrx.AppAuthEndpoint)
                   .syncGoogleUser(session),
+        ),
+      },
+    );
+    connectors['cart'] = _is.EndpointConnector(
+      name: 'cart',
+      endpoint: endpoints['cart']!,
+      methodConnectors: {
+        'getMyCart': _is.MethodConnector(
+          name: 'getMyCart',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['cart'] as _i4pgg4av.CartEndpoint)
+                  .getMyCart(session),
+        ),
+        'addItem': _is.MethodConnector(
+          name: 'addItem',
+          params: {
+            'productId': _is.ParameterDescription(
+              name: 'productId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'quantity': _is.ParameterDescription(
+              name: 'quantity',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['cart'] as _i4pgg4av.CartEndpoint).addItem(
+                session,
+                params['productId'],
+                params['quantity'],
+              ),
+        ),
+        'updateQuantity': _is.MethodConnector(
+          name: 'updateQuantity',
+          params: {
+            'productId': _is.ParameterDescription(
+              name: 'productId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'quantity': _is.ParameterDescription(
+              name: 'quantity',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['cart'] as _i4pgg4av.CartEndpoint).updateQuantity(
+                    session,
+                    params['productId'],
+                    params['quantity'],
+                  ),
+        ),
+        'removeItem': _is.MethodConnector(
+          name: 'removeItem',
+          params: {
+            'productId': _is.ParameterDescription(
+              name: 'productId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['cart'] as _i4pgg4av.CartEndpoint).removeItem(
+                    session,
+                    params['productId'],
+                  ),
+        ),
+        'clearCart': _is.MethodConnector(
+          name: 'clearCart',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['cart'] as _i4pgg4av.CartEndpoint)
+                  .clearCart(session),
+        ),
+      },
+    );
+    connectors['favorite'] = _is.EndpointConnector(
+      name: 'favorite',
+      endpoint: endpoints['favorite']!,
+      methodConnectors: {
+        'getMyFavorites': _is.MethodConnector(
+          name: 'getMyFavorites',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['favorite'] as _i5chwg2z.FavoriteEndpoint)
+                  .getMyFavorites(session),
+        ),
+        'addFavorite': _is.MethodConnector(
+          name: 'addFavorite',
+          params: {
+            'productId': _is.ParameterDescription(
+              name: 'productId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['favorite'] as _i5chwg2z.FavoriteEndpoint)
+                  .addFavorite(
+                    session,
+                    params['productId'],
+                  ),
+        ),
+        'removeFavorite': _is.MethodConnector(
+          name: 'removeFavorite',
+          params: {
+            'productId': _is.ParameterDescription(
+              name: 'productId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['favorite'] as _i5chwg2z.FavoriteEndpoint)
+                  .removeFavorite(
+                    session,
+                    params['productId'],
+                  ),
+        ),
+        'clearMyFavorites': _is.MethodConnector(
+          name: 'clearMyFavorites',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['favorite'] as _i5chwg2z.FavoriteEndpoint)
+                  .clearMyFavorites(session),
         ),
       },
     );

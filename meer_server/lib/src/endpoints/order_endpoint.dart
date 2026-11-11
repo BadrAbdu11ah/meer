@@ -236,6 +236,13 @@ class OrderEndpoint extends Endpoint {
       session,
       where: (o) => o.customerId.equals(customer.id!),
       orderBy: (o) => o.createdAt.desc(),
+      include: OrderInfo.include(
+        items: OrderItem.includeList(
+          include: OrderItem.include(
+            product: Product.include(),
+          ),
+        ),
+      ),
     );
   }
 
@@ -335,9 +342,11 @@ class OrderEndpoint extends Endpoint {
 
     return await session.db.transaction(
       (transaction) async {
+        // قفل الطلب حتى تنتهي العملية الحالية.
         final order = await OrderInfo.db.findById(
           session,
           orderId,
+          lockMode: LockMode.forUpdate,
           transaction: transaction,
         );
 
@@ -345,12 +354,12 @@ class OrderEndpoint extends Endpoint {
           return false;
         }
 
-        // منع الأسرة من تعديل طلب أسرة أخرى.
+        // التأكد من ملكية الطلب.
         if (order.sellerId != seller.id) {
           throw Exception('هذا الطلب لا يخص متجرك.');
         }
 
-        // لا نسمح بتجاوز مراحل الطلب.
+        // التحقق من الحالة بعد الحصول على القفل.
         if (order.status != expectedStatus) {
           return false;
         }
@@ -366,7 +375,7 @@ class OrderEndpoint extends Endpoint {
         return true;
       },
       settings: TransactionSettings(
-        isolationLevel: IsolationLevel.serializable,
+        isolationLevel: IsolationLevel.readCommitted,
       ),
     );
   }

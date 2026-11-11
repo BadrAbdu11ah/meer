@@ -8,6 +8,7 @@ import 'package:meer_flutter/presentation/account/screen/account_screen.dart';
 import 'package:meer_flutter/presentation/cart/bloc/cart_bloc.dart';
 import 'package:meer_flutter/presentation/customer_orders/bloc/customer_orders_bloc.dart';
 import 'package:meer_flutter/presentation/customer_orders/screen/customer_orders_screen.dart';
+import 'package:meer_flutter/presentation/favorites/bloc/favorites_bloc.dart';
 import 'package:meer_flutter/presentation/favorites/screen/favorites_screen.dart';
 import 'package:meer_flutter/presentation/home/bloc/home_bloc.dart';
 import 'package:meer_flutter/presentation/home/screen/home_screen.dart';
@@ -27,6 +28,19 @@ class _MainScreenState extends State<MainScreen> {
   final Map<int, Widget> _pageCache = {};
 
   CustomerOrdersBloc? _customerOrdersBloc;
+
+  @override
+  void initState() {
+    super.initState();
+
+    context.read<CartBloc>().add(
+      const CartEvent.loadRequested(),
+    );
+
+    context.read<FavoritesBloc>().add(
+      const FavoritesEvent.loadRequested(),
+    );
+  }
 
   // إنشاء الصفحة عند أول زيارة فقط.
   Widget _createPage(int index) {
@@ -187,35 +201,6 @@ class _MainScreenState extends State<MainScreen> {
           ),
         );
       },
-    );
-  }
-}
-
-class _PlaceholderPage extends StatelessWidget {
-  final String title;
-  final String message;
-
-  const _PlaceholderPage({
-    super.key,
-    required this.title,
-    required this.message,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Text(
-            message,
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ),
     );
   }
 }

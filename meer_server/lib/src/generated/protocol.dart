@@ -11,6 +11,10 @@
 // ignore_for_file: dead_code, unnecessary_type_check
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:meer_server/src/generated/model/cart_item_record.dart'
+    as _igx9tmzj;
+import 'package:meer_server/src/generated/model/favorite_product.dart'
+    as _ieqdpo46;
 import 'package:meer_server/src/generated/model/order_info.dart' as _i8hwzj5x;
 import 'package:meer_server/src/generated/model/order_item_request.dart'
     as _i4g4bzck;
@@ -23,6 +27,8 @@ import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _iais;
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i1n3uhu0;
 import 'greetings/greeting.dart' as _izw8z7ou;
+import 'model/cart_item_record.dart' as _ivirwujx;
+import 'model/favorite_product.dart' as _i8l2y79r;
 import 'model/MeerUserProfile.dart' as _ii0ycxhg;
 import 'model/order_info.dart' as _ig93noqx;
 import 'model/order_item.dart' as _iae72vfi;
@@ -33,6 +39,8 @@ import 'model/product.dart' as _igfqb4xa;
 import 'model/seller_public_info.dart' as _iigi60b2;
 export 'greetings/greeting.dart';
 export 'model/MeerUserProfile.dart';
+export 'model/cart_item_record.dart';
+export 'model/favorite_product.dart';
 export 'model/order_info.dart';
 export 'model/order_item.dart';
 export 'model/order_item_request.dart';
@@ -49,6 +57,168 @@ class Protocol extends _is.DatabaseSerializationManager {
   static final Protocol _instance = Protocol._().._registerHostProtocols();
 
   static List<_isp.TableDefinition> get targetTableDefinitions => [
+    _isp.TableDefinition(
+      name: 'cart_item',
+      dartName: 'CartItemRecord',
+      schema: 'public',
+      module: 'meer',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'userId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'productId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'quantity',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _isp.ColumnDefinition(
+          name: 'updatedAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+      ],
+      foreignKeys: [
+        _isp.ForeignKeyDefinition(
+          constraintName: 'cart_item_fk_0',
+          columns: ['userId'],
+          referenceTable: 'user',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.cascade,
+          matchType: null,
+        ),
+        _isp.ForeignKeyDefinition(
+          constraintName: 'cart_item_fk_1',
+          columns: ['productId'],
+          referenceTable: 'product',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.cascade,
+          matchType: null,
+        ),
+      ],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'cart_item_user_product_unique_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'userId',
+            ),
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'productId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _isp.TableDefinition(
+      name: 'favorite_product',
+      dartName: 'FavoriteProduct',
+      schema: 'public',
+      module: 'meer',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'userId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'productId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+      ],
+      foreignKeys: [
+        _isp.ForeignKeyDefinition(
+          constraintName: 'favorite_product_fk_0',
+          columns: ['userId'],
+          referenceTable: 'user',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.cascade,
+          matchType: null,
+        ),
+        _isp.ForeignKeyDefinition(
+          constraintName: 'favorite_product_fk_1',
+          columns: ['productId'],
+          referenceTable: 'product',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.cascade,
+          matchType: null,
+        ),
+      ],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'favorite_product_user_product_unique_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'userId',
+            ),
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'productId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
     _isp.TableDefinition(
       name: 'order_info',
       dartName: 'OrderInfo',
@@ -520,6 +690,12 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _ii0ycxhg.MeerUserProfile) {
       return _ii0ycxhg.MeerUserProfile.fromJson(data) as T;
     }
+    if (t == _ivirwujx.CartItemRecord) {
+      return _ivirwujx.CartItemRecord.fromJson(data) as T;
+    }
+    if (t == _i8l2y79r.FavoriteProduct) {
+      return _i8l2y79r.FavoriteProduct.fromJson(data) as T;
+    }
     if (t == _ig93noqx.OrderInfo) {
       return _ig93noqx.OrderInfo.fromJson(data) as T;
     }
@@ -546,6 +722,14 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (t == _is.getType<_ii0ycxhg.MeerUserProfile?>()) {
       return (data != null ? _ii0ycxhg.MeerUserProfile.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_ivirwujx.CartItemRecord?>()) {
+      return (data != null ? _ivirwujx.CartItemRecord.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_i8l2y79r.FavoriteProduct?>()) {
+      return (data != null ? _i8l2y79r.FavoriteProduct.fromJson(data) : null)
           as T;
     }
     if (t == _is.getType<_ig93noqx.OrderInfo?>()) {
@@ -587,6 +771,18 @@ class Protocol extends _is.DatabaseSerializationManager {
               : null)
           as T;
     }
+    if (t == List<_igx9tmzj.CartItemRecord>) {
+      return (data as List)
+              .map((e) => deserialize<_igx9tmzj.CartItemRecord>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_ieqdpo46.FavoriteProduct>) {
+      return (data as List)
+              .map((e) => deserialize<_ieqdpo46.FavoriteProduct>(e))
+              .toList()
+          as T;
+    }
     if (t == List<_i4g4bzck.OrderItemRequest>) {
       return (data as List)
               .map((e) => deserialize<_i4g4bzck.OrderItemRequest>(e))
@@ -624,6 +820,8 @@ class Protocol extends _is.DatabaseSerializationManager {
     return switch (type) {
       _izw8z7ou.Greeting => 'Greeting',
       _ii0ycxhg.MeerUserProfile => 'MeerUserProfile',
+      _ivirwujx.CartItemRecord => 'CartItemRecord',
+      _i8l2y79r.FavoriteProduct => 'FavoriteProduct',
       _ig93noqx.OrderInfo => 'OrderInfo',
       _iae72vfi.OrderItem => 'OrderItem',
       _i52izl0k.OrderItemRequest => 'OrderItemRequest',
@@ -649,6 +847,10 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'Greeting';
       case _ii0ycxhg.MeerUserProfile():
         return 'MeerUserProfile';
+      case _ivirwujx.CartItemRecord():
+        return 'CartItemRecord';
+      case _i8l2y79r.FavoriteProduct():
+        return 'FavoriteProduct';
       case _ig93noqx.OrderInfo():
         return 'OrderInfo';
       case _iae72vfi.OrderItem():
@@ -698,6 +900,12 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (dataClassName == 'MeerUserProfile') {
       return deserialize<_ii0ycxhg.MeerUserProfile>(data['data']);
+    }
+    if (dataClassName == 'CartItemRecord') {
+      return deserialize<_ivirwujx.CartItemRecord>(data['data']);
+    }
+    if (dataClassName == 'FavoriteProduct') {
+      return deserialize<_i8l2y79r.FavoriteProduct>(data['data']);
     }
     if (dataClassName == 'OrderInfo') {
       return deserialize<_ig93noqx.OrderInfo>(data['data']);
@@ -774,6 +982,10 @@ class Protocol extends _is.DatabaseSerializationManager {
     switch (t) {
       case _ii0ycxhg.MeerUserProfile:
         return _ii0ycxhg.MeerUserProfile.t;
+      case _ivirwujx.CartItemRecord:
+        return _ivirwujx.CartItemRecord.t;
+      case _i8l2y79r.FavoriteProduct:
+        return _i8l2y79r.FavoriteProduct.t;
       case _ig93noqx.OrderInfo:
         return _ig93noqx.OrderInfo.t;
       case _iae72vfi.OrderItem:
