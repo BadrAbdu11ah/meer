@@ -138,4 +138,35 @@ class SellerEndpoint extends Endpoint {
 
     return profile;
   }
+
+  // 4.
+  /// حفظ موقع التوصيل في ملف المستخدم الحالي لاستخدامه في الطلبات القادمة.
+  Future<MeerUserProfile> updateMyDeliveryLocation(
+    Session session,
+    String address,
+    double latitude,
+    double longitude,
+  ) async {
+    final profile = await getMyProfile(session);
+
+    final normalizedAddress = address.trim();
+
+    if (normalizedAddress.isEmpty) {
+      throw FormatException('عنوان التوصيل مطلوب.');
+    }
+
+    if (!latitude.isFinite || latitude < -90 || latitude > 90) {
+      throw FormatException('إحداثيات الموقع غير صحيحة.');
+    }
+
+    if (!longitude.isFinite || longitude < -180 || longitude > 180) {
+      throw FormatException('إحداثيات الموقع غير صحيحة.');
+    }
+
+    profile.address = normalizedAddress;
+    profile.latitude = latitude;
+    profile.longitude = longitude;
+
+    return await MeerUserProfile.db.updateRow(session, profile);
+  }
 }

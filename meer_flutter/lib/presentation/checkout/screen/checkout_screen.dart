@@ -15,6 +15,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final _formKey = GlobalKey<FormState>();
   final _addressController = TextEditingController();
 
+  // موقع التوصيل (من الموقع الحالي، ولاحقًا من الخريطة).
+  double? _latitude;
+  double? _longitude;
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<CheckoutBloc>().add(const CheckoutEvent.started());
+  }
+
   @override
   void dispose() {
     _addressController.dispose();
@@ -32,6 +42,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       CheckoutEvent.submitted(
         items: cartItems,
         deliveryAddress: _addressController.text,
+        latitude: _latitude,
+        longitude: _longitude,
       ),
     );
   }
@@ -41,6 +53,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return BlocConsumer<CheckoutBloc, CheckoutState>(
       listener: (context, state) {
         state.whenOrNull(
+          ready: (address, latitude, longitude) {
+            setState(() {
+              if (address != null &&
+                  address.trim().isNotEmpty &&
+                  _addressController.text.trim().isEmpty) {
+                _addressController.text = address;
+              }
+
+              _latitude = latitude;
+              _longitude = longitude;
+            });
+          },
           success: (_) {
             // تفريغ السلة بعد أن يؤكد الخادم إنشاء الطلب.
             context.read<CartBloc>().add(
@@ -62,6 +86,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       builder: (context, state) {
         final isSubmitting = state.maybeWhen(
           submitting: () => true,
+          orElse: () => false,
+        );
+
+        final isLocating = state.maybeWhen(
+          locating: () => true,
           orElse: () => false,
         );
 
@@ -129,6 +158,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           items: cartState.items,
                           addressController: _addressController,
                           formKey: _formKey,
+                          hasLocation: _latitude != null && _longitude != null,
+                          isLocating: isLocating,
+                          onUseCurrentLocation: () {
+                            context.read<CheckoutBloc>().add(
+                              const CheckoutEvent.locationRequested(),
+                            );
+                          },
                         ),
                   bottomNavigationBar: cartState.isEmpty
                       ? null

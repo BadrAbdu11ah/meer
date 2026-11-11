@@ -794,6 +794,37 @@ class Endpoints extends _is.EndpointDispatch {
               ) async => (endpoints['seller'] as _ifhnucmp.SellerEndpoint)
                   .getMyProfile(session),
         ),
+        'updateMyDeliveryLocation': _is.MethodConnector(
+          name: 'updateMyDeliveryLocation',
+          params: {
+            'address': _is.ParameterDescription(
+              name: 'address',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'latitude': _is.ParameterDescription(
+              name: 'latitude',
+              type: _is.getType<double>(),
+              nullable: false,
+            ),
+            'longitude': _is.ParameterDescription(
+              name: 'longitude',
+              type: _is.getType<double>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['seller'] as _ifhnucmp.SellerEndpoint)
+                  .updateMyDeliveryLocation(
+                    session,
+                    params['address'],
+                    params['latitude'],
+                    params['longitude'],
+                  ),
+        ),
       },
     );
     connectors['greeting'] = _is.EndpointConnector(

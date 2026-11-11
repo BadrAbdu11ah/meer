@@ -452,6 +452,21 @@ class EndpointSeller extends _isc.EndpointRef {
         'getMyProfile',
         {},
       );
+
+  /// حفظ موقع التوصيل في ملف المستخدم الحالي لاستخدامه في الطلبات القادمة.
+  _ida.Future<_ihcobg5g.MeerUserProfile> updateMyDeliveryLocation(
+    String address,
+    double latitude,
+    double longitude,
+  ) => caller.callServerEndpoint<_ihcobg5g.MeerUserProfile>(
+    'seller',
+    'updateMyDeliveryLocation',
+    {
+      'address': address,
+      'latitude': latitude,
+      'longitude': longitude,
+    },
+  );
 }
 
 /// This is an example endpoint that returns a greeting message through

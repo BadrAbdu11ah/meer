@@ -7,11 +7,17 @@ class CheckoutView extends StatelessWidget {
     required this.items,
     required this.addressController,
     required this.formKey,
+    required this.hasLocation,
+    required this.isLocating,
+    required this.onUseCurrentLocation,
   });
 
   final List<CartItem> items;
   final TextEditingController addressController;
   final GlobalKey<FormState> formKey;
+  final bool hasLocation;
+  final bool isLocating;
+  final VoidCallback onUseCurrentLocation;
 
   double get totalAmount {
     return items.fold(
@@ -57,6 +63,42 @@ class CheckoutView extends StatelessWidget {
 
                 return null;
               },
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Icon(
+                  hasLocation
+                      ? Icons.check_circle_outline
+                      : Icons.location_searching,
+                  size: 20,
+                  color: hasLocation ? colors.primary : colors.onSurfaceVariant,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    hasLocation
+                        ? 'تم تحديد موقع التوصيل.'
+                        : 'لم يتم تحديد موقع التوصيل بعد.',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: colors.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: isLocating ? null : onUseCurrentLocation,
+                  icon: isLocating
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.my_location, size: 18),
+                  label: Text(
+                    hasLocation ? 'تحديث موقعي' : 'استخدم موقعي الحالي',
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 28),
             Text(

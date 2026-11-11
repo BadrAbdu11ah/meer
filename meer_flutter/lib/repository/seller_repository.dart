@@ -71,4 +71,28 @@ class SellerRepository {
       );
     }
   }
+
+  // 4.
+  /// حفظ موقع التوصيل في ملف المستخدم الحالي.
+  Future<Either<Failure, MeerUserProfile>> updateMyDeliveryLocation({
+    required String address,
+    required double latitude,
+    required double longitude,
+  }) async {
+    try {
+      final profile = await client.seller.updateMyDeliveryLocation(
+        address,
+        latitude,
+        longitude,
+      );
+
+      return Right(profile);
+    } catch (error) {
+      return Left(
+        ServerFailure(
+          'تعذر حفظ موقع التوصيل: ${error.toString()}',
+        ),
+      );
+    }
+  }
 }

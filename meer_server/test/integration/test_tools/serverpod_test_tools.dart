@@ -1434,6 +1434,43 @@ class _SellerEndpoint {
       }
     });
   }
+
+  _ida.Future<_iy43oh7i.MeerUserProfile> updateMyDeliveryLocation(
+    _ist.TestSessionBuilder sessionBuilder,
+    String address,
+    double latitude,
+    double longitude,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'seller',
+            method: 'updateMyDeliveryLocation',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'seller',
+          methodName: 'updateMyDeliveryLocation',
+          parameters: _ist.testObjectToJson({
+            'address': address,
+            'latitude': latitude,
+            'longitude': longitude,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_iy43oh7i.MeerUserProfile>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
 }
 
 class _GreetingEndpoint {

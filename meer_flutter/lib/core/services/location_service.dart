@@ -3,9 +3,9 @@ import 'package:meer_client/meer_client.dart';
 import 'package:meer_flutter/core/constant/city_info.dart';
 
 class LocationService {
-  /// يحاول تحديد مدينة المستخدم من موقعه الحالي.
-  /// يرجع null إذا رُفض الإذن أو الخدمة مغلقة أو كان خارج المدن المدعومة.
-  Future<MeerCity?> detectCity() async {
+  /// الموقع الحالي للمستخدم، أو null إذا رُفض الإذن
+  /// أو كانت خدمة الموقع مغلقة أو تعذر تحديده.
+  Future<({double latitude, double longitude})?> currentCoordinates() async {
     try {
       if (!await Geolocator.isLocationServiceEnabled()) {
         return null;
@@ -24,15 +24,27 @@ class LocationService {
 
       final position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.low,
-          timeLimit: Duration(seconds: 10),
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 15),
         ),
       );
 
-      return nearestCity(position.latitude, position.longitude);
+      return (latitude: position.latitude, longitude: position.longitude);
     } catch (_) {
       return null;
     }
+  }
+
+  /// يحاول تحديد مدينة المستخدم من موقعه الحالي.
+  /// يرجع null إذا تعذر تحديد الموقع أو كان خارج المدن المدعومة.
+  Future<MeerCity?> detectCity() async {
+    final coordinates = await currentCoordinates();
+
+    if (coordinates == null) {
+      return null;
+    }
+
+    return nearestCity(coordinates.latitude, coordinates.longitude);
   }
 
   /// أقرب مدينة مدعومة، أو null إذا كان الموقع بعيدًا عن جميع المدن.

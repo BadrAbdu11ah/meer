@@ -14,62 +14,30 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$CheckoutEvent {
 
- List<CartItem> get items; String get deliveryAddress;
-/// Create a copy of CheckoutEvent
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$CheckoutEventCopyWith<CheckoutEvent> get copyWith => _$CheckoutEventCopyWithImpl<CheckoutEvent>(this as CheckoutEvent, _$identity);
+
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CheckoutEvent&&const DeepCollectionEquality().equals(other.items, items)&&(identical(other.deliveryAddress, deliveryAddress) || other.deliveryAddress == deliveryAddress));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CheckoutEvent);
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(items),deliveryAddress);
+int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'CheckoutEvent(items: $items, deliveryAddress: $deliveryAddress)';
+  return 'CheckoutEvent()';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $CheckoutEventCopyWith<$Res>  {
-  factory $CheckoutEventCopyWith(CheckoutEvent value, $Res Function(CheckoutEvent) _then) = _$CheckoutEventCopyWithImpl;
-@useResult
-$Res call({
- List<CartItem> items, String deliveryAddress
-});
-
-
-
-
-}
-/// @nodoc
-class _$CheckoutEventCopyWithImpl<$Res>
-    implements $CheckoutEventCopyWith<$Res> {
-  _$CheckoutEventCopyWithImpl(this._self, this._then);
-
-  final CheckoutEvent _self;
-  final $Res Function(CheckoutEvent) _then;
-
-/// Create a copy of CheckoutEvent
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? items = null,Object? deliveryAddress = null,}) {
-  return _then(_self.copyWith(
-items: null == items ? _self.items : items // ignore: cast_nullable_to_non_nullable
-as List<CartItem>,deliveryAddress: null == deliveryAddress ? _self.deliveryAddress : deliveryAddress // ignore: cast_nullable_to_non_nullable
-as String,
-  ));
-}
-
+class $CheckoutEventCopyWith<$Res>  {
+$CheckoutEventCopyWith(CheckoutEvent _, $Res Function(CheckoutEvent) __);
 }
 
 
@@ -87,10 +55,12 @@ extension CheckoutEventPatterns on CheckoutEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( CheckoutSubmitted value)?  submitted,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( CheckoutStarted value)?  started,TResult Function( CheckoutLocationRequested value)?  locationRequested,TResult Function( CheckoutSubmitted value)?  submitted,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case CheckoutSubmitted() when submitted != null:
+case CheckoutStarted() when started != null:
+return started(_that);case CheckoutLocationRequested() when locationRequested != null:
+return locationRequested(_that);case CheckoutSubmitted() when submitted != null:
 return submitted(_that);case _:
   return orElse();
 
@@ -109,10 +79,12 @@ return submitted(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( CheckoutSubmitted value)  submitted,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( CheckoutStarted value)  started,required TResult Function( CheckoutLocationRequested value)  locationRequested,required TResult Function( CheckoutSubmitted value)  submitted,}){
 final _that = this;
 switch (_that) {
-case CheckoutSubmitted():
+case CheckoutStarted():
+return started(_that);case CheckoutLocationRequested():
+return locationRequested(_that);case CheckoutSubmitted():
 return submitted(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
@@ -127,10 +99,12 @@ return submitted(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( CheckoutSubmitted value)?  submitted,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( CheckoutStarted value)?  started,TResult? Function( CheckoutLocationRequested value)?  locationRequested,TResult? Function( CheckoutSubmitted value)?  submitted,}){
 final _that = this;
 switch (_that) {
-case CheckoutSubmitted() when submitted != null:
+case CheckoutStarted() when started != null:
+return started(_that);case CheckoutLocationRequested() when locationRequested != null:
+return locationRequested(_that);case CheckoutSubmitted() when submitted != null:
 return submitted(_that);case _:
   return null;
 
@@ -148,10 +122,12 @@ return submitted(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( List<CartItem> items,  String deliveryAddress)?  submitted,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  started,TResult Function()?  locationRequested,TResult Function( List<CartItem> items,  String deliveryAddress,  double? latitude,  double? longitude)?  submitted,required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case CheckoutSubmitted() when submitted != null:
-return submitted(_that.items,_that.deliveryAddress);case _:
+case CheckoutStarted() when started != null:
+return started();case CheckoutLocationRequested() when locationRequested != null:
+return locationRequested();case CheckoutSubmitted() when submitted != null:
+return submitted(_that.items,_that.deliveryAddress,_that.latitude,_that.longitude);case _:
   return orElse();
 
 }
@@ -169,10 +145,12 @@ return submitted(_that.items,_that.deliveryAddress);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( List<CartItem> items,  String deliveryAddress)  submitted,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  started,required TResult Function()  locationRequested,required TResult Function( List<CartItem> items,  String deliveryAddress,  double? latitude,  double? longitude)  submitted,}) {final _that = this;
 switch (_that) {
-case CheckoutSubmitted():
-return submitted(_that.items,_that.deliveryAddress);}
+case CheckoutStarted():
+return started();case CheckoutLocationRequested():
+return locationRequested();case CheckoutSubmitted():
+return submitted(_that.items,_that.deliveryAddress,_that.latitude,_that.longitude);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -186,10 +164,12 @@ return submitted(_that.items,_that.deliveryAddress);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( List<CartItem> items,  String deliveryAddress)?  submitted,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  started,TResult? Function()?  locationRequested,TResult? Function( List<CartItem> items,  String deliveryAddress,  double? latitude,  double? longitude)?  submitted,}) {final _that = this;
 switch (_that) {
-case CheckoutSubmitted() when submitted != null:
-return submitted(_that.items,_that.deliveryAddress);case _:
+case CheckoutStarted() when started != null:
+return started();case CheckoutLocationRequested() when locationRequested != null:
+return locationRequested();case CheckoutSubmitted() when submitted != null:
+return submitted(_that.items,_that.deliveryAddress,_that.latitude,_that.longitude);case _:
   return null;
 
 }
@@ -200,22 +180,88 @@ return submitted(_that.items,_that.deliveryAddress);case _:
 /// @nodoc
 
 
+class CheckoutStarted implements CheckoutEvent {
+  const CheckoutStarted();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CheckoutStarted);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'CheckoutEvent.started()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class CheckoutLocationRequested implements CheckoutEvent {
+  const CheckoutLocationRequested();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CheckoutLocationRequested);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'CheckoutEvent.locationRequested()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
 class CheckoutSubmitted implements CheckoutEvent {
-  const CheckoutSubmitted({required final  List<CartItem> items, required this.deliveryAddress}): _items = items;
+  const CheckoutSubmitted({required final  List<CartItem> items, required this.deliveryAddress, this.latitude, this.longitude}): _items = items;
   
 
  final  List<CartItem> _items;
-@override List<CartItem> get items {
+ List<CartItem> get items {
   if (_items is EqualUnmodifiableListView) return _items;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_items);
 }
 
-@override final  String deliveryAddress;
+ final  String deliveryAddress;
+ final  double? latitude;
+ final  double? longitude;
 
 /// Create a copy of CheckoutEvent
 /// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
+@JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 $CheckoutSubmittedCopyWith<CheckoutSubmitted> get copyWith => _$CheckoutSubmittedCopyWithImpl<CheckoutSubmitted>(this, _$identity);
 
@@ -223,16 +269,16 @@ $CheckoutSubmittedCopyWith<CheckoutSubmitted> get copyWith => _$CheckoutSubmitte
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CheckoutSubmitted&&const DeepCollectionEquality().equals(other._items, _items)&&(identical(other.deliveryAddress, deliveryAddress) || other.deliveryAddress == deliveryAddress));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CheckoutSubmitted&&const DeepCollectionEquality().equals(other._items, _items)&&(identical(other.deliveryAddress, deliveryAddress) || other.deliveryAddress == deliveryAddress)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_items),deliveryAddress);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_items),deliveryAddress,latitude,longitude);
 
 @override
 String toString() {
-  return 'CheckoutEvent.submitted(items: $items, deliveryAddress: $deliveryAddress)';
+  return 'CheckoutEvent.submitted(items: $items, deliveryAddress: $deliveryAddress, latitude: $latitude, longitude: $longitude)';
 }
 
 
@@ -241,9 +287,9 @@ String toString() {
 /// @nodoc
 abstract mixin class $CheckoutSubmittedCopyWith<$Res> implements $CheckoutEventCopyWith<$Res> {
   factory $CheckoutSubmittedCopyWith(CheckoutSubmitted value, $Res Function(CheckoutSubmitted) _then) = _$CheckoutSubmittedCopyWithImpl;
-@override @useResult
+@useResult
 $Res call({
- List<CartItem> items, String deliveryAddress
+ List<CartItem> items, String deliveryAddress, double? latitude, double? longitude
 });
 
 
@@ -260,11 +306,13 @@ class _$CheckoutSubmittedCopyWithImpl<$Res>
 
 /// Create a copy of CheckoutEvent
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? items = null,Object? deliveryAddress = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? items = null,Object? deliveryAddress = null,Object? latitude = freezed,Object? longitude = freezed,}) {
   return _then(CheckoutSubmitted(
 items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
 as List<CartItem>,deliveryAddress: null == deliveryAddress ? _self.deliveryAddress : deliveryAddress // ignore: cast_nullable_to_non_nullable
-as String,
+as String,latitude: freezed == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
+as double?,longitude: freezed == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
+as double?,
   ));
 }
 
@@ -315,11 +363,13 @@ extension CheckoutStatePatterns on CheckoutState {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( CheckoutInitial value)?  initial,TResult Function( CheckoutSubmitting value)?  submitting,TResult Function( CheckoutSuccess value)?  success,TResult Function( CheckoutFailure value)?  failure,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( CheckoutInitial value)?  initial,TResult Function( CheckoutLocating value)?  locating,TResult Function( CheckoutReady value)?  ready,TResult Function( CheckoutSubmitting value)?  submitting,TResult Function( CheckoutSuccess value)?  success,TResult Function( CheckoutFailure value)?  failure,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case CheckoutInitial() when initial != null:
-return initial(_that);case CheckoutSubmitting() when submitting != null:
+return initial(_that);case CheckoutLocating() when locating != null:
+return locating(_that);case CheckoutReady() when ready != null:
+return ready(_that);case CheckoutSubmitting() when submitting != null:
 return submitting(_that);case CheckoutSuccess() when success != null:
 return success(_that);case CheckoutFailure() when failure != null:
 return failure(_that);case _:
@@ -340,11 +390,13 @@ return failure(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( CheckoutInitial value)  initial,required TResult Function( CheckoutSubmitting value)  submitting,required TResult Function( CheckoutSuccess value)  success,required TResult Function( CheckoutFailure value)  failure,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( CheckoutInitial value)  initial,required TResult Function( CheckoutLocating value)  locating,required TResult Function( CheckoutReady value)  ready,required TResult Function( CheckoutSubmitting value)  submitting,required TResult Function( CheckoutSuccess value)  success,required TResult Function( CheckoutFailure value)  failure,}){
 final _that = this;
 switch (_that) {
 case CheckoutInitial():
-return initial(_that);case CheckoutSubmitting():
+return initial(_that);case CheckoutLocating():
+return locating(_that);case CheckoutReady():
+return ready(_that);case CheckoutSubmitting():
 return submitting(_that);case CheckoutSuccess():
 return success(_that);case CheckoutFailure():
 return failure(_that);}
@@ -361,11 +413,13 @@ return failure(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( CheckoutInitial value)?  initial,TResult? Function( CheckoutSubmitting value)?  submitting,TResult? Function( CheckoutSuccess value)?  success,TResult? Function( CheckoutFailure value)?  failure,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( CheckoutInitial value)?  initial,TResult? Function( CheckoutLocating value)?  locating,TResult? Function( CheckoutReady value)?  ready,TResult? Function( CheckoutSubmitting value)?  submitting,TResult? Function( CheckoutSuccess value)?  success,TResult? Function( CheckoutFailure value)?  failure,}){
 final _that = this;
 switch (_that) {
 case CheckoutInitial() when initial != null:
-return initial(_that);case CheckoutSubmitting() when submitting != null:
+return initial(_that);case CheckoutLocating() when locating != null:
+return locating(_that);case CheckoutReady() when ready != null:
+return ready(_that);case CheckoutSubmitting() when submitting != null:
 return submitting(_that);case CheckoutSuccess() when success != null:
 return success(_that);case CheckoutFailure() when failure != null:
 return failure(_that);case _:
@@ -385,10 +439,12 @@ return failure(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  submitting,TResult Function( OrderInfo order)?  success,TResult Function( String message)?  failure,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  locating,TResult Function( String? address,  double? latitude,  double? longitude)?  ready,TResult Function()?  submitting,TResult Function( OrderInfo order)?  success,TResult Function( String message)?  failure,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case CheckoutInitial() when initial != null:
-return initial();case CheckoutSubmitting() when submitting != null:
+return initial();case CheckoutLocating() when locating != null:
+return locating();case CheckoutReady() when ready != null:
+return ready(_that.address,_that.latitude,_that.longitude);case CheckoutSubmitting() when submitting != null:
 return submitting();case CheckoutSuccess() when success != null:
 return success(_that.order);case CheckoutFailure() when failure != null:
 return failure(_that.message);case _:
@@ -409,10 +465,12 @@ return failure(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  submitting,required TResult Function( OrderInfo order)  success,required TResult Function( String message)  failure,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  locating,required TResult Function( String? address,  double? latitude,  double? longitude)  ready,required TResult Function()  submitting,required TResult Function( OrderInfo order)  success,required TResult Function( String message)  failure,}) {final _that = this;
 switch (_that) {
 case CheckoutInitial():
-return initial();case CheckoutSubmitting():
+return initial();case CheckoutLocating():
+return locating();case CheckoutReady():
+return ready(_that.address,_that.latitude,_that.longitude);case CheckoutSubmitting():
 return submitting();case CheckoutSuccess():
 return success(_that.order);case CheckoutFailure():
 return failure(_that.message);}
@@ -429,10 +487,12 @@ return failure(_that.message);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  submitting,TResult? Function( OrderInfo order)?  success,TResult? Function( String message)?  failure,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  locating,TResult? Function( String? address,  double? latitude,  double? longitude)?  ready,TResult? Function()?  submitting,TResult? Function( OrderInfo order)?  success,TResult? Function( String message)?  failure,}) {final _that = this;
 switch (_that) {
 case CheckoutInitial() when initial != null:
-return initial();case CheckoutSubmitting() when submitting != null:
+return initial();case CheckoutLocating() when locating != null:
+return locating();case CheckoutReady() when ready != null:
+return ready(_that.address,_that.latitude,_that.longitude);case CheckoutSubmitting() when submitting != null:
 return submitting();case CheckoutSuccess() when success != null:
 return success(_that.order);case CheckoutFailure() when failure != null:
 return failure(_that.message);case _:
@@ -474,6 +534,108 @@ String toString() {
 
 
 
+
+/// @nodoc
+
+
+class CheckoutLocating implements CheckoutState {
+  const CheckoutLocating();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CheckoutLocating);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'CheckoutState.locating()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class CheckoutReady implements CheckoutState {
+  const CheckoutReady({this.address, this.latitude, this.longitude});
+  
+
+ final  String? address;
+ final  double? latitude;
+ final  double? longitude;
+
+/// Create a copy of CheckoutState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CheckoutReadyCopyWith<CheckoutReady> get copyWith => _$CheckoutReadyCopyWithImpl<CheckoutReady>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CheckoutReady&&(identical(other.address, address) || other.address == address)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,address,latitude,longitude);
+
+@override
+String toString() {
+  return 'CheckoutState.ready(address: $address, latitude: $latitude, longitude: $longitude)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $CheckoutReadyCopyWith<$Res> implements $CheckoutStateCopyWith<$Res> {
+  factory $CheckoutReadyCopyWith(CheckoutReady value, $Res Function(CheckoutReady) _then) = _$CheckoutReadyCopyWithImpl;
+@useResult
+$Res call({
+ String? address, double? latitude, double? longitude
+});
+
+
+
+
+}
+/// @nodoc
+class _$CheckoutReadyCopyWithImpl<$Res>
+    implements $CheckoutReadyCopyWith<$Res> {
+  _$CheckoutReadyCopyWithImpl(this._self, this._then);
+
+  final CheckoutReady _self;
+  final $Res Function(CheckoutReady) _then;
+
+/// Create a copy of CheckoutState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? address = freezed,Object? latitude = freezed,Object? longitude = freezed,}) {
+  return _then(CheckoutReady(
+address: freezed == address ? _self.address : address // ignore: cast_nullable_to_non_nullable
+as String?,latitude: freezed == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
+as double?,longitude: freezed == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
+as double?,
+  ));
+}
+
+
+}
 
 /// @nodoc
 

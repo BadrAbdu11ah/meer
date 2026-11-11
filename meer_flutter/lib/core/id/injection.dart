@@ -112,6 +112,8 @@ Future<void> initGetIt() async {
   sl.registerFactory(
     () => CheckoutBloc(
       sl<OrderRepository>(),
+      sl<SellerRepository>(),
+      sl<LocationService>(),
     ),
   );
 
