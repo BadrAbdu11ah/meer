@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meer_client/meer_client.dart';
+import 'package:meer_flutter/core/constant/city_info.dart';
 import 'package:meer_flutter/presentation/home/bloc/home_bloc.dart';
 import 'package:meer_flutter/presentation/home/view/widgets/home_error.dart';
 import 'package:meer_flutter/presentation/home/view/home_view.dart';
@@ -42,6 +44,35 @@ class _HomeScreenState extends State<HomeScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          BlocBuilder<HomeBloc, HomeState>(
+            builder: (context, _) {
+              final bloc = context.read<HomeBloc>();
+
+              return PopupMenuButton<MeerCity>(
+                tooltip: 'تغيير المدينة',
+                initialValue: bloc.city,
+                onSelected: (city) => bloc.add(HomeCityChanged(city)),
+                itemBuilder: (_) => [
+                  for (final city in MeerCity.values)
+                    PopupMenuItem(value: city, child: Text(city.label)),
+                ],
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.location_on_outlined, size: 20),
+                      const SizedBox(width: 4),
+                      Text(bloc.city.label),
+                      const Icon(Icons.arrow_drop_down),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: BlocConsumer<HomeBloc, HomeState>(
         listener: (context, state) {

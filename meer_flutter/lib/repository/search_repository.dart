@@ -2,9 +2,14 @@ import 'package:fpdart/fpdart.dart';
 import 'package:meer_client/meer_client.dart';
 import 'package:meer_flutter/client.dart';
 import 'package:meer_flutter/core/class/failure.dart';
+import 'package:meer_flutter/repository/local/city_local_repository.dart';
 
 class SearchRepository {
-  /// البحث عن المنتجات المتاحة.
+  final CityLocalRepository _cityRepository;
+
+  SearchRepository(this._cityRepository);
+
+  /// البحث عن المنتجات المتاحة في المدينة المختارة.
   Future<Either<Failure, List<Product>>> searchResults(
     String search,
   ) async {
@@ -18,6 +23,7 @@ class SearchRepository {
     try {
       final products = await client.product.searchProducts(
         query,
+        _cityRepository.current,
       );
 
       return Right(products);

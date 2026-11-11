@@ -28,6 +28,7 @@ import 'package:serverpod_client/serverpod_client.dart' as _isc;
 import 'greetings/greeting.dart' as _izw8z7ou;
 import 'model/cart_item_record.dart' as _ivirwujx;
 import 'model/favorite_product.dart' as _i8l2y79r;
+import 'model/meer_city.dart' as _idc5ggrx;
 import 'model/MeerUserProfile.dart' as _ii0ycxhg;
 import 'model/order_info.dart' as _ig93noqx;
 import 'model/order_item.dart' as _iae72vfi;
@@ -39,6 +40,7 @@ export 'greetings/greeting.dart';
 export 'model/MeerUserProfile.dart';
 export 'model/cart_item_record.dart';
 export 'model/favorite_product.dart';
+export 'model/meer_city.dart';
 export 'model/order_info.dart';
 export 'model/order_item.dart';
 export 'model/order_item_request.dart';
@@ -93,6 +95,9 @@ class Protocol extends _isc.SerializationManager {
     if (t == _i8l2y79r.FavoriteProduct) {
       return _i8l2y79r.FavoriteProduct.fromJson(data) as T;
     }
+    if (t == _idc5ggrx.MeerCity) {
+      return _idc5ggrx.MeerCity.fromJson(data) as T;
+    }
     if (t == _ig93noqx.OrderInfo) {
       return _ig93noqx.OrderInfo.fromJson(data) as T;
     }
@@ -125,6 +130,9 @@ class Protocol extends _isc.SerializationManager {
     if (t == _isc.getType<_i8l2y79r.FavoriteProduct?>()) {
       return (data != null ? _i8l2y79r.FavoriteProduct.fromJson(data) : null)
           as T;
+    }
+    if (t == _isc.getType<_idc5ggrx.MeerCity?>()) {
+      return (data != null ? _idc5ggrx.MeerCity.fromJson(data) : null) as T;
     }
     if (t == _isc.getType<_ig93noqx.OrderInfo?>()) {
       return (data != null ? _ig93noqx.OrderInfo.fromJson(data) : null) as T;
@@ -209,6 +217,7 @@ class Protocol extends _isc.SerializationManager {
       _ii0ycxhg.MeerUserProfile => 'MeerUserProfile',
       _ivirwujx.CartItemRecord => 'CartItemRecord',
       _i8l2y79r.FavoriteProduct => 'FavoriteProduct',
+      _idc5ggrx.MeerCity => 'MeerCity',
       _ig93noqx.OrderInfo => 'OrderInfo',
       _iae72vfi.OrderItem => 'OrderItem',
       _i52izl0k.OrderItemRequest => 'OrderItemRequest',
@@ -237,6 +246,8 @@ class Protocol extends _isc.SerializationManager {
         return 'CartItemRecord';
       case _i8l2y79r.FavoriteProduct():
         return 'FavoriteProduct';
+      case _idc5ggrx.MeerCity():
+        return 'MeerCity';
       case _ig93noqx.OrderInfo():
         return 'OrderInfo';
       case _iae72vfi.OrderItem():
@@ -286,6 +297,9 @@ class Protocol extends _isc.SerializationManager {
     }
     if (dataClassName == 'FavoriteProduct') {
       return deserialize<_i8l2y79r.FavoriteProduct>(data['data']);
+    }
+    if (dataClassName == 'MeerCity') {
+      return deserialize<_idc5ggrx.MeerCity>(data['data']);
     }
     if (dataClassName == 'OrderInfo') {
       return deserialize<_ig93noqx.OrderInfo>(data['data']);

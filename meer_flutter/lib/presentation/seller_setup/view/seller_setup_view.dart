@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:meer_client/meer_client.dart';
+import 'package:meer_flutter/core/constant/city_info.dart';
 
 class SellerSetupView extends StatelessWidget {
   final GlobalKey<FormState> formKey;
@@ -6,6 +8,9 @@ class SellerSetupView extends StatelessWidget {
   final TextEditingController storeNameController;
   final TextEditingController descriptionController;
   final TextEditingController addressController;
+  final TextEditingController districtController;
+  final MeerCity city;
+  final ValueChanged<MeerCity> onCityChanged;
   final TextEditingController latitudeController;
   final TextEditingController longitudeController;
 
@@ -18,6 +23,9 @@ class SellerSetupView extends StatelessWidget {
     required this.storeNameController,
     required this.descriptionController,
     required this.addressController,
+    required this.districtController,
+    required this.city,
+    required this.onCityChanged,
     required this.latitudeController,
     required this.longitudeController,
     required this.isSubmitting,
@@ -113,6 +121,37 @@ class SellerSetupView extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
+          DropdownButtonFormField<MeerCity>(
+            initialValue: city,
+            decoration: const InputDecoration(
+              labelText: 'المدينة',
+              prefixIcon: Icon(Icons.location_city_outlined),
+              border: OutlineInputBorder(),
+            ),
+            items: [
+              for (final item in MeerCity.values)
+                DropdownMenuItem(value: item, child: Text(item.label)),
+            ],
+            onChanged: isSubmitting
+                ? null
+                : (value) {
+                    if (value != null) onCityChanged(value);
+                  },
+          ),
+          const SizedBox(height: 16),
+
+          TextFormField(
+            controller: districtController,
+            enabled: !isSubmitting,
+            textInputAction: TextInputAction.next,
+            decoration: const InputDecoration(
+              labelText: 'الحي (اختياري)',
+              prefixIcon: Icon(Icons.map_outlined),
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 16),
+
           TextFormField(
             controller: addressController,
             enabled: !isSubmitting,
@@ -120,7 +159,7 @@ class SellerSetupView extends StatelessWidget {
             textInputAction: TextInputAction.next,
             decoration: const InputDecoration(
               labelText: 'عنوان المتجر',
-              hintText: 'المدينة والحي والعنوان المناسب للاستلام',
+              hintText: 'العنوان المناسب للاستلام',
               prefixIcon: Icon(Icons.location_on_outlined),
               border: OutlineInputBorder(),
             ),

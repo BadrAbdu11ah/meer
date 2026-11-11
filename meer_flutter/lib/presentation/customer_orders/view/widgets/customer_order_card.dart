@@ -149,7 +149,6 @@ class CustomerOrderCard extends StatelessWidget {
             ExpansionTile(
               tilePadding: EdgeInsets.zero,
               childrenPadding: EdgeInsets.zero,
-              collapsedBackgroundColor: Colors.grey[300],
               title: Text(
                 'تفاصيل الطلب (${items.length} منتجات)',
                 style: theme.textTheme.titleSmall?.copyWith(

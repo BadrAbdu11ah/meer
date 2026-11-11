@@ -18,6 +18,7 @@ import 'package:meer_server/src/generated/model/cart_item_record.dart'
     as _igx9tmzj;
 import 'package:meer_server/src/generated/model/favorite_product.dart'
     as _ieqdpo46;
+import 'package:meer_server/src/generated/model/meer_city.dart' as _ibpct1hm;
 import 'package:meer_server/src/generated/model/MeerUserProfile.dart'
     as _iy43oh7i;
 import 'package:meer_server/src/generated/model/order_info.dart' as _i8hwzj5x;
@@ -1095,6 +1096,7 @@ class _ProductEndpoint {
 
   _ida.Future<List<_iq8dxf2n.Product>> getAllAvailableProducts(
     _ist.TestSessionBuilder sessionBuilder,
+    _ibpct1hm.MeerCity city,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1107,7 +1109,7 @@ class _ProductEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'product',
           methodName: 'getAllAvailableProducts',
-          parameters: _ist.testObjectToJson({}),
+          parameters: _ist.testObjectToJson({'city': city}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -1222,6 +1224,7 @@ class _ProductEndpoint {
   _ida.Future<List<_iq8dxf2n.Product>> searchProducts(
     _ist.TestSessionBuilder sessionBuilder,
     String search,
+    _ibpct1hm.MeerCity city,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1234,7 +1237,10 @@ class _ProductEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'product',
           methodName: 'searchProducts',
-          parameters: _ist.testObjectToJson({'search': search}),
+          parameters: _ist.testObjectToJson({
+            'search': search,
+            'city': city,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -1359,6 +1365,8 @@ class _SellerEndpoint {
     String storeName,
     String? storeDescription,
     String storeAddress,
+    _ibpct1hm.MeerCity storeCity,
+    String? storeDistrict,
     double latitude,
     double longitude,
   ) async {
@@ -1377,6 +1385,8 @@ class _SellerEndpoint {
             'storeName': storeName,
             'storeDescription': storeDescription,
             'storeAddress': storeAddress,
+            'storeCity': storeCity,
+            'storeDistrict': storeDistrict,
             'latitude': latitude,
             'longitude': longitude,
           }),

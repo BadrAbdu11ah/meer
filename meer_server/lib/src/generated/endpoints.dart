@@ -10,6 +10,7 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:meer_server/src/generated/model/meer_city.dart' as _ibpct1hm;
 import 'package:meer_server/src/generated/model/order_item_request.dart'
     as _i4g4bzck;
 import 'package:meer_server/src/generated/model/product.dart' as _iq8dxf2n;
@@ -569,13 +570,22 @@ class Endpoints extends _is.EndpointDispatch {
         ),
         'getAllAvailableProducts': _is.MethodConnector(
           name: 'getAllAvailableProducts',
-          params: {},
+          params: {
+            'city': _is.ParameterDescription(
+              name: 'city',
+              type: _is.getType<_ibpct1hm.MeerCity>(),
+              nullable: false,
+            ),
+          },
           call:
               (
                 _is.Session session,
                 Map<String, dynamic> params,
               ) async => (endpoints['product'] as _im5j1753.ProductEndpoint)
-                  .getAllAvailableProducts(session),
+                  .getAllAvailableProducts(
+                    session,
+                    params['city'],
+                  ),
         ),
         'getProductsBySeller': _is.MethodConnector(
           name: 'getProductsBySeller',
@@ -639,6 +649,11 @@ class Endpoints extends _is.EndpointDispatch {
               type: _is.getType<String>(),
               nullable: false,
             ),
+            'city': _is.ParameterDescription(
+              name: 'city',
+              type: _is.getType<_ibpct1hm.MeerCity>(),
+              nullable: false,
+            ),
           },
           call:
               (
@@ -648,6 +663,7 @@ class Endpoints extends _is.EndpointDispatch {
                   .searchProducts(
                     session,
                     params['search'],
+                    params['city'],
                   ),
         ),
         'updateProduct': _is.MethodConnector(
@@ -731,6 +747,16 @@ class Endpoints extends _is.EndpointDispatch {
               type: _is.getType<String>(),
               nullable: false,
             ),
+            'storeCity': _is.ParameterDescription(
+              name: 'storeCity',
+              type: _is.getType<_ibpct1hm.MeerCity>(),
+              nullable: false,
+            ),
+            'storeDistrict': _is.ParameterDescription(
+              name: 'storeDistrict',
+              type: _is.getType<String?>(),
+              nullable: true,
+            ),
             'latitude': _is.ParameterDescription(
               name: 'latitude',
               type: _is.getType<double>(),
@@ -752,6 +778,8 @@ class Endpoints extends _is.EndpointDispatch {
                     params['storeName'],
                     params['storeDescription'],
                     params['storeAddress'],
+                    params['storeCity'],
+                    params['storeDistrict'],
                     params['latitude'],
                     params['longitude'],
                   ),

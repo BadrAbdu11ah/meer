@@ -20,6 +20,8 @@ fields:
   storeName: String?
   storeDescription: String?
   storeAddress: String?
+  storeCity: MeerCity?
+  storeDistrict: String?
   storeLatitude: double?
   storeLongitude: double?
 

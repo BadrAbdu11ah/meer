@@ -78,15 +78,38 @@ class ProductEndpoint extends Endpoint {
   }
 
   // --------------------------------------------------
-  // 2. جلب جميع المنتجات المتاحة للمشترين
+  // 2. جلب المنتجات المتاحة للمشترين في مدينة محددة
   // --------------------------------------------------
+
+  /// معرّفات الأسر المنتجة المفعّلة في المدينة.
+  Future<Set<int>> _sellerIdsInCity(
+    Session session,
+    MeerCity city,
+  ) async {
+    final sellers = await MeerUserProfile.db.find(
+      session,
+      where: (u) => u.isSeller.equals(true) & u.storeCity.equals(city),
+    );
+
+    return {
+      for (final seller in sellers)
+        if (seller.id != null) seller.id!,
+    };
+  }
 
   Future<List<Product>> getAllAvailableProducts(
     Session session,
+    MeerCity city,
   ) async {
+    final sellerIds = await _sellerIdsInCity(session, city);
+
+    if (sellerIds.isEmpty) {
+      return [];
+    }
+
     return await Product.db.find(
       session,
-      where: (p) => p.isAvailable.equals(true),
+      where: (p) => p.isAvailable.equals(true) & p.sellerId.inSet(sellerIds),
     );
   }
 
@@ -165,10 +188,17 @@ class ProductEndpoint extends Endpoint {
   Future<List<Product>> searchProducts(
     Session session,
     String search,
+    MeerCity city,
   ) async {
     final query = search.trim();
 
     if (query.isEmpty) {
+      return [];
+    }
+
+    final sellerIds = await _sellerIdsInCity(session, city);
+
+    if (sellerIds.isEmpty) {
       return [];
     }
 
@@ -178,6 +208,7 @@ class ProductEndpoint extends Endpoint {
       session,
       where: (p) =>
           p.isAvailable.equals(true) &
+          p.sellerId.inSet(sellerIds) &
           (p.name.ilike(pattern) | p.description.ilike(pattern)),
     );
   }

@@ -47,6 +47,8 @@ class SellerEndpoint extends Endpoint {
     String storeName,
     String? storeDescription,
     String storeAddress,
+    MeerCity storeCity,
+    String? storeDistrict,
     double latitude,
     double longitude,
   ) async {
@@ -93,6 +95,13 @@ class SellerEndpoint extends Endpoint {
     profile.storeName = normalizedStoreName;
     profile.storeDescription = storeDescription?.trim();
     profile.storeAddress = normalizedAddress;
+    profile.storeCity = storeCity;
+
+    final normalizedDistrict = storeDistrict?.trim();
+    profile.storeDistrict =
+        normalizedDistrict == null || normalizedDistrict.isEmpty
+        ? null
+        : normalizedDistrict;
     profile.storeLatitude = latitude;
     profile.storeLongitude = longitude;
 

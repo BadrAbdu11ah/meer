@@ -26,6 +26,8 @@ class SellerSetupBloc extends Bloc<SellerSetupEvent, SellerSetupState> {
         storeName: event.storeName,
         storeDescription: event.storeDescription,
         storeAddress: event.storeAddress,
+        city: event.city,
+        district: event.district,
         latitude: event.latitude,
         longitude: event.longitude,
       );

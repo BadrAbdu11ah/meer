@@ -15,6 +15,7 @@ import 'package:meer_server/src/generated/protocol.dart' as _i58zzwu7;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
+import '../model/meer_city.dart' as _is2bz3ye;
 
 abstract class MeerUserProfile
     implements _is.TableRow<int?>, _is.ProtocolSerialization {
@@ -33,6 +34,8 @@ abstract class MeerUserProfile
     this.storeName,
     this.storeDescription,
     this.storeAddress,
+    this.storeCity,
+    this.storeDistrict,
     this.storeLatitude,
     this.storeLongitude,
     required this.createdAt,
@@ -53,6 +56,8 @@ abstract class MeerUserProfile
     String? storeName,
     String? storeDescription,
     String? storeAddress,
+    _is2bz3ye.MeerCity? storeCity,
+    String? storeDistrict,
     double? storeLatitude,
     double? storeLongitude,
     required DateTime createdAt,
@@ -84,6 +89,12 @@ abstract class MeerUserProfile
       storeName: jsonSerialization['storeName'] as String?,
       storeDescription: jsonSerialization['storeDescription'] as String?,
       storeAddress: jsonSerialization['storeAddress'] as String?,
+      storeCity: jsonSerialization['storeCity'] == null
+          ? null
+          : _is2bz3ye.MeerCity.fromJson(
+              (jsonSerialization['storeCity'] as String),
+            ),
+      storeDistrict: jsonSerialization['storeDistrict'] as String?,
       storeLatitude: (jsonSerialization['storeLatitude'] as num?)?.toDouble(),
       storeLongitude: (jsonSerialization['storeLongitude'] as num?)?.toDouble(),
       createdAt: _is.DateTimeJsonExtension.fromJson(
@@ -125,6 +136,10 @@ abstract class MeerUserProfile
 
   String? storeAddress;
 
+  _is2bz3ye.MeerCity? storeCity;
+
+  String? storeDistrict;
+
   double? storeLatitude;
 
   double? storeLongitude;
@@ -152,6 +167,8 @@ abstract class MeerUserProfile
     String? storeName,
     String? storeDescription,
     String? storeAddress,
+    _is2bz3ye.MeerCity? storeCity,
+    String? storeDistrict,
     double? storeLatitude,
     double? storeLongitude,
     DateTime? createdAt,
@@ -174,6 +191,8 @@ abstract class MeerUserProfile
       if (storeName != null) 'storeName': storeName,
       if (storeDescription != null) 'storeDescription': storeDescription,
       if (storeAddress != null) 'storeAddress': storeAddress,
+      if (storeCity != null) 'storeCity': storeCity?.toJson(),
+      if (storeDistrict != null) 'storeDistrict': storeDistrict,
       if (storeLatitude != null) 'storeLatitude': storeLatitude,
       if (storeLongitude != null) 'storeLongitude': storeLongitude,
       'createdAt': createdAt.toJson(),
@@ -198,6 +217,8 @@ abstract class MeerUserProfile
       if (storeName != null) 'storeName': storeName,
       if (storeDescription != null) 'storeDescription': storeDescription,
       if (storeAddress != null) 'storeAddress': storeAddress,
+      if (storeCity != null) 'storeCity': storeCity?.toJson(),
+      if (storeDistrict != null) 'storeDistrict': storeDistrict,
       if (storeLatitude != null) 'storeLatitude': storeLatitude,
       if (storeLongitude != null) 'storeLongitude': storeLongitude,
       'createdAt': createdAt.toJson(),
@@ -250,6 +271,8 @@ class _MeerUserProfileImpl extends MeerUserProfile {
     String? storeName,
     String? storeDescription,
     String? storeAddress,
+    _is2bz3ye.MeerCity? storeCity,
+    String? storeDistrict,
     double? storeLatitude,
     double? storeLongitude,
     required DateTime createdAt,
@@ -268,6 +291,8 @@ class _MeerUserProfileImpl extends MeerUserProfile {
          storeName: storeName,
          storeDescription: storeDescription,
          storeAddress: storeAddress,
+         storeCity: storeCity,
+         storeDistrict: storeDistrict,
          storeLatitude: storeLatitude,
          storeLongitude: storeLongitude,
          createdAt: createdAt,
@@ -292,6 +317,8 @@ class _MeerUserProfileImpl extends MeerUserProfile {
     Object? storeName = _Undefined,
     Object? storeDescription = _Undefined,
     Object? storeAddress = _Undefined,
+    Object? storeCity = _Undefined,
+    Object? storeDistrict = _Undefined,
     Object? storeLatitude = _Undefined,
     Object? storeLongitude = _Undefined,
     DateTime? createdAt,
@@ -315,6 +342,10 @@ class _MeerUserProfileImpl extends MeerUserProfile {
           ? storeDescription
           : this.storeDescription,
       storeAddress: storeAddress is String? ? storeAddress : this.storeAddress,
+      storeCity: storeCity is _is2bz3ye.MeerCity? ? storeCity : this.storeCity,
+      storeDistrict: storeDistrict is String?
+          ? storeDistrict
+          : this.storeDistrict,
       storeLatitude: storeLatitude is double?
           ? storeLatitude
           : this.storeLatitude,
@@ -393,6 +424,19 @@ class MeerUserProfileUpdateTable extends _is.UpdateTable<MeerUserProfileTable> {
         value,
       );
 
+  _is.ColumnValue<_is2bz3ye.MeerCity, _is2bz3ye.MeerCity> storeCity(
+    _is2bz3ye.MeerCity? value,
+  ) => _is.ColumnValue(
+    table.storeCity,
+    value,
+  );
+
+  _is.ColumnValue<String, String> storeDistrict(String? value) =>
+      _is.ColumnValue(
+        table.storeDistrict,
+        value,
+      );
+
   _is.ColumnValue<double, double> storeLatitude(double? value) =>
       _is.ColumnValue(
         table.storeLatitude,
@@ -464,6 +508,15 @@ class MeerUserProfileTable extends _is.Table<int?> {
       'storeAddress',
       this,
     );
+    storeCity = _is.ColumnEnum(
+      'storeCity',
+      this,
+      _is.EnumSerialization.byName,
+    );
+    storeDistrict = _is.ColumnString(
+      'storeDistrict',
+      this,
+    );
     storeLatitude = _is.ColumnDouble(
       'storeLatitude',
       this,
@@ -506,6 +559,10 @@ class MeerUserProfileTable extends _is.Table<int?> {
 
   late final _is.ColumnString storeAddress;
 
+  late final _is.ColumnEnum<_is2bz3ye.MeerCity> storeCity;
+
+  late final _is.ColumnString storeDistrict;
+
   late final _is.ColumnDouble storeLatitude;
 
   late final _is.ColumnDouble storeLongitude;
@@ -540,6 +597,8 @@ class MeerUserProfileTable extends _is.Table<int?> {
     storeName,
     storeDescription,
     storeAddress,
+    storeCity,
+    storeDistrict,
     storeLatitude,
     storeLongitude,
     createdAt,

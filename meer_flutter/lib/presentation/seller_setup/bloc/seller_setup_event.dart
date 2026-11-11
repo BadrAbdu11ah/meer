@@ -6,6 +6,8 @@ sealed class SellerSetupEvent with _$SellerSetupEvent {
     required String storeName,
     required String? storeDescription,
     required String storeAddress,
+    required MeerCity city,
+    required String? district,
     required double latitude,
     required double longitude,
   }) = _SellerSetupSubmitted;

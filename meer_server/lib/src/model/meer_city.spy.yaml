@@ -1,0 +1,4 @@
+enum: MeerCity
+serialized: byName
+values:
+  - madinah

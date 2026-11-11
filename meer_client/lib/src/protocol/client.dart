@@ -17,6 +17,7 @@ import 'package:meer_client/src/protocol/model/cart_item_record.dart'
     as _iivmvpvv;
 import 'package:meer_client/src/protocol/model/favorite_product.dart'
     as _iztphn1q;
+import 'package:meer_client/src/protocol/model/meer_city.dart' as _ifagbua2;
 import 'package:meer_client/src/protocol/model/MeerUserProfile.dart'
     as _ihcobg5g;
 import 'package:meer_client/src/protocol/model/order_info.dart' as _iiv379dz;
@@ -342,12 +343,13 @@ class EndpointProduct extends _isc.EndpointRef {
         {'product': product},
       );
 
-  _ida.Future<List<_i90cwas4.Product>> getAllAvailableProducts() =>
-      caller.callServerEndpoint<List<_i90cwas4.Product>>(
-        'product',
-        'getAllAvailableProducts',
-        {},
-      );
+  _ida.Future<List<_i90cwas4.Product>> getAllAvailableProducts(
+    _ifagbua2.MeerCity city,
+  ) => caller.callServerEndpoint<List<_i90cwas4.Product>>(
+    'product',
+    'getAllAvailableProducts',
+    {'city': city},
+  );
 
   _ida.Future<List<_i90cwas4.Product>> getProductsBySeller(int sellerId) =>
       caller.callServerEndpoint<List<_i90cwas4.Product>>(
@@ -376,12 +378,17 @@ class EndpointProduct extends _isc.EndpointRef {
   );
 
   /// البحث في أسماء المنتجات وأوصافها.
-  _ida.Future<List<_i90cwas4.Product>> searchProducts(String search) =>
-      caller.callServerEndpoint<List<_i90cwas4.Product>>(
-        'product',
-        'searchProducts',
-        {'search': search},
-      );
+  _ida.Future<List<_i90cwas4.Product>> searchProducts(
+    String search,
+    _ifagbua2.MeerCity city,
+  ) => caller.callServerEndpoint<List<_i90cwas4.Product>>(
+    'product',
+    'searchProducts',
+    {
+      'search': search,
+      'city': city,
+    },
+  );
 
   /// 7. تعديل منتج
   _ida.Future<_i90cwas4.Product> updateProduct(_i90cwas4.Product input) =>
@@ -420,6 +427,8 @@ class EndpointSeller extends _isc.EndpointRef {
     String storeName,
     String? storeDescription,
     String storeAddress,
+    _ifagbua2.MeerCity storeCity,
+    String? storeDistrict,
     double latitude,
     double longitude,
   ) => caller.callServerEndpoint<_ihcobg5g.MeerUserProfile>(
@@ -429,6 +438,8 @@ class EndpointSeller extends _isc.EndpointRef {
       'storeName': storeName,
       'storeDescription': storeDescription,
       'storeAddress': storeAddress,
+      'storeCity': storeCity,
+      'storeDistrict': storeDistrict,
       'latitude': latitude,
       'longitude': longitude,
     },

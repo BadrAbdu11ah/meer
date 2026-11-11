@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 // import 'package:meer_flutter/client.dart';
 import 'package:meer_flutter/core/services/app_service.dart';
+import 'package:meer_flutter/core/services/location_service.dart';
 import 'package:meer_flutter/presentation/account/bloc/account_bloc.dart';
 import 'package:meer_flutter/presentation/auth/login/bloc/login_bloc.dart';
 import 'package:meer_flutter/presentation/auth/verify_otp/bloc/verify_otp_bloc.dart';
@@ -19,6 +20,7 @@ import 'package:meer_flutter/presentation/seller_setup/bloc/seller_setup_bloc.da
 import 'package:meer_flutter/repository/auth_repository.dart';
 import 'package:meer_flutter/repository/cart_repository.dart';
 import 'package:meer_flutter/repository/favorites_repository.dart';
+import 'package:meer_flutter/repository/local/city_local_repository.dart';
 import 'package:meer_flutter/repository/order_repository.dart';
 import 'package:meer_flutter/repository/product_repository.dart';
 import 'package:meer_flutter/repository/search_repository.dart';
@@ -35,7 +37,11 @@ Future<void> initGetIt() async {
   sl.registerLazySingleton(
     () => ProductRepository(),
   );
-  sl.registerLazySingleton(() => SearchRepository());
+  sl.registerLazySingleton(() => CityLocalRepository());
+  sl.registerLazySingleton(() => LocationService());
+  sl.registerLazySingleton(
+    () => SearchRepository(sl<CityLocalRepository>()),
+  );
   sl.registerLazySingleton(
     () => SellerRepository(),
   );
@@ -58,7 +64,11 @@ Future<void> initGetIt() async {
 
   // // 3. Home BLoC
   sl.registerFactory(
-    () => HomeBloc(sl<ProductRepository>()),
+    () => HomeBloc(
+      sl<ProductRepository>(),
+      sl<CityLocalRepository>(),
+      sl<LocationService>(),
+    ),
   );
 
   // // 4. Search BloC

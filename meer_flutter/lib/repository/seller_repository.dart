@@ -29,6 +29,8 @@ class SellerRepository {
   Future<Either<Failure, MeerUserProfile>> activateSeller({
     required String storeName,
     required String storeAddress,
+    required MeerCity city,
+    String? district,
     required double latitude,
     required double longitude,
     String? storeDescription,
@@ -38,6 +40,8 @@ class SellerRepository {
         storeName,
         storeDescription,
         storeAddress,
+        city,
+        district,
         latitude,
         longitude,
       );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meer_client/meer_client.dart';
 import 'package:meer_flutter/core/constant/app_route.dart';
 import 'package:meer_flutter/presentation/seller_setup/bloc/seller_setup_bloc.dart';
 import 'package:meer_flutter/presentation/seller_setup/view/seller_setup_view.dart';
@@ -17,6 +18,8 @@ class _SellerSetupScreenState extends State<SellerSetupScreen> {
   final _storeNameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _addressController = TextEditingController();
+  final _districtController = TextEditingController();
+  MeerCity _city = MeerCity.madinah;
   final _latitudeController = TextEditingController();
   final _longitudeController = TextEditingController();
 
@@ -25,6 +28,7 @@ class _SellerSetupScreenState extends State<SellerSetupScreen> {
     _storeNameController.dispose();
     _descriptionController.dispose();
     _addressController.dispose();
+    _districtController.dispose();
     _latitudeController.dispose();
     _longitudeController.dispose();
     super.dispose();
@@ -44,6 +48,10 @@ class _SellerSetupScreenState extends State<SellerSetupScreen> {
             ? null
             : _descriptionController.text.trim(),
         storeAddress: _addressController.text.trim(),
+        city: _city,
+        district: _districtController.text.trim().isEmpty
+            ? null
+            : _districtController.text.trim(),
         latitude: double.parse(
           _latitudeController.text.trim(),
         ),
@@ -95,6 +103,9 @@ class _SellerSetupScreenState extends State<SellerSetupScreen> {
             storeNameController: _storeNameController,
             descriptionController: _descriptionController,
             addressController: _addressController,
+            districtController: _districtController,
+            city: _city,
+            onCityChanged: (city) => setState(() => _city = city),
             latitudeController: _latitudeController,
             longitudeController: _longitudeController,
             isSubmitting: isSubmitting,

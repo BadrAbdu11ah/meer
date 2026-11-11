@@ -429,11 +429,13 @@ extension HomeEventPatterns on HomeEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( HomeProductsRequested value)?  productsRequested,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( HomeStarted value)?  started,TResult Function( HomeProductsRequested value)?  productsRequested,TResult Function( HomeCityChanged value)?  cityChanged,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
-case HomeProductsRequested() when productsRequested != null:
-return productsRequested(_that);case _:
+case HomeStarted() when started != null:
+return started(_that);case HomeProductsRequested() when productsRequested != null:
+return productsRequested(_that);case HomeCityChanged() when cityChanged != null:
+return cityChanged(_that);case _:
   return orElse();
 
 }
@@ -451,11 +453,13 @@ return productsRequested(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( HomeProductsRequested value)  productsRequested,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( HomeStarted value)  started,required TResult Function( HomeProductsRequested value)  productsRequested,required TResult Function( HomeCityChanged value)  cityChanged,}){
 final _that = this;
 switch (_that) {
-case HomeProductsRequested():
-return productsRequested(_that);}
+case HomeStarted():
+return started(_that);case HomeProductsRequested():
+return productsRequested(_that);case HomeCityChanged():
+return cityChanged(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
 ///
@@ -469,11 +473,13 @@ return productsRequested(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( HomeProductsRequested value)?  productsRequested,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( HomeStarted value)?  started,TResult? Function( HomeProductsRequested value)?  productsRequested,TResult? Function( HomeCityChanged value)?  cityChanged,}){
 final _that = this;
 switch (_that) {
-case HomeProductsRequested() when productsRequested != null:
-return productsRequested(_that);case _:
+case HomeStarted() when started != null:
+return started(_that);case HomeProductsRequested() when productsRequested != null:
+return productsRequested(_that);case HomeCityChanged() when cityChanged != null:
+return cityChanged(_that);case _:
   return null;
 
 }
@@ -490,10 +496,12 @@ return productsRequested(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  productsRequested,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  started,TResult Function()?  productsRequested,TResult Function( MeerCity city)?  cityChanged,required TResult orElse(),}) {final _that = this;
 switch (_that) {
-case HomeProductsRequested() when productsRequested != null:
-return productsRequested();case _:
+case HomeStarted() when started != null:
+return started();case HomeProductsRequested() when productsRequested != null:
+return productsRequested();case HomeCityChanged() when cityChanged != null:
+return cityChanged(_that.city);case _:
   return orElse();
 
 }
@@ -511,10 +519,12 @@ return productsRequested();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  productsRequested,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  started,required TResult Function()  productsRequested,required TResult Function( MeerCity city)  cityChanged,}) {final _that = this;
 switch (_that) {
-case HomeProductsRequested():
-return productsRequested();}
+case HomeStarted():
+return started();case HomeProductsRequested():
+return productsRequested();case HomeCityChanged():
+return cityChanged(_that.city);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -528,16 +538,50 @@ return productsRequested();}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  productsRequested,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  started,TResult? Function()?  productsRequested,TResult? Function( MeerCity city)?  cityChanged,}) {final _that = this;
 switch (_that) {
-case HomeProductsRequested() when productsRequested != null:
-return productsRequested();case _:
+case HomeStarted() when started != null:
+return started();case HomeProductsRequested() when productsRequested != null:
+return productsRequested();case HomeCityChanged() when cityChanged != null:
+return cityChanged(_that.city);case _:
   return null;
 
 }
 }
 
 }
+
+/// @nodoc
+
+
+class HomeStarted implements HomeEvent {
+  const HomeStarted();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeStarted);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'HomeEvent.started()';
+}
+
+
+}
+
+
+
 
 /// @nodoc
 
@@ -570,5 +614,71 @@ String toString() {
 
 
 
+
+/// @nodoc
+
+
+class HomeCityChanged implements HomeEvent {
+  const HomeCityChanged(this.city);
+  
+
+ final  MeerCity city;
+
+/// Create a copy of HomeEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$HomeCityChangedCopyWith<HomeCityChanged> get copyWith => _$HomeCityChangedCopyWithImpl<HomeCityChanged>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is HomeCityChanged&&(identical(other.city, city) || other.city == city));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,city);
+
+@override
+String toString() {
+  return 'HomeEvent.cityChanged(city: $city)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $HomeCityChangedCopyWith<$Res> implements $HomeEventCopyWith<$Res> {
+  factory $HomeCityChangedCopyWith(HomeCityChanged value, $Res Function(HomeCityChanged) _then) = _$HomeCityChangedCopyWithImpl;
+@useResult
+$Res call({
+ MeerCity city
+});
+
+
+
+
+}
+/// @nodoc
+class _$HomeCityChangedCopyWithImpl<$Res>
+    implements $HomeCityChangedCopyWith<$Res> {
+  _$HomeCityChangedCopyWithImpl(this._self, this._then);
+
+  final HomeCityChanged _self;
+  final $Res Function(HomeCityChanged) _then;
+
+/// Create a copy of HomeEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? city = null,}) {
+  return _then(HomeCityChanged(
+null == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
+as MeerCity,
+  ));
+}
+
+
+}
 
 // dart format on

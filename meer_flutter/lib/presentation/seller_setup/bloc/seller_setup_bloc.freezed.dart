@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SellerSetupEvent {
 
- String get storeName; String? get storeDescription; String get storeAddress; double get latitude; double get longitude;
+ String get storeName; String? get storeDescription; String get storeAddress; MeerCity get city; String? get district; double get latitude; double get longitude;
 /// Create a copy of SellerSetupEvent
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $SellerSetupEventCopyWith<SellerSetupEvent> get copyWith => _$SellerSetupEventCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SellerSetupEvent&&(identical(other.storeName, storeName) || other.storeName == storeName)&&(identical(other.storeDescription, storeDescription) || other.storeDescription == storeDescription)&&(identical(other.storeAddress, storeAddress) || other.storeAddress == storeAddress)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SellerSetupEvent&&(identical(other.storeName, storeName) || other.storeName == storeName)&&(identical(other.storeDescription, storeDescription) || other.storeDescription == storeDescription)&&(identical(other.storeAddress, storeAddress) || other.storeAddress == storeAddress)&&(identical(other.city, city) || other.city == city)&&(identical(other.district, district) || other.district == district)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,storeName,storeDescription,storeAddress,latitude,longitude);
+int get hashCode => Object.hash(runtimeType,storeName,storeDescription,storeAddress,city,district,latitude,longitude);
 
 @override
 String toString() {
-  return 'SellerSetupEvent(storeName: $storeName, storeDescription: $storeDescription, storeAddress: $storeAddress, latitude: $latitude, longitude: $longitude)';
+  return 'SellerSetupEvent(storeName: $storeName, storeDescription: $storeDescription, storeAddress: $storeAddress, city: $city, district: $district, latitude: $latitude, longitude: $longitude)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $SellerSetupEventCopyWith<$Res>  {
   factory $SellerSetupEventCopyWith(SellerSetupEvent value, $Res Function(SellerSetupEvent) _then) = _$SellerSetupEventCopyWithImpl;
 @useResult
 $Res call({
- String storeName, String? storeDescription, String storeAddress, double latitude, double longitude
+ String storeName, String? storeDescription, String storeAddress, MeerCity city, String? district, double latitude, double longitude
 });
 
 
@@ -62,12 +62,14 @@ class _$SellerSetupEventCopyWithImpl<$Res>
 
 /// Create a copy of SellerSetupEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? storeName = null,Object? storeDescription = freezed,Object? storeAddress = null,Object? latitude = null,Object? longitude = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? storeName = null,Object? storeDescription = freezed,Object? storeAddress = null,Object? city = null,Object? district = freezed,Object? latitude = null,Object? longitude = null,}) {
   return _then(_self.copyWith(
 storeName: null == storeName ? _self.storeName : storeName // ignore: cast_nullable_to_non_nullable
 as String,storeDescription: freezed == storeDescription ? _self.storeDescription : storeDescription // ignore: cast_nullable_to_non_nullable
 as String?,storeAddress: null == storeAddress ? _self.storeAddress : storeAddress // ignore: cast_nullable_to_non_nullable
-as String,latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
+as String,city: null == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
+as MeerCity,district: freezed == district ? _self.district : district // ignore: cast_nullable_to_non_nullable
+as String?,latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double,longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
 as double,
   ));
@@ -151,10 +153,10 @@ return submitted(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String storeName,  String? storeDescription,  String storeAddress,  double latitude,  double longitude)?  submitted,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String storeName,  String? storeDescription,  String storeAddress,  MeerCity city,  String? district,  double latitude,  double longitude)?  submitted,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SellerSetupSubmitted() when submitted != null:
-return submitted(_that.storeName,_that.storeDescription,_that.storeAddress,_that.latitude,_that.longitude);case _:
+return submitted(_that.storeName,_that.storeDescription,_that.storeAddress,_that.city,_that.district,_that.latitude,_that.longitude);case _:
   return orElse();
 
 }
@@ -172,10 +174,10 @@ return submitted(_that.storeName,_that.storeDescription,_that.storeAddress,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String storeName,  String? storeDescription,  String storeAddress,  double latitude,  double longitude)  submitted,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String storeName,  String? storeDescription,  String storeAddress,  MeerCity city,  String? district,  double latitude,  double longitude)  submitted,}) {final _that = this;
 switch (_that) {
 case _SellerSetupSubmitted():
-return submitted(_that.storeName,_that.storeDescription,_that.storeAddress,_that.latitude,_that.longitude);}
+return submitted(_that.storeName,_that.storeDescription,_that.storeAddress,_that.city,_that.district,_that.latitude,_that.longitude);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -189,10 +191,10 @@ return submitted(_that.storeName,_that.storeDescription,_that.storeAddress,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String storeName,  String? storeDescription,  String storeAddress,  double latitude,  double longitude)?  submitted,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String storeName,  String? storeDescription,  String storeAddress,  MeerCity city,  String? district,  double latitude,  double longitude)?  submitted,}) {final _that = this;
 switch (_that) {
 case _SellerSetupSubmitted() when submitted != null:
-return submitted(_that.storeName,_that.storeDescription,_that.storeAddress,_that.latitude,_that.longitude);case _:
+return submitted(_that.storeName,_that.storeDescription,_that.storeAddress,_that.city,_that.district,_that.latitude,_that.longitude);case _:
   return null;
 
 }
@@ -204,12 +206,14 @@ return submitted(_that.storeName,_that.storeDescription,_that.storeAddress,_that
 
 
 class _SellerSetupSubmitted implements SellerSetupEvent {
-  const _SellerSetupSubmitted({required this.storeName, required this.storeDescription, required this.storeAddress, required this.latitude, required this.longitude});
+  const _SellerSetupSubmitted({required this.storeName, required this.storeDescription, required this.storeAddress, required this.city, required this.district, required this.latitude, required this.longitude});
   
 
 @override final  String storeName;
 @override final  String? storeDescription;
 @override final  String storeAddress;
+@override final  MeerCity city;
+@override final  String? district;
 @override final  double latitude;
 @override final  double longitude;
 
@@ -223,16 +227,16 @@ _$SellerSetupSubmittedCopyWith<_SellerSetupSubmitted> get copyWith => __$SellerS
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SellerSetupSubmitted&&(identical(other.storeName, storeName) || other.storeName == storeName)&&(identical(other.storeDescription, storeDescription) || other.storeDescription == storeDescription)&&(identical(other.storeAddress, storeAddress) || other.storeAddress == storeAddress)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SellerSetupSubmitted&&(identical(other.storeName, storeName) || other.storeName == storeName)&&(identical(other.storeDescription, storeDescription) || other.storeDescription == storeDescription)&&(identical(other.storeAddress, storeAddress) || other.storeAddress == storeAddress)&&(identical(other.city, city) || other.city == city)&&(identical(other.district, district) || other.district == district)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,storeName,storeDescription,storeAddress,latitude,longitude);
+int get hashCode => Object.hash(runtimeType,storeName,storeDescription,storeAddress,city,district,latitude,longitude);
 
 @override
 String toString() {
-  return 'SellerSetupEvent.submitted(storeName: $storeName, storeDescription: $storeDescription, storeAddress: $storeAddress, latitude: $latitude, longitude: $longitude)';
+  return 'SellerSetupEvent.submitted(storeName: $storeName, storeDescription: $storeDescription, storeAddress: $storeAddress, city: $city, district: $district, latitude: $latitude, longitude: $longitude)';
 }
 
 
@@ -243,7 +247,7 @@ abstract mixin class _$SellerSetupSubmittedCopyWith<$Res> implements $SellerSetu
   factory _$SellerSetupSubmittedCopyWith(_SellerSetupSubmitted value, $Res Function(_SellerSetupSubmitted) _then) = __$SellerSetupSubmittedCopyWithImpl;
 @override @useResult
 $Res call({
- String storeName, String? storeDescription, String storeAddress, double latitude, double longitude
+ String storeName, String? storeDescription, String storeAddress, MeerCity city, String? district, double latitude, double longitude
 });
 
 
@@ -260,12 +264,14 @@ class __$SellerSetupSubmittedCopyWithImpl<$Res>
 
 /// Create a copy of SellerSetupEvent
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? storeName = null,Object? storeDescription = freezed,Object? storeAddress = null,Object? latitude = null,Object? longitude = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? storeName = null,Object? storeDescription = freezed,Object? storeAddress = null,Object? city = null,Object? district = freezed,Object? latitude = null,Object? longitude = null,}) {
   return _then(_SellerSetupSubmitted(
 storeName: null == storeName ? _self.storeName : storeName // ignore: cast_nullable_to_non_nullable
 as String,storeDescription: freezed == storeDescription ? _self.storeDescription : storeDescription // ignore: cast_nullable_to_non_nullable
 as String?,storeAddress: null == storeAddress ? _self.storeAddress : storeAddress // ignore: cast_nullable_to_non_nullable
-as String,latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
+as String,city: null == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
+as MeerCity,district: freezed == district ? _self.district : district // ignore: cast_nullable_to_non_nullable
+as String?,latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double,longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
 as double,
   ));

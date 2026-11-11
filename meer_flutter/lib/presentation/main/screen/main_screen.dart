@@ -52,7 +52,7 @@ class _MainScreenState extends State<MainScreen> {
             final bloc = sl<HomeBloc>();
             _homeBloc = bloc;
 
-            bloc.add(const HomeProductsRequested());
+            bloc.add(const HomeStarted());
 
             return bloc;
           },

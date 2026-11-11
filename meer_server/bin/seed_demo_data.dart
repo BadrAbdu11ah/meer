@@ -43,16 +43,36 @@ Future<void> main(List<String> args) async {
             phone: '0500000000',
             email: demoSellerEmail,
             role: 'seller',
+            isSeller: true,
             address: 'المدينة المنورة - حي تجريبي',
             latitude: 24.5247,
             longitude: 39.5692,
+            storeName: 'أسرة مِيْر التجريبية',
+            storeDescription: 'أكلات منزلية للتجربة.',
+            storeAddress: 'المدينة المنورة - حي تجريبي',
+            storeCity: MeerCity.madinah,
+            storeDistrict: 'حي تجريبي',
+            storeLatitude: 24.5247,
+            storeLongitude: 39.5692,
             createdAt: DateTime.now().toUtc(),
           ),
         );
 
         print('تم إنشاء الأسرة التجريبية.');
       } else {
-        print('الأسرة التجريبية موجودة مسبقًا.');
+        // الأسرة موجودة من تشغيل سابق: نحدّث بياناتها بدل تخطيها.
+        seller.isSeller = true;
+        seller.storeName ??= 'أسرة مِيْر التجريبية';
+        seller.storeDescription ??= 'أكلات منزلية للتجربة.';
+        seller.storeAddress ??= 'المدينة المنورة - حي تجريبي';
+        seller.storeCity = MeerCity.madinah;
+        seller.storeDistrict ??= 'حي تجريبي';
+        seller.storeLatitude ??= 24.5247;
+        seller.storeLongitude ??= 39.5692;
+
+        seller = await MeerUserProfile.db.updateRow(session, seller);
+
+        print('تم تحديث بيانات الأسرة التجريبية.');
       }
 
       final sellerId = seller.id;

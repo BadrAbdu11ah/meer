@@ -73,10 +73,12 @@ class ProductRepository {
   }
 
   // 4.
-  /// جلب جميع المنتجات المتاحة للمشترين.
-  Future<Either<Failure, List<Product>>> getAllAvailableProducts() async {
+  /// جلب المنتجات المتاحة للمشترين في مدينة محددة.
+  Future<Either<Failure, List<Product>>> getAllAvailableProducts(
+    MeerCity city,
+  ) async {
     try {
-      final products = await client.product.getAllAvailableProducts();
+      final products = await client.product.getAllAvailableProducts(city);
 
       return Right(products);
     } catch (e) {
