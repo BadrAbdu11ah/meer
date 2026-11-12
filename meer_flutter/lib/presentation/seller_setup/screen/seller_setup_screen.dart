@@ -6,7 +6,15 @@ import 'package:meer_flutter/presentation/seller_setup/bloc/seller_setup_bloc.da
 import 'package:meer_flutter/presentation/seller_setup/view/seller_setup_view.dart';
 
 class SellerSetupScreen extends StatefulWidget {
-  const SellerSetupScreen({super.key});
+  const SellerSetupScreen({
+    super.key,
+    this.initialProfile,
+  });
+
+  /// عند تمريره تعمل الشاشة في وضع تعديل بيانات الأسرة الحالية.
+  final MeerUserProfile? initialProfile;
+
+  bool get isEditing => initialProfile != null;
 
   @override
   State<SellerSetupScreen> createState() => _SellerSetupScreenState();
@@ -22,6 +30,23 @@ class _SellerSetupScreenState extends State<SellerSetupScreen> {
   MeerCity _city = MeerCity.madinah;
   final _latitudeController = TextEditingController();
   final _longitudeController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    final profile = widget.initialProfile;
+
+    if (profile != null) {
+      _storeNameController.text = profile.storeName ?? '';
+      _descriptionController.text = profile.storeDescription ?? '';
+      _addressController.text = profile.storeAddress ?? '';
+      _districtController.text = profile.storeDistrict ?? '';
+      _city = profile.storeCity ?? MeerCity.madinah;
+      _latitudeController.text = profile.storeLatitude?.toString() ?? '';
+      _longitudeController.text = profile.storeLongitude?.toString() ?? '';
+    }
+  }
 
   @override
   void dispose() {
@@ -68,14 +93,18 @@ class _SellerSetupScreenState extends State<SellerSetupScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'إعداد المتجر',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          widget.isEditing ? 'تعديل بيانات الأسرة' : 'إعداد المتجر',
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: BlocConsumer<SellerSetupBloc, SellerSetupState>(
         listener: (context, state) {
           state.whenOrNull(
+            locationFound: (latitude, longitude) {
+              _latitudeController.text = latitude.toStringAsFixed(6);
+              _longitudeController.text = longitude.toStringAsFixed(6);
+            },
             failure: (message) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -85,6 +114,17 @@ class _SellerSetupScreenState extends State<SellerSetupScreen> {
               );
             },
             success: (profile) {
+              if (widget.isEditing) {
+                // وضع التعديل: نرجع لشاشة الحساب.
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('تم حفظ بيانات الأسرة.'),
+                  ),
+                );
+                Navigator.pop(context, true);
+                return;
+              }
+
               Navigator.pushReplacementNamed(
                 context,
                 AppRoute.sellerProductsScreen,
@@ -95,6 +135,11 @@ class _SellerSetupScreenState extends State<SellerSetupScreen> {
         builder: (context, state) {
           final isSubmitting = state.maybeWhen(
             submitting: () => true,
+            orElse: () => false,
+          );
+
+          final isLocating = state.maybeWhen(
+            locating: () => true,
             orElse: () => false,
           );
 
@@ -109,6 +154,13 @@ class _SellerSetupScreenState extends State<SellerSetupScreen> {
             latitudeController: _latitudeController,
             longitudeController: _longitudeController,
             isSubmitting: isSubmitting,
+            isEditing: widget.isEditing,
+            isLocating: isLocating,
+            onUseCurrentLocation: () {
+              context.read<SellerSetupBloc>().add(
+                const SellerSetupEvent.locationRequested(),
+              );
+            },
             onSubmit: _submit,
           );
         },

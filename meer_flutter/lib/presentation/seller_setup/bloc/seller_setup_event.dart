@@ -11,4 +11,8 @@ sealed class SellerSetupEvent with _$SellerSetupEvent {
     required double latitude,
     required double longitude,
   }) = _SellerSetupSubmitted;
+
+  /// زر «استخدم موقعي الحالي» لتعبئة إحداثيات المتجر.
+  const factory SellerSetupEvent.locationRequested() =
+      _SellerSetupLocationRequested;
 }

@@ -86,6 +86,20 @@ class _AccountScreenState extends State<AccountScreen> {
                   );
                 },
 
+                onEditStore: () async {
+                  await Navigator.pushNamed(
+                    context,
+                    AppRoute.sellerSetupScreen,
+                    arguments: profile,
+                  );
+                  if (!context.mounted) return;
+
+                  // تحديث ملف المستخدم بعد العودة من تعديل بيانات الأسرة.
+                  context.read<AccountBloc>().add(
+                    const AccountEvent.refreshRequested(),
+                  );
+                },
+
                 onSignOut: signOut,
 
                 onStartSelling: () async {

@@ -21,6 +21,9 @@ favorite:
   - addFavorite:
   - removeFavorite:
   - clearMyFavorites:
+image:
+  - createProductImageUpload:
+  - verifyProductImageUpload:
 order:
   - createOrder:
   - getMyCustomerOrders:

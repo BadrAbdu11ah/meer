@@ -17,6 +17,8 @@ import 'package:meer_client/src/protocol/model/cart_item_record.dart'
     as _iivmvpvv;
 import 'package:meer_client/src/protocol/model/favorite_product.dart'
     as _iztphn1q;
+import 'package:meer_client/src/protocol/model/image_upload_description.dart'
+    as _i9nqlixc;
 import 'package:meer_client/src/protocol/model/meer_city.dart' as _ifagbua2;
 import 'package:meer_client/src/protocol/model/MeerUserProfile.dart'
     as _ihcobg5g;
@@ -267,6 +269,35 @@ class EndpointFavorite extends _isc.EndpointRef {
     'clearMyFavorites',
     {},
   );
+}
+
+/// رفع صور الأسر المنتجة (صور المنتجات) إلى تخزين Serverpod.
+///
+/// الرفع على خطوتين:
+/// 1. [createProductImageUpload]: الخادم يجهّز مسارًا ووصف رفع.
+/// 2. التطبيق يرفع الملف مباشرة إلى التخزين.
+/// 3. [verifyProductImageUpload]: الخادم يتأكد من الرفع ويرجع رابط الصورة.
+/// {@category Endpoint}
+class EndpointImage extends _isc.EndpointRef {
+  EndpointImage(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'image';
+
+  _ida.Future<_i9nqlixc.ImageUploadDescription> createProductImageUpload(
+    String fileExtension,
+  ) => caller.callServerEndpoint<_i9nqlixc.ImageUploadDescription>(
+    'image',
+    'createProductImageUpload',
+    {'fileExtension': fileExtension},
+  );
+
+  _ida.Future<String> verifyProductImageUpload(String filePath) =>
+      caller.callServerEndpoint<String>(
+        'image',
+        'verifyProductImageUpload',
+        {'filePath': filePath},
+      );
 }
 
 /// {@category Endpoint}
@@ -548,6 +579,7 @@ class Client extends _isc.ServerpodClientShared {
     appAuth = EndpointAppAuth(this);
     cart = EndpointCart(this);
     favorite = EndpointFavorite(this);
+    image = EndpointImage(this);
     order = EndpointOrder(this);
     product = EndpointProduct(this);
     seller = EndpointSeller(this);
@@ -564,6 +596,8 @@ class Client extends _isc.ServerpodClientShared {
   late final EndpointCart cart;
 
   late final EndpointFavorite favorite;
+
+  late final EndpointImage image;
 
   late final EndpointOrder order;
 
@@ -582,6 +616,7 @@ class Client extends _isc.ServerpodClientShared {
     'appAuth': appAuth,
     'cart': cart,
     'favorite': favorite,
+    'image': image,
     'order': order,
     'product': product,
     'seller': seller,

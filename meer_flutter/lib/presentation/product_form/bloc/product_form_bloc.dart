@@ -1,6 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:meer_client/meer_client.dart';
+import 'package:meer_flutter/repository/image_repository.dart';
 import 'package:meer_flutter/repository/product_repository.dart';
 
 part 'product_form_event.dart';
@@ -9,13 +12,15 @@ part 'product_form_bloc.freezed.dart';
 
 class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
   ProductFormBloc(
-    this._productRepository, {
+    this._productRepository,
+    this._imageRepository, {
     this.productToEdit,
   }) : super(const ProductFormState.initial()) {
     on<ProductFormSubmitted>(_onSubmitted);
   }
 
   final ProductRepository _productRepository;
+  final ImageRepository _imageRepository;
 
   /// null تعني إضافة منتج، ووجود المنتج يعني تعديله.
   final Product? productToEdit;
@@ -27,7 +32,8 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
     final name = event.name.trim();
     final price = double.tryParse(event.price.trim());
     final description = event.description?.trim();
-    final imageUrl = event.imageUrl?.trim();
+    var imageUrl = event.imageUrl?.trim();
+    final newImageBytes = event.newImageBytes;
 
     if (name.isEmpty) {
       emit(
@@ -66,6 +72,35 @@ class ProductFormBloc extends Bloc<ProductFormEvent, ProductFormState> {
     emit(const ProductFormState.submitting());
 
     try {
+      // رفع الصورة الجديدة أولًا، ثم نحفظ رابطها مع المنتج.
+      if (newImageBytes != null) {
+        final uploadResult = await _imageRepository.uploadProductImage(
+          bytes: newImageBytes,
+          extension: event.newImageExtension ?? 'jpg',
+        );
+
+        String? uploadedUrl;
+        String? uploadFailure;
+
+        uploadResult.fold(
+          (failure) => uploadFailure = failure.message,
+          (url) => uploadedUrl = url,
+        );
+
+        final uploaded = uploadedUrl;
+
+        if (uploaded == null) {
+          emit(
+            ProductFormState.failure(
+              uploadFailure ?? 'تعذر رفع الصورة. حاول مرة أخرى.',
+            ),
+          );
+          return;
+        }
+
+        imageUrl = uploaded;
+      }
+
       final existingProduct = productToEdit;
 
       final product = Product(

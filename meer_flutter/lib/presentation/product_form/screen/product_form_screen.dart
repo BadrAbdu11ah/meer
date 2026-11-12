@@ -54,6 +54,8 @@ class ProductFormScreen extends StatelessWidget {
                     required price,
                     description,
                     imageUrl,
+                    newImageBytes,
+                    newImageExtension,
                   }) {
                     context.read<ProductFormBloc>().add(
                       ProductFormEvent.submitted(
@@ -61,6 +63,8 @@ class ProductFormScreen extends StatelessWidget {
                         price: price,
                         description: description,
                         imageUrl: imageUrl,
+                        newImageBytes: newImageBytes,
+                        newImageExtension: newImageExtension,
                       ),
                     );
                   },

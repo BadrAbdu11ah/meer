@@ -6,6 +6,7 @@ class AccountView extends StatelessWidget {
     required this.isSeller,
     required this.onManageProducts,
     required this.onManageOrders,
+    required this.onEditStore,
     required this.onSignOut,
     required this.onStartSelling,
   });
@@ -13,6 +14,7 @@ class AccountView extends StatelessWidget {
   final bool isSeller;
   final VoidCallback onManageProducts;
   final VoidCallback onManageOrders;
+  final VoidCallback onEditStore;
   final VoidCallback onSignOut;
   final VoidCallback onStartSelling;
 
@@ -90,6 +92,12 @@ class AccountView extends StatelessWidget {
             title: 'الطلبات الواردة',
             subtitle: 'عرض طلبات عملائك وقبولها وتجهيزها',
             onTap: onManageOrders,
+          ),
+          _AccountActionTile(
+            icon: Icons.edit_location_alt_outlined,
+            title: 'تعديل بيانات الأسرة',
+            subtitle: 'الاسم والمدينة والحي والعنوان',
+            onTap: onEditStore,
           ),
         ] else
           _AccountActionTile(

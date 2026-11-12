@@ -1,0 +1,6 @@
+class: ImageUploadDescription
+fields:
+  # مسار الملف داخل التخزين، ويُرسل مرة أخرى عند التحقق من الرفع.
+  filePath: String
+  # وصف الرفع الذي يستخدمه FileUploader في التطبيق.
+  uploadDescription: String

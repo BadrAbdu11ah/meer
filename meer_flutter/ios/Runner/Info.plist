@@ -4,6 +4,10 @@
 <dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>نستخدم موقعك لعرض الأسر المنتجة في مدينتك.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>نحتاج الوصول إلى الصور لإضافة صور منتجاتك.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>نحتاج الكاميرا لالتقاط صور منتجاتك.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>

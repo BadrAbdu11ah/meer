@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meer_client/meer_client.dart';
+import 'package:meer_flutter/core/constant/app_route.dart';
 import 'package:meer_flutter/presentation/shared/widgets/product_card.dart';
 
 class ListProductsSearch extends StatelessWidget {
@@ -24,6 +25,12 @@ class ListProductsSearch extends StatelessWidget {
       itemBuilder: (context, index) {
         return ProductCard(
           product: products[index],
+          onTap: () {
+            Navigator.of(context).pushNamed(
+              AppRoute.productDetailsScreen,
+              arguments: products[index],
+            );
+          },
         );
       },
     );

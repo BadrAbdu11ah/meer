@@ -14,67 +14,30 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SellerSetupEvent {
 
- String get storeName; String? get storeDescription; String get storeAddress; MeerCity get city; String? get district; double get latitude; double get longitude;
-/// Create a copy of SellerSetupEvent
-/// with the given fields replaced by the non-null parameter values.
-@JsonKey(includeFromJson: false, includeToJson: false)
-@pragma('vm:prefer-inline')
-$SellerSetupEventCopyWith<SellerSetupEvent> get copyWith => _$SellerSetupEventCopyWithImpl<SellerSetupEvent>(this as SellerSetupEvent, _$identity);
+
 
 
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SellerSetupEvent&&(identical(other.storeName, storeName) || other.storeName == storeName)&&(identical(other.storeDescription, storeDescription) || other.storeDescription == storeDescription)&&(identical(other.storeAddress, storeAddress) || other.storeAddress == storeAddress)&&(identical(other.city, city) || other.city == city)&&(identical(other.district, district) || other.district == district)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SellerSetupEvent);
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,storeName,storeDescription,storeAddress,city,district,latitude,longitude);
+int get hashCode => runtimeType.hashCode;
 
 @override
 String toString() {
-  return 'SellerSetupEvent(storeName: $storeName, storeDescription: $storeDescription, storeAddress: $storeAddress, city: $city, district: $district, latitude: $latitude, longitude: $longitude)';
+  return 'SellerSetupEvent()';
 }
 
 
 }
 
 /// @nodoc
-abstract mixin class $SellerSetupEventCopyWith<$Res>  {
-  factory $SellerSetupEventCopyWith(SellerSetupEvent value, $Res Function(SellerSetupEvent) _then) = _$SellerSetupEventCopyWithImpl;
-@useResult
-$Res call({
- String storeName, String? storeDescription, String storeAddress, MeerCity city, String? district, double latitude, double longitude
-});
-
-
-
-
-}
-/// @nodoc
-class _$SellerSetupEventCopyWithImpl<$Res>
-    implements $SellerSetupEventCopyWith<$Res> {
-  _$SellerSetupEventCopyWithImpl(this._self, this._then);
-
-  final SellerSetupEvent _self;
-  final $Res Function(SellerSetupEvent) _then;
-
-/// Create a copy of SellerSetupEvent
-/// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? storeName = null,Object? storeDescription = freezed,Object? storeAddress = null,Object? city = null,Object? district = freezed,Object? latitude = null,Object? longitude = null,}) {
-  return _then(_self.copyWith(
-storeName: null == storeName ? _self.storeName : storeName // ignore: cast_nullable_to_non_nullable
-as String,storeDescription: freezed == storeDescription ? _self.storeDescription : storeDescription // ignore: cast_nullable_to_non_nullable
-as String?,storeAddress: null == storeAddress ? _self.storeAddress : storeAddress // ignore: cast_nullable_to_non_nullable
-as String,city: null == city ? _self.city : city // ignore: cast_nullable_to_non_nullable
-as MeerCity,district: freezed == district ? _self.district : district // ignore: cast_nullable_to_non_nullable
-as String?,latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
-as double,longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
-as double,
-  ));
-}
-
+class $SellerSetupEventCopyWith<$Res>  {
+$SellerSetupEventCopyWith(SellerSetupEvent _, $Res Function(SellerSetupEvent) __);
 }
 
 
@@ -92,11 +55,12 @@ extension SellerSetupEventPatterns on SellerSetupEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _SellerSetupSubmitted value)?  submitted,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _SellerSetupSubmitted value)?  submitted,TResult Function( _SellerSetupLocationRequested value)?  locationRequested,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _SellerSetupSubmitted() when submitted != null:
-return submitted(_that);case _:
+return submitted(_that);case _SellerSetupLocationRequested() when locationRequested != null:
+return locationRequested(_that);case _:
   return orElse();
 
 }
@@ -114,11 +78,12 @@ return submitted(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _SellerSetupSubmitted value)  submitted,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _SellerSetupSubmitted value)  submitted,required TResult Function( _SellerSetupLocationRequested value)  locationRequested,}){
 final _that = this;
 switch (_that) {
 case _SellerSetupSubmitted():
-return submitted(_that);}
+return submitted(_that);case _SellerSetupLocationRequested():
+return locationRequested(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
 ///
@@ -132,11 +97,12 @@ return submitted(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _SellerSetupSubmitted value)?  submitted,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _SellerSetupSubmitted value)?  submitted,TResult? Function( _SellerSetupLocationRequested value)?  locationRequested,}){
 final _that = this;
 switch (_that) {
 case _SellerSetupSubmitted() when submitted != null:
-return submitted(_that);case _:
+return submitted(_that);case _SellerSetupLocationRequested() when locationRequested != null:
+return locationRequested(_that);case _:
   return null;
 
 }
@@ -153,10 +119,11 @@ return submitted(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String storeName,  String? storeDescription,  String storeAddress,  MeerCity city,  String? district,  double latitude,  double longitude)?  submitted,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String storeName,  String? storeDescription,  String storeAddress,  MeerCity city,  String? district,  double latitude,  double longitude)?  submitted,TResult Function()?  locationRequested,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SellerSetupSubmitted() when submitted != null:
-return submitted(_that.storeName,_that.storeDescription,_that.storeAddress,_that.city,_that.district,_that.latitude,_that.longitude);case _:
+return submitted(_that.storeName,_that.storeDescription,_that.storeAddress,_that.city,_that.district,_that.latitude,_that.longitude);case _SellerSetupLocationRequested() when locationRequested != null:
+return locationRequested();case _:
   return orElse();
 
 }
@@ -174,10 +141,11 @@ return submitted(_that.storeName,_that.storeDescription,_that.storeAddress,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String storeName,  String? storeDescription,  String storeAddress,  MeerCity city,  String? district,  double latitude,  double longitude)  submitted,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String storeName,  String? storeDescription,  String storeAddress,  MeerCity city,  String? district,  double latitude,  double longitude)  submitted,required TResult Function()  locationRequested,}) {final _that = this;
 switch (_that) {
 case _SellerSetupSubmitted():
-return submitted(_that.storeName,_that.storeDescription,_that.storeAddress,_that.city,_that.district,_that.latitude,_that.longitude);}
+return submitted(_that.storeName,_that.storeDescription,_that.storeAddress,_that.city,_that.district,_that.latitude,_that.longitude);case _SellerSetupLocationRequested():
+return locationRequested();}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -191,10 +159,11 @@ return submitted(_that.storeName,_that.storeDescription,_that.storeAddress,_that
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String storeName,  String? storeDescription,  String storeAddress,  MeerCity city,  String? district,  double latitude,  double longitude)?  submitted,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String storeName,  String? storeDescription,  String storeAddress,  MeerCity city,  String? district,  double latitude,  double longitude)?  submitted,TResult? Function()?  locationRequested,}) {final _that = this;
 switch (_that) {
 case _SellerSetupSubmitted() when submitted != null:
-return submitted(_that.storeName,_that.storeDescription,_that.storeAddress,_that.city,_that.district,_that.latitude,_that.longitude);case _:
+return submitted(_that.storeName,_that.storeDescription,_that.storeAddress,_that.city,_that.district,_that.latitude,_that.longitude);case _SellerSetupLocationRequested() when locationRequested != null:
+return locationRequested();case _:
   return null;
 
 }
@@ -209,17 +178,17 @@ class _SellerSetupSubmitted implements SellerSetupEvent {
   const _SellerSetupSubmitted({required this.storeName, required this.storeDescription, required this.storeAddress, required this.city, required this.district, required this.latitude, required this.longitude});
   
 
-@override final  String storeName;
-@override final  String? storeDescription;
-@override final  String storeAddress;
-@override final  MeerCity city;
-@override final  String? district;
-@override final  double latitude;
-@override final  double longitude;
+ final  String storeName;
+ final  String? storeDescription;
+ final  String storeAddress;
+ final  MeerCity city;
+ final  String? district;
+ final  double latitude;
+ final  double longitude;
 
 /// Create a copy of SellerSetupEvent
 /// with the given fields replaced by the non-null parameter values.
-@override @JsonKey(includeFromJson: false, includeToJson: false)
+@JsonKey(includeFromJson: false, includeToJson: false)
 @pragma('vm:prefer-inline')
 _$SellerSetupSubmittedCopyWith<_SellerSetupSubmitted> get copyWith => __$SellerSetupSubmittedCopyWithImpl<_SellerSetupSubmitted>(this, _$identity);
 
@@ -245,7 +214,7 @@ String toString() {
 /// @nodoc
 abstract mixin class _$SellerSetupSubmittedCopyWith<$Res> implements $SellerSetupEventCopyWith<$Res> {
   factory _$SellerSetupSubmittedCopyWith(_SellerSetupSubmitted value, $Res Function(_SellerSetupSubmitted) _then) = __$SellerSetupSubmittedCopyWithImpl;
-@override @useResult
+@useResult
 $Res call({
  String storeName, String? storeDescription, String storeAddress, MeerCity city, String? district, double latitude, double longitude
 });
@@ -264,7 +233,7 @@ class __$SellerSetupSubmittedCopyWithImpl<$Res>
 
 /// Create a copy of SellerSetupEvent
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? storeName = null,Object? storeDescription = freezed,Object? storeAddress = null,Object? city = null,Object? district = freezed,Object? latitude = null,Object? longitude = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? storeName = null,Object? storeDescription = freezed,Object? storeAddress = null,Object? city = null,Object? district = freezed,Object? latitude = null,Object? longitude = null,}) {
   return _then(_SellerSetupSubmitted(
 storeName: null == storeName ? _self.storeName : storeName // ignore: cast_nullable_to_non_nullable
 as String,storeDescription: freezed == storeDescription ? _self.storeDescription : storeDescription // ignore: cast_nullable_to_non_nullable
@@ -279,6 +248,38 @@ as double,
 
 
 }
+
+/// @nodoc
+
+
+class _SellerSetupLocationRequested implements SellerSetupEvent {
+  const _SellerSetupLocationRequested();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SellerSetupLocationRequested);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'SellerSetupEvent.locationRequested()';
+}
+
+
+}
+
+
+
 
 /// @nodoc
 mixin _$SellerSetupState {
@@ -324,12 +325,14 @@ extension SellerSetupStatePatterns on SellerSetupState {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _SellerSetupInitial value)?  initial,TResult Function( _SellerSetupSubmitting value)?  submitting,TResult Function( _SellerSetupSuccess value)?  success,TResult Function( _SellerSetupFailure value)?  failure,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _SellerSetupInitial value)?  initial,TResult Function( _SellerSetupSubmitting value)?  submitting,TResult Function( _SellerSetupLocating value)?  locating,TResult Function( _SellerSetupLocationFound value)?  locationFound,TResult Function( _SellerSetupSuccess value)?  success,TResult Function( _SellerSetupFailure value)?  failure,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _SellerSetupInitial() when initial != null:
 return initial(_that);case _SellerSetupSubmitting() when submitting != null:
-return submitting(_that);case _SellerSetupSuccess() when success != null:
+return submitting(_that);case _SellerSetupLocating() when locating != null:
+return locating(_that);case _SellerSetupLocationFound() when locationFound != null:
+return locationFound(_that);case _SellerSetupSuccess() when success != null:
 return success(_that);case _SellerSetupFailure() when failure != null:
 return failure(_that);case _:
   return orElse();
@@ -349,12 +352,14 @@ return failure(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _SellerSetupInitial value)  initial,required TResult Function( _SellerSetupSubmitting value)  submitting,required TResult Function( _SellerSetupSuccess value)  success,required TResult Function( _SellerSetupFailure value)  failure,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _SellerSetupInitial value)  initial,required TResult Function( _SellerSetupSubmitting value)  submitting,required TResult Function( _SellerSetupLocating value)  locating,required TResult Function( _SellerSetupLocationFound value)  locationFound,required TResult Function( _SellerSetupSuccess value)  success,required TResult Function( _SellerSetupFailure value)  failure,}){
 final _that = this;
 switch (_that) {
 case _SellerSetupInitial():
 return initial(_that);case _SellerSetupSubmitting():
-return submitting(_that);case _SellerSetupSuccess():
+return submitting(_that);case _SellerSetupLocating():
+return locating(_that);case _SellerSetupLocationFound():
+return locationFound(_that);case _SellerSetupSuccess():
 return success(_that);case _SellerSetupFailure():
 return failure(_that);}
 }
@@ -370,12 +375,14 @@ return failure(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _SellerSetupInitial value)?  initial,TResult? Function( _SellerSetupSubmitting value)?  submitting,TResult? Function( _SellerSetupSuccess value)?  success,TResult? Function( _SellerSetupFailure value)?  failure,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _SellerSetupInitial value)?  initial,TResult? Function( _SellerSetupSubmitting value)?  submitting,TResult? Function( _SellerSetupLocating value)?  locating,TResult? Function( _SellerSetupLocationFound value)?  locationFound,TResult? Function( _SellerSetupSuccess value)?  success,TResult? Function( _SellerSetupFailure value)?  failure,}){
 final _that = this;
 switch (_that) {
 case _SellerSetupInitial() when initial != null:
 return initial(_that);case _SellerSetupSubmitting() when submitting != null:
-return submitting(_that);case _SellerSetupSuccess() when success != null:
+return submitting(_that);case _SellerSetupLocating() when locating != null:
+return locating(_that);case _SellerSetupLocationFound() when locationFound != null:
+return locationFound(_that);case _SellerSetupSuccess() when success != null:
 return success(_that);case _SellerSetupFailure() when failure != null:
 return failure(_that);case _:
   return null;
@@ -394,11 +401,13 @@ return failure(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  submitting,TResult Function( MeerUserProfile profile)?  success,TResult Function( String message)?  failure,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  submitting,TResult Function()?  locating,TResult Function( double latitude,  double longitude)?  locationFound,TResult Function( MeerUserProfile profile)?  success,TResult Function( String message)?  failure,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SellerSetupInitial() when initial != null:
 return initial();case _SellerSetupSubmitting() when submitting != null:
-return submitting();case _SellerSetupSuccess() when success != null:
+return submitting();case _SellerSetupLocating() when locating != null:
+return locating();case _SellerSetupLocationFound() when locationFound != null:
+return locationFound(_that.latitude,_that.longitude);case _SellerSetupSuccess() when success != null:
 return success(_that.profile);case _SellerSetupFailure() when failure != null:
 return failure(_that.message);case _:
   return orElse();
@@ -418,11 +427,13 @@ return failure(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  submitting,required TResult Function( MeerUserProfile profile)  success,required TResult Function( String message)  failure,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  submitting,required TResult Function()  locating,required TResult Function( double latitude,  double longitude)  locationFound,required TResult Function( MeerUserProfile profile)  success,required TResult Function( String message)  failure,}) {final _that = this;
 switch (_that) {
 case _SellerSetupInitial():
 return initial();case _SellerSetupSubmitting():
-return submitting();case _SellerSetupSuccess():
+return submitting();case _SellerSetupLocating():
+return locating();case _SellerSetupLocationFound():
+return locationFound(_that.latitude,_that.longitude);case _SellerSetupSuccess():
 return success(_that.profile);case _SellerSetupFailure():
 return failure(_that.message);}
 }
@@ -438,11 +449,13 @@ return failure(_that.message);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  submitting,TResult? Function( MeerUserProfile profile)?  success,TResult? Function( String message)?  failure,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  submitting,TResult? Function()?  locating,TResult? Function( double latitude,  double longitude)?  locationFound,TResult? Function( MeerUserProfile profile)?  success,TResult? Function( String message)?  failure,}) {final _that = this;
 switch (_that) {
 case _SellerSetupInitial() when initial != null:
 return initial();case _SellerSetupSubmitting() when submitting != null:
-return submitting();case _SellerSetupSuccess() when success != null:
+return submitting();case _SellerSetupLocating() when locating != null:
+return locating();case _SellerSetupLocationFound() when locationFound != null:
+return locationFound(_that.latitude,_that.longitude);case _SellerSetupSuccess() when success != null:
 return success(_that.profile);case _SellerSetupFailure() when failure != null:
 return failure(_that.message);case _:
   return null;
@@ -515,6 +528,106 @@ String toString() {
 
 
 
+
+/// @nodoc
+
+
+class _SellerSetupLocating implements SellerSetupState {
+  const _SellerSetupLocating();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SellerSetupLocating);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'SellerSetupState.locating()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class _SellerSetupLocationFound implements SellerSetupState {
+  const _SellerSetupLocationFound({required this.latitude, required this.longitude});
+  
+
+ final  double latitude;
+ final  double longitude;
+
+/// Create a copy of SellerSetupState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$SellerSetupLocationFoundCopyWith<_SellerSetupLocationFound> get copyWith => __$SellerSetupLocationFoundCopyWithImpl<_SellerSetupLocationFound>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SellerSetupLocationFound&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,latitude,longitude);
+
+@override
+String toString() {
+  return 'SellerSetupState.locationFound(latitude: $latitude, longitude: $longitude)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$SellerSetupLocationFoundCopyWith<$Res> implements $SellerSetupStateCopyWith<$Res> {
+  factory _$SellerSetupLocationFoundCopyWith(_SellerSetupLocationFound value, $Res Function(_SellerSetupLocationFound) _then) = __$SellerSetupLocationFoundCopyWithImpl;
+@useResult
+$Res call({
+ double latitude, double longitude
+});
+
+
+
+
+}
+/// @nodoc
+class __$SellerSetupLocationFoundCopyWithImpl<$Res>
+    implements _$SellerSetupLocationFoundCopyWith<$Res> {
+  __$SellerSetupLocationFoundCopyWithImpl(this._self, this._then);
+
+  final _SellerSetupLocationFound _self;
+  final $Res Function(_SellerSetupLocationFound) _then;
+
+/// Create a copy of SellerSetupState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? latitude = null,Object? longitude = null,}) {
+  return _then(_SellerSetupLocationFound(
+latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
+as double,longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
+as double,
+  ));
+}
+
+
+}
 
 /// @nodoc
 

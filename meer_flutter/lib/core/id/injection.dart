@@ -20,6 +20,7 @@ import 'package:meer_flutter/presentation/seller_setup/bloc/seller_setup_bloc.da
 import 'package:meer_flutter/repository/auth_repository.dart';
 import 'package:meer_flutter/repository/cart_repository.dart';
 import 'package:meer_flutter/repository/favorites_repository.dart';
+import 'package:meer_flutter/repository/image_repository.dart';
 import 'package:meer_flutter/repository/local/city_local_repository.dart';
 import 'package:meer_flutter/repository/order_repository.dart';
 import 'package:meer_flutter/repository/product_repository.dart';
@@ -38,6 +39,7 @@ Future<void> initGetIt() async {
     () => ProductRepository(),
   );
   sl.registerLazySingleton(() => CityLocalRepository());
+  sl.registerLazySingleton(() => ImageRepository());
   sl.registerLazySingleton(() => LocationService());
   sl.registerLazySingleton(
     () => SearchRepository(sl<CityLocalRepository>()),
@@ -83,13 +85,17 @@ Future<void> initGetIt() async {
 
   // // 6. Seller Setup BloC
   sl.registerFactory(
-    () => SellerSetupBloc(sl<SellerRepository>()),
+    () => SellerSetupBloc(
+      sl<SellerRepository>(),
+      sl<LocationService>(),
+    ),
   );
 
   // // 7. Product Form BloC
   sl.registerFactory<ProductFormBloc>(
     () => ProductFormBloc(
       sl<ProductRepository>(),
+      sl<ImageRepository>(),
     ),
   );
 

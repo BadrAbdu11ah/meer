@@ -18,6 +18,8 @@ import 'package:meer_server/src/generated/model/cart_item_record.dart'
     as _igx9tmzj;
 import 'package:meer_server/src/generated/model/favorite_product.dart'
     as _ieqdpo46;
+import 'package:meer_server/src/generated/model/image_upload_description.dart'
+    as _ipzrgtmi;
 import 'package:meer_server/src/generated/model/meer_city.dart' as _ibpct1hm;
 import 'package:meer_server/src/generated/model/MeerUserProfile.dart'
     as _iy43oh7i;
@@ -174,6 +176,8 @@ class TestEndpoints {
 
   late final _FavoriteEndpoint favorite;
 
+  late final _ImageEndpoint image;
+
   late final _OrderEndpoint order;
 
   late final _ProductEndpoint product;
@@ -207,6 +211,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     favorite = _FavoriteEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    image = _ImageEndpoint(
       endpoints,
       serializationManager,
     );
@@ -842,6 +850,79 @@ class _FavoriteEndpoint {
                   _localCallContext.arguments,
                 )
                 as _ida.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _ImageEndpoint {
+  _ImageEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<_ipzrgtmi.ImageUploadDescription> createProductImageUpload(
+    _ist.TestSessionBuilder sessionBuilder,
+    String fileExtension,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'image',
+            method: 'createProductImageUpload',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'image',
+          methodName: 'createProductImageUpload',
+          parameters: _ist.testObjectToJson({'fileExtension': fileExtension}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_ipzrgtmi.ImageUploadDescription>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<String> verifyProductImageUpload(
+    _ist.TestSessionBuilder sessionBuilder,
+    String filePath,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'image',
+            method: 'verifyProductImageUpload',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'image',
+          methodName: 'verifyProductImageUpload',
+          parameters: _ist.testObjectToJson({'filePath': filePath}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<String>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

@@ -14,7 +14,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ProductFormEvent {
 
- String get name; String get price; String? get description; String? get imageUrl;
+ String get name; String get price; String? get description; String? get imageUrl;// صورة جديدة اختارها البائع وتحتاج رفعًا قبل الحفظ.
+ Uint8List? get newImageBytes; String? get newImageExtension;
 /// Create a copy of ProductFormEvent
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +26,16 @@ $ProductFormEventCopyWith<ProductFormEvent> get copyWith => _$ProductFormEventCo
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProductFormEvent&&(identical(other.name, name) || other.name == name)&&(identical(other.price, price) || other.price == price)&&(identical(other.description, description) || other.description == description)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProductFormEvent&&(identical(other.name, name) || other.name == name)&&(identical(other.price, price) || other.price == price)&&(identical(other.description, description) || other.description == description)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&const DeepCollectionEquality().equals(other.newImageBytes, newImageBytes)&&(identical(other.newImageExtension, newImageExtension) || other.newImageExtension == newImageExtension));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,name,price,description,imageUrl);
+int get hashCode => Object.hash(runtimeType,name,price,description,imageUrl,const DeepCollectionEquality().hash(newImageBytes),newImageExtension);
 
 @override
 String toString() {
-  return 'ProductFormEvent(name: $name, price: $price, description: $description, imageUrl: $imageUrl)';
+  return 'ProductFormEvent(name: $name, price: $price, description: $description, imageUrl: $imageUrl, newImageBytes: $newImageBytes, newImageExtension: $newImageExtension)';
 }
 
 
@@ -45,7 +46,7 @@ abstract mixin class $ProductFormEventCopyWith<$Res>  {
   factory $ProductFormEventCopyWith(ProductFormEvent value, $Res Function(ProductFormEvent) _then) = _$ProductFormEventCopyWithImpl;
 @useResult
 $Res call({
- String name, String price, String? description, String? imageUrl
+ String name, String price, String? description, String? imageUrl, Uint8List? newImageBytes, String? newImageExtension
 });
 
 
@@ -62,12 +63,14 @@ class _$ProductFormEventCopyWithImpl<$Res>
 
 /// Create a copy of ProductFormEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? price = null,Object? description = freezed,Object? imageUrl = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? name = null,Object? price = null,Object? description = freezed,Object? imageUrl = freezed,Object? newImageBytes = freezed,Object? newImageExtension = freezed,}) {
   return _then(_self.copyWith(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,price: null == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
+as String?,newImageBytes: freezed == newImageBytes ? _self.newImageBytes : newImageBytes // ignore: cast_nullable_to_non_nullable
+as Uint8List?,newImageExtension: freezed == newImageExtension ? _self.newImageExtension : newImageExtension // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -150,10 +153,10 @@ return submitted(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String name,  String price,  String? description,  String? imageUrl)?  submitted,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String name,  String price,  String? description,  String? imageUrl,  Uint8List? newImageBytes,  String? newImageExtension)?  submitted,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case ProductFormSubmitted() when submitted != null:
-return submitted(_that.name,_that.price,_that.description,_that.imageUrl);case _:
+return submitted(_that.name,_that.price,_that.description,_that.imageUrl,_that.newImageBytes,_that.newImageExtension);case _:
   return orElse();
 
 }
@@ -171,10 +174,10 @@ return submitted(_that.name,_that.price,_that.description,_that.imageUrl);case _
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String name,  String price,  String? description,  String? imageUrl)  submitted,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String name,  String price,  String? description,  String? imageUrl,  Uint8List? newImageBytes,  String? newImageExtension)  submitted,}) {final _that = this;
 switch (_that) {
 case ProductFormSubmitted():
-return submitted(_that.name,_that.price,_that.description,_that.imageUrl);}
+return submitted(_that.name,_that.price,_that.description,_that.imageUrl,_that.newImageBytes,_that.newImageExtension);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -188,10 +191,10 @@ return submitted(_that.name,_that.price,_that.description,_that.imageUrl);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String name,  String price,  String? description,  String? imageUrl)?  submitted,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String name,  String price,  String? description,  String? imageUrl,  Uint8List? newImageBytes,  String? newImageExtension)?  submitted,}) {final _that = this;
 switch (_that) {
 case ProductFormSubmitted() when submitted != null:
-return submitted(_that.name,_that.price,_that.description,_that.imageUrl);case _:
+return submitted(_that.name,_that.price,_that.description,_that.imageUrl,_that.newImageBytes,_that.newImageExtension);case _:
   return null;
 
 }
@@ -203,13 +206,16 @@ return submitted(_that.name,_that.price,_that.description,_that.imageUrl);case _
 
 
 class ProductFormSubmitted implements ProductFormEvent {
-  const ProductFormSubmitted({required this.name, required this.price, this.description, this.imageUrl});
+  const ProductFormSubmitted({required this.name, required this.price, this.description, this.imageUrl, this.newImageBytes, this.newImageExtension});
   
 
 @override final  String name;
 @override final  String price;
 @override final  String? description;
 @override final  String? imageUrl;
+// صورة جديدة اختارها البائع وتحتاج رفعًا قبل الحفظ.
+@override final  Uint8List? newImageBytes;
+@override final  String? newImageExtension;
 
 /// Create a copy of ProductFormEvent
 /// with the given fields replaced by the non-null parameter values.
@@ -221,16 +227,16 @@ $ProductFormSubmittedCopyWith<ProductFormSubmitted> get copyWith => _$ProductFor
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProductFormSubmitted&&(identical(other.name, name) || other.name == name)&&(identical(other.price, price) || other.price == price)&&(identical(other.description, description) || other.description == description)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProductFormSubmitted&&(identical(other.name, name) || other.name == name)&&(identical(other.price, price) || other.price == price)&&(identical(other.description, description) || other.description == description)&&(identical(other.imageUrl, imageUrl) || other.imageUrl == imageUrl)&&const DeepCollectionEquality().equals(other.newImageBytes, newImageBytes)&&(identical(other.newImageExtension, newImageExtension) || other.newImageExtension == newImageExtension));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,name,price,description,imageUrl);
+int get hashCode => Object.hash(runtimeType,name,price,description,imageUrl,const DeepCollectionEquality().hash(newImageBytes),newImageExtension);
 
 @override
 String toString() {
-  return 'ProductFormEvent.submitted(name: $name, price: $price, description: $description, imageUrl: $imageUrl)';
+  return 'ProductFormEvent.submitted(name: $name, price: $price, description: $description, imageUrl: $imageUrl, newImageBytes: $newImageBytes, newImageExtension: $newImageExtension)';
 }
 
 
@@ -241,7 +247,7 @@ abstract mixin class $ProductFormSubmittedCopyWith<$Res> implements $ProductForm
   factory $ProductFormSubmittedCopyWith(ProductFormSubmitted value, $Res Function(ProductFormSubmitted) _then) = _$ProductFormSubmittedCopyWithImpl;
 @override @useResult
 $Res call({
- String name, String price, String? description, String? imageUrl
+ String name, String price, String? description, String? imageUrl, Uint8List? newImageBytes, String? newImageExtension
 });
 
 
@@ -258,12 +264,14 @@ class _$ProductFormSubmittedCopyWithImpl<$Res>
 
 /// Create a copy of ProductFormEvent
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? price = null,Object? description = freezed,Object? imageUrl = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? name = null,Object? price = null,Object? description = freezed,Object? imageUrl = freezed,Object? newImageBytes = freezed,Object? newImageExtension = freezed,}) {
   return _then(ProductFormSubmitted(
 name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,price: null == price ? _self.price : price // ignore: cast_nullable_to_non_nullable
 as String,description: freezed == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
 as String?,imageUrl: freezed == imageUrl ? _self.imageUrl : imageUrl // ignore: cast_nullable_to_non_nullable
+as String?,newImageBytes: freezed == newImageBytes ? _self.newImageBytes : newImageBytes // ignore: cast_nullable_to_non_nullable
+as Uint8List?,newImageExtension: freezed == newImageExtension ? _self.newImageExtension : newImageExtension // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

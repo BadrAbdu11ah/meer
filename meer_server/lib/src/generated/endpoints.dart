@@ -25,6 +25,7 @@ import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
 import '../endpoints/app_auth_endpoint.dart' as _ifrhcmrx;
 import '../endpoints/cart_endpoint.dart' as _i4pgg4av;
 import '../endpoints/favorite_endpoint.dart' as _i5chwg2z;
+import '../endpoints/image_endpoint.dart' as _iu0td00j;
 import '../endpoints/order_endpoint.dart' as _itwfdqvf;
 import '../endpoints/product_endpoint.dart' as _im5j1753;
 import '../endpoints/seller_endpoint.dart' as _ifhnucmp;
@@ -62,6 +63,12 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'favorite',
+          null,
+        ),
+      'image': _iu0td00j.ImageEndpoint()
+        ..initialize(
+          server,
+          'image',
           null,
         ),
       'order': _itwfdqvf.OrderEndpoint()
@@ -422,6 +429,50 @@ class Endpoints extends _is.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async => (endpoints['favorite'] as _i5chwg2z.FavoriteEndpoint)
                   .clearMyFavorites(session),
+        ),
+      },
+    );
+    connectors['image'] = _is.EndpointConnector(
+      name: 'image',
+      endpoint: endpoints['image']!,
+      methodConnectors: {
+        'createProductImageUpload': _is.MethodConnector(
+          name: 'createProductImageUpload',
+          params: {
+            'fileExtension': _is.ParameterDescription(
+              name: 'fileExtension',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['image'] as _iu0td00j.ImageEndpoint)
+                  .createProductImageUpload(
+                    session,
+                    params['fileExtension'],
+                  ),
+        ),
+        'verifyProductImageUpload': _is.MethodConnector(
+          name: 'verifyProductImageUpload',
+          params: {
+            'filePath': _is.ParameterDescription(
+              name: 'filePath',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['image'] as _iu0td00j.ImageEndpoint)
+                  .verifyProductImageUpload(
+                    session,
+                    params['filePath'],
+                  ),
         ),
       },
     );

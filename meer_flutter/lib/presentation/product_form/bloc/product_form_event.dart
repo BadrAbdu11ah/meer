@@ -7,5 +7,8 @@ sealed class ProductFormEvent with _$ProductFormEvent {
     required String price,
     String? description,
     String? imageUrl,
+    // صورة جديدة اختارها البائع وتحتاج رفعًا قبل الحفظ.
+    Uint8List? newImageBytes,
+    String? newImageExtension,
   }) = ProductFormSubmitted;
 }

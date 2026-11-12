@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:meer_client/meer_client.dart';
 
 typedef ProductFormSubmitCallback =
@@ -7,6 +10,8 @@ typedef ProductFormSubmitCallback =
       required String price,
       String? description,
       String? imageUrl,
+      Uint8List? newImageBytes,
+      String? newImageExtension,
     });
 
 class ProductFormView extends StatefulWidget {
@@ -31,7 +36,17 @@ class _ProductFormViewState extends State<ProductFormView> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _priceController = TextEditingController();
-  final _imageUrlController = TextEditingController();
+  final _imagePicker = ImagePicker();
+
+  // رابط الصورة الحالية للمنتج (عند التعديل).
+  String? _currentImageUrl;
+
+  // صورة جديدة اختارها البائع ولم تُرفع بعد.
+  Uint8List? _pickedImageBytes;
+  String? _pickedImageExtension;
+
+  static const _allowedExtensions = {'jpg', 'jpeg', 'png', 'webp'};
+  static const _maxImageBytes = 5 * 1024 * 1024;
 
   @override
   void initState() {
@@ -43,7 +58,7 @@ class _ProductFormViewState extends State<ProductFormView> {
       _nameController.text = product.name;
       _descriptionController.text = product.description ?? '';
       _priceController.text = product.price.toString();
-      _imageUrlController.text = product.imageUrl ?? '';
+      _currentImageUrl = product.imageUrl;
     }
   }
 
@@ -52,7 +67,6 @@ class _ProductFormViewState extends State<ProductFormView> {
     _nameController.dispose();
     _descriptionController.dispose();
     _priceController.dispose();
-    _imageUrlController.dispose();
     super.dispose();
   }
 
@@ -65,7 +79,97 @@ class _ProductFormViewState extends State<ProductFormView> {
       name: _nameController.text,
       price: _priceController.text,
       description: _descriptionController.text,
-      imageUrl: _imageUrlController.text,
+      imageUrl: _currentImageUrl,
+      newImageBytes: _pickedImageBytes,
+      newImageExtension: _pickedImageExtension,
+    );
+  }
+
+  /// امتداد الملف بحروف صغيرة، والافتراضي jpg.
+  String _extensionOf(String fileName) {
+    final dotIndex = fileName.lastIndexOf('.');
+
+    if (dotIndex == -1 || dotIndex == fileName.length - 1) return 'jpg';
+
+    final extension = fileName.substring(dotIndex + 1).toLowerCase();
+
+    return _allowedExtensions.contains(extension) ? extension : 'jpg';
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    if (widget.isSubmitting) return;
+
+    try {
+      // نصغّر الصورة قبل الرفع لتبقى سريعة وخفيفة.
+      final file = await _imagePicker.pickImage(
+        source: source,
+        maxWidth: 1280,
+        maxHeight: 1280,
+        imageQuality: 80,
+      );
+
+      if (file == null) return;
+
+      final bytes = await file.readAsBytes();
+
+      if (bytes.length > _maxImageBytes) {
+        if (!mounted) return;
+        _showMessage('حجم الصورة كبير. اختر صورة أصغر من 5 ميجابايت.');
+        return;
+      }
+
+      if (!mounted) return;
+
+      setState(() {
+        _pickedImageBytes = bytes;
+        _pickedImageExtension = _extensionOf(file.name);
+      });
+    } catch (_) {
+      if (!mounted) return;
+      _showMessage('تعذر اختيار الصورة. تأكد من السماح للتطبيق بالوصول.');
+    }
+  }
+
+  Widget _buildImagePreview() {
+    final pickedBytes = _pickedImageBytes;
+    final currentUrl = _currentImageUrl?.trim();
+
+    final Widget image;
+
+    if (pickedBytes != null) {
+      image = Image.memory(pickedBytes, fit: BoxFit.cover);
+    } else if (currentUrl != null && currentUrl.isNotEmpty) {
+      image = Image.network(
+        currentUrl,
+        fit: BoxFit.cover,
+        errorBuilder: (_, _, _) => _imagePlaceholder(),
+      );
+    } else {
+      image = _imagePlaceholder();
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: AspectRatio(aspectRatio: 4 / 3, child: image),
+    );
+  }
+
+  Widget _imagePlaceholder() {
+    return ColoredBox(
+      color: Colors.grey.shade200,
+      child: const Center(
+        child: Icon(
+          Icons.add_photo_alternate_outlined,
+          size: 48,
+          color: Colors.grey,
+        ),
+      ),
     );
   }
 
@@ -78,23 +182,6 @@ class _ProductFormViewState extends State<ProductFormView> {
 
     if (price == null || !price.isFinite || price <= 0) {
       return 'أدخل سعرًا صحيحًا أكبر من صفر.';
-    }
-
-    return null;
-  }
-
-  String? _validateImageUrl(String? value) {
-    final text = value?.trim() ?? '';
-
-    if (text.isEmpty) return null;
-
-    final uri = Uri.tryParse(text);
-
-    if (uri == null ||
-        !uri.hasAuthority ||
-        uri.host.isEmpty ||
-        !(uri.scheme == 'http' || uri.scheme == 'https')) {
-      return 'أدخل رابط صورة يبدأ بـ https:// أو http://';
     }
 
     return null;
@@ -180,20 +267,32 @@ class _ProductFormViewState extends State<ProductFormView> {
 
             const SizedBox(height: 16),
 
-            TextFormField(
-              controller: _imageUrlController,
-              enabled: !widget.isSubmitting,
-              keyboardType: TextInputType.url,
-              textInputAction: TextInputAction.done,
-              autocorrect: false,
-              decoration: const InputDecoration(
-                labelText: 'رابط صورة المنتج (اختياري)',
-                hintText: 'https://example.com/image.jpg',
-                prefixIcon: Icon(Icons.image_outlined),
-                border: OutlineInputBorder(),
-              ),
-              validator: _validateImageUrl,
-              onFieldSubmitted: (_) => _submit(),
+            _buildImagePreview(),
+
+            const SizedBox(height: 12),
+
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: widget.isSubmitting
+                        ? null
+                        : () => _pickImage(ImageSource.gallery),
+                    icon: const Icon(Icons.photo_library_outlined),
+                    label: const Text('من المعرض'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: widget.isSubmitting
+                        ? null
+                        : () => _pickImage(ImageSource.camera),
+                    icon: const Icon(Icons.photo_camera_outlined),
+                    label: const Text('التقاط صورة'),
+                  ),
+                ),
+              ],
             ),
 
             const SizedBox(height: 24),

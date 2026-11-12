@@ -39,6 +39,7 @@ dependencies:
   geolocator: ^14.0.0
   get_it: ^9.3.0
   google_fonts: ^8.1.0
+  image_picker: ^1.2.4
   intl_phone_field: ^3.2.0
   meer_client:
     path: ../meer_client

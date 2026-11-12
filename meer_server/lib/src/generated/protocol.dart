@@ -29,6 +29,7 @@ import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i1n3uhu0;
 import 'greetings/greeting.dart' as _izw8z7ou;
 import 'model/cart_item_record.dart' as _ivirwujx;
 import 'model/favorite_product.dart' as _i8l2y79r;
+import 'model/image_upload_description.dart' as _ir1pddjn;
 import 'model/meer_city.dart' as _idc5ggrx;
 import 'model/MeerUserProfile.dart' as _ii0ycxhg;
 import 'model/order_info.dart' as _ig93noqx;
@@ -42,6 +43,7 @@ export 'greetings/greeting.dart';
 export 'model/MeerUserProfile.dart';
 export 'model/cart_item_record.dart';
 export 'model/favorite_product.dart';
+export 'model/image_upload_description.dart';
 export 'model/meer_city.dart';
 export 'model/order_info.dart';
 export 'model/order_item.dart';
@@ -710,6 +712,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _i8l2y79r.FavoriteProduct) {
       return _i8l2y79r.FavoriteProduct.fromJson(data) as T;
     }
+    if (t == _ir1pddjn.ImageUploadDescription) {
+      return _ir1pddjn.ImageUploadDescription.fromJson(data) as T;
+    }
     if (t == _idc5ggrx.MeerCity) {
       return _idc5ggrx.MeerCity.fromJson(data) as T;
     }
@@ -747,6 +752,12 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (t == _is.getType<_i8l2y79r.FavoriteProduct?>()) {
       return (data != null ? _i8l2y79r.FavoriteProduct.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_ir1pddjn.ImageUploadDescription?>()) {
+      return (data != null
+              ? _ir1pddjn.ImageUploadDescription.fromJson(data)
+              : null)
           as T;
     }
     if (t == _is.getType<_idc5ggrx.MeerCity?>()) {
@@ -842,6 +853,7 @@ class Protocol extends _is.DatabaseSerializationManager {
       _ii0ycxhg.MeerUserProfile => 'MeerUserProfile',
       _ivirwujx.CartItemRecord => 'CartItemRecord',
       _i8l2y79r.FavoriteProduct => 'FavoriteProduct',
+      _ir1pddjn.ImageUploadDescription => 'ImageUploadDescription',
       _idc5ggrx.MeerCity => 'MeerCity',
       _ig93noqx.OrderInfo => 'OrderInfo',
       _iae72vfi.OrderItem => 'OrderItem',
@@ -872,6 +884,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'CartItemRecord';
       case _i8l2y79r.FavoriteProduct():
         return 'FavoriteProduct';
+      case _ir1pddjn.ImageUploadDescription():
+        return 'ImageUploadDescription';
       case _idc5ggrx.MeerCity():
         return 'MeerCity';
       case _ig93noqx.OrderInfo():
@@ -929,6 +943,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (dataClassName == 'FavoriteProduct') {
       return deserialize<_i8l2y79r.FavoriteProduct>(data['data']);
+    }
+    if (dataClassName == 'ImageUploadDescription') {
+      return deserialize<_ir1pddjn.ImageUploadDescription>(data['data']);
     }
     if (dataClassName == 'MeerCity') {
       return deserialize<_idc5ggrx.MeerCity>(data['data']);

@@ -15,6 +15,9 @@ class SellerSetupView extends StatelessWidget {
   final TextEditingController longitudeController;
 
   final bool isSubmitting;
+  final bool isEditing;
+  final bool isLocating;
+  final VoidCallback onUseCurrentLocation;
   final VoidCallback onSubmit;
 
   const SellerSetupView({
@@ -29,6 +32,9 @@ class SellerSetupView extends StatelessWidget {
     required this.latitudeController,
     required this.longitudeController,
     required this.isSubmitting,
+    required this.isEditing,
+    required this.isLocating,
+    required this.onUseCurrentLocation,
     required this.onSubmit,
   });
 
@@ -175,9 +181,24 @@ class SellerSetupView extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'أدخل الإحداثيات الرقمية للموقع. سنضيف اختيار الموقع من الخريطة لاحقًا.',
+            'إذا كنت الآن في مكان الأسرة، اضغط «استخدم موقعي الحالي» لتعبئة الإحداثيات تلقائيًا. ويمكنك إدخالها يدويًا. وسنضيف اختيار الموقع من الخريطة لاحقًا.',
             style: theme.textTheme.bodySmall?.copyWith(
               color: colors.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          OutlinedButton.icon(
+            onPressed: isSubmitting || isLocating ? null : onUseCurrentLocation,
+            icon: isLocating
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.my_location),
+            label: Text(
+              isLocating ? 'جارٍ تحديد الموقع...' : 'استخدم موقعي الحالي',
             ),
           ),
           const SizedBox(height: 12),
@@ -228,7 +249,9 @@ class SellerSetupView extends StatelessWidget {
                         strokeWidth: 2,
                       ),
                     )
-                  : const Text('حفظ البيانات وتفعيل البيع'),
+                  : Text(
+                      isEditing ? 'حفظ التعديلات' : 'حفظ البيانات وتفعيل البيع',
+                    ),
             ),
           ),
         ],

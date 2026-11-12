@@ -24,6 +24,7 @@ import 'package:meer_flutter/presentation/seller_products/bloc/seller_products_b
 import 'package:meer_flutter/presentation/seller_products/screen/seller_products_screen.dart';
 import 'package:meer_flutter/presentation/seller_setup/bloc/seller_setup_bloc.dart';
 import 'package:meer_flutter/presentation/seller_setup/screen/seller_setup_screen.dart';
+import 'package:meer_flutter/repository/image_repository.dart';
 import 'package:meer_flutter/repository/product_repository.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 
@@ -75,11 +76,14 @@ class AppRouter {
           ),
         );
       case AppRoute.sellerSetupScreen:
-        return MaterialPageRoute(
+        final argument = settings.arguments;
+        final profileToEdit = argument is MeerUserProfile ? argument : null;
+
+        return MaterialPageRoute<bool?>(
           settings: settings,
           builder: (_) => BlocProvider(
             create: (_) => sl<SellerSetupBloc>(),
-            child: const SellerSetupScreen(),
+            child: SellerSetupScreen(initialProfile: profileToEdit),
           ),
         );
       case AppRoute.productFormScreen:
@@ -91,6 +95,7 @@ class AppRouter {
           builder: (_) => BlocProvider(
             create: (_) => ProductFormBloc(
               sl<ProductRepository>(),
+              sl<ImageRepository>(),
               productToEdit: productToEdit,
             ),
             child: ProductFormScreen(
