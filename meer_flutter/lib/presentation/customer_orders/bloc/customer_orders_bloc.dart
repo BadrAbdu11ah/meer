@@ -83,46 +83,38 @@ class CustomerOrdersBloc
       event.orderId,
     );
 
-    await result.fold<Future<void>>(
-      (failure) async {
-        final latestIds = _currentCancellingIds()..remove(event.orderId);
+    // نجلب القائمة من الخادم في الحالتين (نجح الإلغاء أو فشل)،
+    // حتى لا تبقى البطاقة تعرض حالة قديمة، مثل أن تكون الأسرة
+    // قبلت الطلب قبل ضغط العميل على الإلغاء.
+    final refreshResult = await _orderRepository.getMyCustomerOrders();
 
+    final latestIds = _currentCancellingIds()..remove(event.orderId);
+
+    final cancelMessage = result.fold(
+      (failure) => failure.message,
+      (_) => 'تم إلغاء الطلب بنجاح.',
+    );
+
+    refreshResult.fold(
+      (failure) {
         emit(
           CustomerOrdersState.loaded(
             orders: _currentOrders() ?? orders,
             cancellingOrderIds: latestIds,
-            message: failure.message,
+            message: result.isRight()
+                ? 'تم إلغاء الطلب، لكن تعذر تحديث القائمة. '
+                      'يرجى تحديثها.'
+                : cancelMessage,
           ),
         );
       },
-      (_) async {
-        final refreshResult = await _orderRepository.getMyCustomerOrders();
-
-        refreshResult.fold(
-          (failure) {
-            final latestIds = _currentCancellingIds()..remove(event.orderId);
-
-            emit(
-              CustomerOrdersState.loaded(
-                orders: _currentOrders() ?? orders,
-                cancellingOrderIds: latestIds,
-                message:
-                    'تم إلغاء الطلب، لكن تعذر تحديث القائمة. '
-                    'يرجى تحديثها.',
-              ),
-            );
-          },
-          (updatedOrders) {
-            final latestIds = _currentCancellingIds()..remove(event.orderId);
-
-            emit(
-              CustomerOrdersState.loaded(
-                orders: updatedOrders,
-                cancellingOrderIds: latestIds,
-                message: 'تم إلغاء الطلب بنجاح.',
-              ),
-            );
-          },
+      (updatedOrders) {
+        emit(
+          CustomerOrdersState.loaded(
+            orders: updatedOrders,
+            cancellingOrderIds: latestIds,
+            message: cancelMessage,
+          ),
         );
       },
     );

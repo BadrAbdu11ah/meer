@@ -237,7 +237,6 @@ class OrderEndpoint extends Endpoint {
       where: (o) => o.customerId.equals(customer.id!),
       orderBy: (o) => o.createdAt.desc(),
       include: OrderInfo.include(
-        seller: MeerUserProfile.include(),
         items: OrderItem.includeList(
           include: OrderItem.include(
             product: Product.include(),
