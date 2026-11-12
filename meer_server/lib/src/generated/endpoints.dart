@@ -476,6 +476,25 @@ class Endpoints extends _is.EndpointDispatch {
               ) async => (endpoints['order'] as _itwfdqvf.OrderEndpoint)
                   .getMyCustomerOrders(session),
         ),
+        'cancelMyOrder': _is.MethodConnector(
+          name: 'cancelMyOrder',
+          params: {
+            'orderId': _is.ParameterDescription(
+              name: 'orderId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['order'] as _itwfdqvf.OrderEndpoint).cancelMyOrder(
+                    session,
+                    params['orderId'],
+                  ),
+        ),
         'getMySellerOrders': _is.MethodConnector(
           name: 'getMySellerOrders',
           params: {},
@@ -539,6 +558,25 @@ class Endpoints extends _is.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async => (endpoints['order'] as _itwfdqvf.OrderEndpoint)
                   .markMyOrderReady(
+                    session,
+                    params['orderId'],
+                  ),
+        ),
+        'markMyOrderCompleted': _is.MethodConnector(
+          name: 'markMyOrderCompleted',
+          params: {
+            'orderId': _is.ParameterDescription(
+              name: 'orderId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['order'] as _itwfdqvf.OrderEndpoint)
+                  .markMyOrderCompleted(
                     session,
                     params['orderId'],
                   ),

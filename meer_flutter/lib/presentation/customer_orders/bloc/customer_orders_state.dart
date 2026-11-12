@@ -8,6 +8,8 @@ sealed class CustomerOrdersState with _$CustomerOrdersState {
 
   const factory CustomerOrdersState.loaded({
     required List<OrderInfo> orders,
+    @Default(<int>{}) Set<int> cancellingOrderIds,
+    String? message,
   }) = CustomerOrdersLoaded;
 
   const factory CustomerOrdersState.error(String message) = CustomerOrdersError;

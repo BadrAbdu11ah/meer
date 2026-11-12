@@ -929,6 +929,37 @@ class _OrderEndpoint {
     });
   }
 
+  _ida.Future<bool> cancelMyOrder(
+    _ist.TestSessionBuilder sessionBuilder,
+    int orderId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'order',
+            method: 'cancelMyOrder',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'order',
+          methodName: 'cancelMyOrder',
+          parameters: _ist.testObjectToJson({'orderId': orderId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
   _ida.Future<List<_i8hwzj5x.OrderInfo>> getMySellerOrders(
     _ist.TestSessionBuilder sessionBuilder,
   ) async {
@@ -1036,6 +1067,37 @@ class _OrderEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'order',
           methodName: 'markMyOrderReady',
+          parameters: _ist.testObjectToJson({'orderId': orderId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<bool> markMyOrderCompleted(
+    _ist.TestSessionBuilder sessionBuilder,
+    int orderId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'order',
+            method: 'markMyOrderCompleted',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'order',
+          methodName: 'markMyOrderCompleted',
           parameters: _ist.testObjectToJson({'orderId': orderId}),
           serializationManager: _serializationManager,
         );

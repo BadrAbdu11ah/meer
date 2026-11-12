@@ -299,6 +299,14 @@ class EndpointOrder extends _isc.EndpointRef {
         {},
       );
 
+  /// يسمح بالإلغاء فقط قبل قبول الأسرة وبدء التجهيز.
+  _ida.Future<bool> cancelMyOrder(int orderId) =>
+      caller.callServerEndpoint<bool>(
+        'order',
+        'cancelMyOrder',
+        {'orderId': orderId},
+      );
+
   _ida.Future<List<_iiv379dz.OrderInfo>> getMySellerOrders() =>
       caller.callServerEndpoint<List<_iiv379dz.OrderInfo>>(
         'order',
@@ -324,6 +332,13 @@ class EndpointOrder extends _isc.EndpointRef {
       caller.callServerEndpoint<bool>(
         'order',
         'markMyOrderReady',
+        {'orderId': orderId},
+      );
+
+  _ida.Future<bool> markMyOrderCompleted(int orderId) =>
+      caller.callServerEndpoint<bool>(
+        'order',
+        'markMyOrderCompleted',
         {'orderId': orderId},
       );
 }

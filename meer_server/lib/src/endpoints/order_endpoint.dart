@@ -237,6 +237,7 @@ class OrderEndpoint extends Endpoint {
       where: (o) => o.customerId.equals(customer.id!),
       orderBy: (o) => o.createdAt.desc(),
       include: OrderInfo.include(
+        seller: MeerUserProfile.include(),
         items: OrderItem.includeList(
           include: OrderItem.include(
             product: Product.include(),
@@ -247,7 +248,57 @@ class OrderEndpoint extends Endpoint {
   }
 
   // --------------------------------------------------
-  // 3. جلب الطلبات الواردة للأسرة الحالية
+  // 3. إلغاء طلب المشتري الحالي
+  // --------------------------------------------------
+
+  /// يسمح بالإلغاء فقط قبل قبول الأسرة وبدء التجهيز.
+  Future<bool> cancelMyOrder(
+    Session session,
+    int orderId,
+  ) async {
+    final customer = await _getCurrentProfile(session);
+
+    return await session.db.transaction(
+      (transaction) async {
+        final order = await OrderInfo.db.findById(
+          session,
+          orderId,
+          lockMode: LockMode.forUpdate,
+          transaction: transaction,
+        );
+
+        if (order == null) {
+          return false;
+        }
+
+        // التأكد من أن الطلب يخص المستخدم الحالي.
+        if (order.customerId != customer.id) {
+          throw Exception('هذا الطلب لا يخص حسابك.');
+        }
+
+        // الإلغاء مسموح فقط قبل بدء التجهيز.
+        if (order.status != 'pending') {
+          return false;
+        }
+
+        order.status = 'cancelled';
+
+        await OrderInfo.db.updateRow(
+          session,
+          order,
+          transaction: transaction,
+        );
+
+        return true;
+      },
+      settings: TransactionSettings(
+        isolationLevel: IsolationLevel.readCommitted,
+      ),
+    );
+  }
+
+  // --------------------------------------------------
+  // 4. جلب الطلبات الواردة للأسرة الحالية
   // --------------------------------------------------
 
   Future<List<OrderInfo>> getMySellerOrders(
@@ -274,7 +325,7 @@ class OrderEndpoint extends Endpoint {
   }
 
   // --------------------------------------------------
-  // 4. قبول الطلب
+  // 5. قبول الطلب
   // pending -> preparing
   // --------------------------------------------------
 
@@ -291,7 +342,7 @@ class OrderEndpoint extends Endpoint {
   }
 
   // --------------------------------------------------
-  // 5. رفض الطلب
+  // 6. رفض الطلب
   // pending -> cancelled
   // --------------------------------------------------
 
@@ -308,7 +359,7 @@ class OrderEndpoint extends Endpoint {
   }
 
   // --------------------------------------------------
-  // 6. تأكيد جاهزية الطلب
+  // 7. تأكيد جاهزية الطلب
   // preparing -> ready
   // --------------------------------------------------
 
@@ -325,7 +376,24 @@ class OrderEndpoint extends Endpoint {
   }
 
   // --------------------------------------------------
-  // دالة داخلية لتغيير حالة طلب الأسرة الحالية
+  // 8. تأكيد تسليم الطلب للمشتري
+  // ready -> completed
+  // --------------------------------------------------
+
+  Future<bool> markMyOrderCompleted(
+    Session session,
+    int orderId,
+  ) async {
+    return _changeMyOrderStatus(
+      session,
+      orderId,
+      expectedStatus: 'ready',
+      newStatus: 'completed',
+    );
+  }
+
+  // --------------------------------------------------
+  // 9. دالة داخلية لتغيير حالة طلب الأسرة الحالية
   // --------------------------------------------------
 
   Future<bool> _changeMyOrderStatus(

@@ -11,6 +11,7 @@ enum _SellerOrderAction {
   accept,
   reject,
   markReady,
+  markCompleted,
 }
 
 class SellerOrdersBloc extends Bloc<SellerOrdersEvent, SellerOrdersState> {
@@ -21,6 +22,9 @@ class SellerOrdersBloc extends Bloc<SellerOrdersEvent, SellerOrdersState> {
     on<SellerOrderAcceptRequested>(_onAcceptRequested);
     on<SellerOrderRejectRequested>(_onRejectRequested);
     on<SellerOrderMarkReadyRequested>(_onMarkReadyRequested);
+    on<SellerOrderMarkCompletedRequested>(
+      _onMarkCompletedRequested,
+    );
     on<SellerOrdersMessageCleared>(_onMessageCleared);
   }
 
@@ -111,6 +115,17 @@ class SellerOrdersBloc extends Bloc<SellerOrdersEvent, SellerOrdersState> {
     );
   }
 
+  Future<void> _onMarkCompletedRequested(
+    SellerOrderMarkCompletedRequested event,
+    Emitter<SellerOrdersState> emit,
+  ) async {
+    await _performAction(
+      event.orderId,
+      _SellerOrderAction.markCompleted,
+      emit,
+    );
+  }
+
   Future<void> _performAction(
     int orderId,
     _SellerOrderAction action,
@@ -150,6 +165,8 @@ class SellerOrdersBloc extends Bloc<SellerOrdersEvent, SellerOrdersState> {
       _SellerOrderAction.markReady => await _orderRepository.markMyOrderReady(
         orderId,
       ),
+      _SellerOrderAction.markCompleted =>
+        await _orderRepository.markMyOrderCompleted(orderId),
     };
 
     await result.fold<Future<void>>(
@@ -190,6 +207,8 @@ class SellerOrdersBloc extends Bloc<SellerOrdersEvent, SellerOrdersState> {
               _SellerOrderAction.accept => 'تم قبول الطلب.',
               _SellerOrderAction.reject => 'تم رفض الطلب.',
               _SellerOrderAction.markReady => 'تم تأكيد جاهزية الطلب.',
+              _SellerOrderAction.markCompleted =>
+                'تم تأكيد تسليم الطلب للمشتري.',
             };
 
             emit(

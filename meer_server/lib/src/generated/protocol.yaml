@@ -24,10 +24,12 @@ favorite:
 order:
   - createOrder:
   - getMyCustomerOrders:
+  - cancelMyOrder:
   - getMySellerOrders:
   - acceptMyOrder:
   - rejectMyOrder:
   - markMyOrderReady:
+  - markMyOrderCompleted:
 product:
   - addProduct:
   - getAllAvailableProducts:

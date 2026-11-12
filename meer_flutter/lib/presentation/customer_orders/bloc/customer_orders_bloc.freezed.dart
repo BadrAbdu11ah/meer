@@ -55,12 +55,14 @@ extension CustomerOrdersEventPatterns on CustomerOrdersEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( CustomerOrdersLoadRequested value)?  loadRequested,TResult Function( CustomerOrdersRefreshRequested value)?  refreshRequested,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( CustomerOrdersLoadRequested value)?  loadRequested,TResult Function( CustomerOrdersRefreshRequested value)?  refreshRequested,TResult Function( CustomerOrderCancelRequested value)?  cancelRequested,TResult Function( CustomerOrdersMessageCleared value)?  messageCleared,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case CustomerOrdersLoadRequested() when loadRequested != null:
 return loadRequested(_that);case CustomerOrdersRefreshRequested() when refreshRequested != null:
-return refreshRequested(_that);case _:
+return refreshRequested(_that);case CustomerOrderCancelRequested() when cancelRequested != null:
+return cancelRequested(_that);case CustomerOrdersMessageCleared() when messageCleared != null:
+return messageCleared(_that);case _:
   return orElse();
 
 }
@@ -78,12 +80,14 @@ return refreshRequested(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( CustomerOrdersLoadRequested value)  loadRequested,required TResult Function( CustomerOrdersRefreshRequested value)  refreshRequested,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( CustomerOrdersLoadRequested value)  loadRequested,required TResult Function( CustomerOrdersRefreshRequested value)  refreshRequested,required TResult Function( CustomerOrderCancelRequested value)  cancelRequested,required TResult Function( CustomerOrdersMessageCleared value)  messageCleared,}){
 final _that = this;
 switch (_that) {
 case CustomerOrdersLoadRequested():
 return loadRequested(_that);case CustomerOrdersRefreshRequested():
-return refreshRequested(_that);}
+return refreshRequested(_that);case CustomerOrderCancelRequested():
+return cancelRequested(_that);case CustomerOrdersMessageCleared():
+return messageCleared(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
 ///
@@ -97,12 +101,14 @@ return refreshRequested(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( CustomerOrdersLoadRequested value)?  loadRequested,TResult? Function( CustomerOrdersRefreshRequested value)?  refreshRequested,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( CustomerOrdersLoadRequested value)?  loadRequested,TResult? Function( CustomerOrdersRefreshRequested value)?  refreshRequested,TResult? Function( CustomerOrderCancelRequested value)?  cancelRequested,TResult? Function( CustomerOrdersMessageCleared value)?  messageCleared,}){
 final _that = this;
 switch (_that) {
 case CustomerOrdersLoadRequested() when loadRequested != null:
 return loadRequested(_that);case CustomerOrdersRefreshRequested() when refreshRequested != null:
-return refreshRequested(_that);case _:
+return refreshRequested(_that);case CustomerOrderCancelRequested() when cancelRequested != null:
+return cancelRequested(_that);case CustomerOrdersMessageCleared() when messageCleared != null:
+return messageCleared(_that);case _:
   return null;
 
 }
@@ -119,11 +125,13 @@ return refreshRequested(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  loadRequested,TResult Function()?  refreshRequested,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  loadRequested,TResult Function()?  refreshRequested,TResult Function( int orderId)?  cancelRequested,TResult Function()?  messageCleared,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case CustomerOrdersLoadRequested() when loadRequested != null:
 return loadRequested();case CustomerOrdersRefreshRequested() when refreshRequested != null:
-return refreshRequested();case _:
+return refreshRequested();case CustomerOrderCancelRequested() when cancelRequested != null:
+return cancelRequested(_that.orderId);case CustomerOrdersMessageCleared() when messageCleared != null:
+return messageCleared();case _:
   return orElse();
 
 }
@@ -141,11 +149,13 @@ return refreshRequested();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  loadRequested,required TResult Function()  refreshRequested,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  loadRequested,required TResult Function()  refreshRequested,required TResult Function( int orderId)  cancelRequested,required TResult Function()  messageCleared,}) {final _that = this;
 switch (_that) {
 case CustomerOrdersLoadRequested():
 return loadRequested();case CustomerOrdersRefreshRequested():
-return refreshRequested();}
+return refreshRequested();case CustomerOrderCancelRequested():
+return cancelRequested(_that.orderId);case CustomerOrdersMessageCleared():
+return messageCleared();}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -159,11 +169,13 @@ return refreshRequested();}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  loadRequested,TResult? Function()?  refreshRequested,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  loadRequested,TResult? Function()?  refreshRequested,TResult? Function( int orderId)?  cancelRequested,TResult? Function()?  messageCleared,}) {final _that = this;
 switch (_that) {
 case CustomerOrdersLoadRequested() when loadRequested != null:
 return loadRequested();case CustomerOrdersRefreshRequested() when refreshRequested != null:
-return refreshRequested();case _:
+return refreshRequested();case CustomerOrderCancelRequested() when cancelRequested != null:
+return cancelRequested(_that.orderId);case CustomerOrdersMessageCleared() when messageCleared != null:
+return messageCleared();case _:
   return null;
 
 }
@@ -227,6 +239,104 @@ int get hashCode => runtimeType.hashCode;
 @override
 String toString() {
   return 'CustomerOrdersEvent.refreshRequested()';
+}
+
+
+}
+
+
+
+
+/// @nodoc
+
+
+class CustomerOrderCancelRequested implements CustomerOrdersEvent {
+  const CustomerOrderCancelRequested({required this.orderId});
+  
+
+ final  int orderId;
+
+/// Create a copy of CustomerOrdersEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CustomerOrderCancelRequestedCopyWith<CustomerOrderCancelRequested> get copyWith => _$CustomerOrderCancelRequestedCopyWithImpl<CustomerOrderCancelRequested>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CustomerOrderCancelRequested&&(identical(other.orderId, orderId) || other.orderId == orderId));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,orderId);
+
+@override
+String toString() {
+  return 'CustomerOrdersEvent.cancelRequested(orderId: $orderId)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $CustomerOrderCancelRequestedCopyWith<$Res> implements $CustomerOrdersEventCopyWith<$Res> {
+  factory $CustomerOrderCancelRequestedCopyWith(CustomerOrderCancelRequested value, $Res Function(CustomerOrderCancelRequested) _then) = _$CustomerOrderCancelRequestedCopyWithImpl;
+@useResult
+$Res call({
+ int orderId
+});
+
+
+
+
+}
+/// @nodoc
+class _$CustomerOrderCancelRequestedCopyWithImpl<$Res>
+    implements $CustomerOrderCancelRequestedCopyWith<$Res> {
+  _$CustomerOrderCancelRequestedCopyWithImpl(this._self, this._then);
+
+  final CustomerOrderCancelRequested _self;
+  final $Res Function(CustomerOrderCancelRequested) _then;
+
+/// Create a copy of CustomerOrdersEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? orderId = null,}) {
+  return _then(CustomerOrderCancelRequested(
+orderId: null == orderId ? _self.orderId : orderId // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class CustomerOrdersMessageCleared implements CustomerOrdersEvent {
+  const CustomerOrdersMessageCleared();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CustomerOrdersMessageCleared);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+  return 'CustomerOrdersEvent.messageCleared()';
 }
 
 
@@ -349,12 +459,12 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( List<OrderInfo> orders)?  loaded,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( List<OrderInfo> orders,  Set<int> cancellingOrderIds,  String? message)?  loaded,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case CustomerOrdersInitial() when initial != null:
 return initial();case CustomerOrdersLoading() when loading != null:
 return loading();case CustomerOrdersLoaded() when loaded != null:
-return loaded(_that.orders);case CustomerOrdersError() when error != null:
+return loaded(_that.orders,_that.cancellingOrderIds,_that.message);case CustomerOrdersError() when error != null:
 return error(_that.message);case _:
   return orElse();
 
@@ -373,12 +483,12 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( List<OrderInfo> orders)  loaded,required TResult Function( String message)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( List<OrderInfo> orders,  Set<int> cancellingOrderIds,  String? message)  loaded,required TResult Function( String message)  error,}) {final _that = this;
 switch (_that) {
 case CustomerOrdersInitial():
 return initial();case CustomerOrdersLoading():
 return loading();case CustomerOrdersLoaded():
-return loaded(_that.orders);case CustomerOrdersError():
+return loaded(_that.orders,_that.cancellingOrderIds,_that.message);case CustomerOrdersError():
 return error(_that.message);}
 }
 /// A variant of `when` that fallback to returning `null`
@@ -393,12 +503,12 @@ return error(_that.message);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( List<OrderInfo> orders)?  loaded,TResult? Function( String message)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( List<OrderInfo> orders,  Set<int> cancellingOrderIds,  String? message)?  loaded,TResult? Function( String message)?  error,}) {final _that = this;
 switch (_that) {
 case CustomerOrdersInitial() when initial != null:
 return initial();case CustomerOrdersLoading() when loading != null:
 return loading();case CustomerOrdersLoaded() when loaded != null:
-return loaded(_that.orders);case CustomerOrdersError() when error != null:
+return loaded(_that.orders,_that.cancellingOrderIds,_that.message);case CustomerOrdersError() when error != null:
 return error(_that.message);case _:
   return null;
 
@@ -475,7 +585,7 @@ String toString() {
 
 
 class CustomerOrdersLoaded implements CustomerOrdersState {
-  const CustomerOrdersLoaded({required final  List<OrderInfo> orders}): _orders = orders;
+  const CustomerOrdersLoaded({required final  List<OrderInfo> orders, final  Set<int> cancellingOrderIds = const <int>{}, this.message}): _orders = orders,_cancellingOrderIds = cancellingOrderIds;
   
 
  final  List<OrderInfo> _orders;
@@ -485,6 +595,14 @@ class CustomerOrdersLoaded implements CustomerOrdersState {
   return EqualUnmodifiableListView(_orders);
 }
 
+ final  Set<int> _cancellingOrderIds;
+@JsonKey() Set<int> get cancellingOrderIds {
+  if (_cancellingOrderIds is EqualUnmodifiableSetView) return _cancellingOrderIds;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableSetView(_cancellingOrderIds);
+}
+
+ final  String? message;
 
 /// Create a copy of CustomerOrdersState
 /// with the given fields replaced by the non-null parameter values.
@@ -496,16 +614,16 @@ $CustomerOrdersLoadedCopyWith<CustomerOrdersLoaded> get copyWith => _$CustomerOr
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CustomerOrdersLoaded&&const DeepCollectionEquality().equals(other._orders, _orders));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CustomerOrdersLoaded&&const DeepCollectionEquality().equals(other._orders, _orders)&&const DeepCollectionEquality().equals(other._cancellingOrderIds, _cancellingOrderIds)&&(identical(other.message, message) || other.message == message));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_orders));
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_orders),const DeepCollectionEquality().hash(_cancellingOrderIds),message);
 
 @override
 String toString() {
-  return 'CustomerOrdersState.loaded(orders: $orders)';
+  return 'CustomerOrdersState.loaded(orders: $orders, cancellingOrderIds: $cancellingOrderIds, message: $message)';
 }
 
 
@@ -516,7 +634,7 @@ abstract mixin class $CustomerOrdersLoadedCopyWith<$Res> implements $CustomerOrd
   factory $CustomerOrdersLoadedCopyWith(CustomerOrdersLoaded value, $Res Function(CustomerOrdersLoaded) _then) = _$CustomerOrdersLoadedCopyWithImpl;
 @useResult
 $Res call({
- List<OrderInfo> orders
+ List<OrderInfo> orders, Set<int> cancellingOrderIds, String? message
 });
 
 
@@ -533,10 +651,12 @@ class _$CustomerOrdersLoadedCopyWithImpl<$Res>
 
 /// Create a copy of CustomerOrdersState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? orders = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? orders = null,Object? cancellingOrderIds = null,Object? message = freezed,}) {
   return _then(CustomerOrdersLoaded(
 orders: null == orders ? _self._orders : orders // ignore: cast_nullable_to_non_nullable
-as List<OrderInfo>,
+as List<OrderInfo>,cancellingOrderIds: null == cancellingOrderIds ? _self._cancellingOrderIds : cancellingOrderIds // ignore: cast_nullable_to_non_nullable
+as Set<int>,message: freezed == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

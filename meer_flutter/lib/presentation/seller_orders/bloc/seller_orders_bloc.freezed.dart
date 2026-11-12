@@ -55,7 +55,7 @@ extension SellerOrdersEventPatterns on SellerOrdersEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( SellerOrdersLoadRequested value)?  loadRequested,TResult Function( SellerOrdersRefreshRequested value)?  refreshRequested,TResult Function( SellerOrderAcceptRequested value)?  acceptRequested,TResult Function( SellerOrderRejectRequested value)?  rejectRequested,TResult Function( SellerOrderMarkReadyRequested value)?  markReadyRequested,TResult Function( SellerOrdersMessageCleared value)?  messageCleared,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( SellerOrdersLoadRequested value)?  loadRequested,TResult Function( SellerOrdersRefreshRequested value)?  refreshRequested,TResult Function( SellerOrderAcceptRequested value)?  acceptRequested,TResult Function( SellerOrderRejectRequested value)?  rejectRequested,TResult Function( SellerOrderMarkReadyRequested value)?  markReadyRequested,TResult Function( SellerOrderMarkCompletedRequested value)?  markCompletedRequested,TResult Function( SellerOrdersMessageCleared value)?  messageCleared,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case SellerOrdersLoadRequested() when loadRequested != null:
@@ -63,7 +63,8 @@ return loadRequested(_that);case SellerOrdersRefreshRequested() when refreshRequ
 return refreshRequested(_that);case SellerOrderAcceptRequested() when acceptRequested != null:
 return acceptRequested(_that);case SellerOrderRejectRequested() when rejectRequested != null:
 return rejectRequested(_that);case SellerOrderMarkReadyRequested() when markReadyRequested != null:
-return markReadyRequested(_that);case SellerOrdersMessageCleared() when messageCleared != null:
+return markReadyRequested(_that);case SellerOrderMarkCompletedRequested() when markCompletedRequested != null:
+return markCompletedRequested(_that);case SellerOrdersMessageCleared() when messageCleared != null:
 return messageCleared(_that);case _:
   return orElse();
 
@@ -82,7 +83,7 @@ return messageCleared(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( SellerOrdersLoadRequested value)  loadRequested,required TResult Function( SellerOrdersRefreshRequested value)  refreshRequested,required TResult Function( SellerOrderAcceptRequested value)  acceptRequested,required TResult Function( SellerOrderRejectRequested value)  rejectRequested,required TResult Function( SellerOrderMarkReadyRequested value)  markReadyRequested,required TResult Function( SellerOrdersMessageCleared value)  messageCleared,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( SellerOrdersLoadRequested value)  loadRequested,required TResult Function( SellerOrdersRefreshRequested value)  refreshRequested,required TResult Function( SellerOrderAcceptRequested value)  acceptRequested,required TResult Function( SellerOrderRejectRequested value)  rejectRequested,required TResult Function( SellerOrderMarkReadyRequested value)  markReadyRequested,required TResult Function( SellerOrderMarkCompletedRequested value)  markCompletedRequested,required TResult Function( SellerOrdersMessageCleared value)  messageCleared,}){
 final _that = this;
 switch (_that) {
 case SellerOrdersLoadRequested():
@@ -90,7 +91,8 @@ return loadRequested(_that);case SellerOrdersRefreshRequested():
 return refreshRequested(_that);case SellerOrderAcceptRequested():
 return acceptRequested(_that);case SellerOrderRejectRequested():
 return rejectRequested(_that);case SellerOrderMarkReadyRequested():
-return markReadyRequested(_that);case SellerOrdersMessageCleared():
+return markReadyRequested(_that);case SellerOrderMarkCompletedRequested():
+return markCompletedRequested(_that);case SellerOrdersMessageCleared():
 return messageCleared(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
@@ -105,7 +107,7 @@ return messageCleared(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( SellerOrdersLoadRequested value)?  loadRequested,TResult? Function( SellerOrdersRefreshRequested value)?  refreshRequested,TResult? Function( SellerOrderAcceptRequested value)?  acceptRequested,TResult? Function( SellerOrderRejectRequested value)?  rejectRequested,TResult? Function( SellerOrderMarkReadyRequested value)?  markReadyRequested,TResult? Function( SellerOrdersMessageCleared value)?  messageCleared,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( SellerOrdersLoadRequested value)?  loadRequested,TResult? Function( SellerOrdersRefreshRequested value)?  refreshRequested,TResult? Function( SellerOrderAcceptRequested value)?  acceptRequested,TResult? Function( SellerOrderRejectRequested value)?  rejectRequested,TResult? Function( SellerOrderMarkReadyRequested value)?  markReadyRequested,TResult? Function( SellerOrderMarkCompletedRequested value)?  markCompletedRequested,TResult? Function( SellerOrdersMessageCleared value)?  messageCleared,}){
 final _that = this;
 switch (_that) {
 case SellerOrdersLoadRequested() when loadRequested != null:
@@ -113,7 +115,8 @@ return loadRequested(_that);case SellerOrdersRefreshRequested() when refreshRequ
 return refreshRequested(_that);case SellerOrderAcceptRequested() when acceptRequested != null:
 return acceptRequested(_that);case SellerOrderRejectRequested() when rejectRequested != null:
 return rejectRequested(_that);case SellerOrderMarkReadyRequested() when markReadyRequested != null:
-return markReadyRequested(_that);case SellerOrdersMessageCleared() when messageCleared != null:
+return markReadyRequested(_that);case SellerOrderMarkCompletedRequested() when markCompletedRequested != null:
+return markCompletedRequested(_that);case SellerOrdersMessageCleared() when messageCleared != null:
 return messageCleared(_that);case _:
   return null;
 
@@ -131,14 +134,15 @@ return messageCleared(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  loadRequested,TResult Function()?  refreshRequested,TResult Function( int orderId)?  acceptRequested,TResult Function( int orderId)?  rejectRequested,TResult Function( int orderId)?  markReadyRequested,TResult Function()?  messageCleared,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  loadRequested,TResult Function()?  refreshRequested,TResult Function( int orderId)?  acceptRequested,TResult Function( int orderId)?  rejectRequested,TResult Function( int orderId)?  markReadyRequested,TResult Function( int orderId)?  markCompletedRequested,TResult Function()?  messageCleared,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case SellerOrdersLoadRequested() when loadRequested != null:
 return loadRequested();case SellerOrdersRefreshRequested() when refreshRequested != null:
 return refreshRequested();case SellerOrderAcceptRequested() when acceptRequested != null:
 return acceptRequested(_that.orderId);case SellerOrderRejectRequested() when rejectRequested != null:
 return rejectRequested(_that.orderId);case SellerOrderMarkReadyRequested() when markReadyRequested != null:
-return markReadyRequested(_that.orderId);case SellerOrdersMessageCleared() when messageCleared != null:
+return markReadyRequested(_that.orderId);case SellerOrderMarkCompletedRequested() when markCompletedRequested != null:
+return markCompletedRequested(_that.orderId);case SellerOrdersMessageCleared() when messageCleared != null:
 return messageCleared();case _:
   return orElse();
 
@@ -157,14 +161,15 @@ return messageCleared();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  loadRequested,required TResult Function()  refreshRequested,required TResult Function( int orderId)  acceptRequested,required TResult Function( int orderId)  rejectRequested,required TResult Function( int orderId)  markReadyRequested,required TResult Function()  messageCleared,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  loadRequested,required TResult Function()  refreshRequested,required TResult Function( int orderId)  acceptRequested,required TResult Function( int orderId)  rejectRequested,required TResult Function( int orderId)  markReadyRequested,required TResult Function( int orderId)  markCompletedRequested,required TResult Function()  messageCleared,}) {final _that = this;
 switch (_that) {
 case SellerOrdersLoadRequested():
 return loadRequested();case SellerOrdersRefreshRequested():
 return refreshRequested();case SellerOrderAcceptRequested():
 return acceptRequested(_that.orderId);case SellerOrderRejectRequested():
 return rejectRequested(_that.orderId);case SellerOrderMarkReadyRequested():
-return markReadyRequested(_that.orderId);case SellerOrdersMessageCleared():
+return markReadyRequested(_that.orderId);case SellerOrderMarkCompletedRequested():
+return markCompletedRequested(_that.orderId);case SellerOrdersMessageCleared():
 return messageCleared();}
 }
 /// A variant of `when` that fallback to returning `null`
@@ -179,14 +184,15 @@ return messageCleared();}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  loadRequested,TResult? Function()?  refreshRequested,TResult? Function( int orderId)?  acceptRequested,TResult? Function( int orderId)?  rejectRequested,TResult? Function( int orderId)?  markReadyRequested,TResult? Function()?  messageCleared,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  loadRequested,TResult? Function()?  refreshRequested,TResult? Function( int orderId)?  acceptRequested,TResult? Function( int orderId)?  rejectRequested,TResult? Function( int orderId)?  markReadyRequested,TResult? Function( int orderId)?  markCompletedRequested,TResult? Function()?  messageCleared,}) {final _that = this;
 switch (_that) {
 case SellerOrdersLoadRequested() when loadRequested != null:
 return loadRequested();case SellerOrdersRefreshRequested() when refreshRequested != null:
 return refreshRequested();case SellerOrderAcceptRequested() when acceptRequested != null:
 return acceptRequested(_that.orderId);case SellerOrderRejectRequested() when rejectRequested != null:
 return rejectRequested(_that.orderId);case SellerOrderMarkReadyRequested() when markReadyRequested != null:
-return markReadyRequested(_that.orderId);case SellerOrdersMessageCleared() when messageCleared != null:
+return markReadyRequested(_that.orderId);case SellerOrderMarkCompletedRequested() when markCompletedRequested != null:
+return markCompletedRequested(_that.orderId);case SellerOrdersMessageCleared() when messageCleared != null:
 return messageCleared();case _:
   return null;
 
@@ -449,6 +455,72 @@ class _$SellerOrderMarkReadyRequestedCopyWithImpl<$Res>
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? orderId = null,}) {
   return _then(SellerOrderMarkReadyRequested(
+orderId: null == orderId ? _self.orderId : orderId // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class SellerOrderMarkCompletedRequested implements SellerOrdersEvent {
+  const SellerOrderMarkCompletedRequested({required this.orderId});
+  
+
+ final  int orderId;
+
+/// Create a copy of SellerOrdersEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$SellerOrderMarkCompletedRequestedCopyWith<SellerOrderMarkCompletedRequested> get copyWith => _$SellerOrderMarkCompletedRequestedCopyWithImpl<SellerOrderMarkCompletedRequested>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SellerOrderMarkCompletedRequested&&(identical(other.orderId, orderId) || other.orderId == orderId));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,orderId);
+
+@override
+String toString() {
+  return 'SellerOrdersEvent.markCompletedRequested(orderId: $orderId)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $SellerOrderMarkCompletedRequestedCopyWith<$Res> implements $SellerOrdersEventCopyWith<$Res> {
+  factory $SellerOrderMarkCompletedRequestedCopyWith(SellerOrderMarkCompletedRequested value, $Res Function(SellerOrderMarkCompletedRequested) _then) = _$SellerOrderMarkCompletedRequestedCopyWithImpl;
+@useResult
+$Res call({
+ int orderId
+});
+
+
+
+
+}
+/// @nodoc
+class _$SellerOrderMarkCompletedRequestedCopyWithImpl<$Res>
+    implements $SellerOrderMarkCompletedRequestedCopyWith<$Res> {
+  _$SellerOrderMarkCompletedRequestedCopyWithImpl(this._self, this._then);
+
+  final SellerOrderMarkCompletedRequested _self;
+  final $Res Function(SellerOrderMarkCompletedRequested) _then;
+
+/// Create a copy of SellerOrdersEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? orderId = null,}) {
+  return _then(SellerOrderMarkCompletedRequested(
 orderId: null == orderId ? _self.orderId : orderId // ignore: cast_nullable_to_non_nullable
 as int,
   ));

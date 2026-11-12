@@ -44,6 +44,7 @@ class OrderStatusTracker extends StatelessWidget {
       'pending' => 0,
       'preparing' => 1,
       'ready' => 2,
+      'completed' => 3,
       _ => -1,
     };
 
@@ -64,12 +65,18 @@ class OrderStatusTracker extends StatelessWidget {
         title: 'الطلب جاهز',
         description: 'اكتمل تجهيز طلبك.',
       ),
+      (
+        title: 'تم التسليم',
+        description: 'أكدت الأسرة تسليم الطلب.',
+      ),
     ];
 
     return Column(
       children: List.generate(steps.length, (index) {
-        final isCompleted = index < currentIndex;
-        final isCurrent = index == currentIndex;
+        final isCompleted = status == 'completed' || index < currentIndex;
+
+        final isCurrent = status != 'completed' && index == currentIndex;
+
         final isActive = isCompleted || isCurrent;
 
         final color = isActive ? colors.primary : colors.outlineVariant;

@@ -7,9 +7,13 @@ class CustomerOrdersView extends StatelessWidget {
   const CustomerOrdersView({
     super.key,
     required this.orders,
+    required this.cancellingOrderIds,
+    required this.onCancel,
   });
 
   final List<OrderInfo> orders;
+  final Set<int> cancellingOrderIds;
+  final ValueChanged<int> onCancel;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +26,18 @@ class CustomerOrdersView extends StatelessWidget {
       itemCount: orders.length,
       separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
-        return CustomerOrderCard(order: orders[index]);
+        final order = orders[index];
+        final orderId = order.id;
+
+        return CustomerOrderCard(
+          order: order,
+          isCancelling: orderId != null && cancellingOrderIds.contains(orderId),
+          onCancel: () {
+            if (orderId != null) {
+              onCancel(orderId);
+            }
+          },
+        );
       },
     );
   }

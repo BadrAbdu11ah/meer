@@ -33,8 +33,8 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
   ) async {
     final result = await _sellerRepository.getMyProfile();
 
-    final saved =
-        result.fold<({String? address, double? latitude, double? longitude})?>(
+    final saved = result
+        .fold<({String? address, double? latitude, double? longitude})?>(
           (_) => null,
           (profile) => (
             address: profile.address,

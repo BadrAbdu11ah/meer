@@ -103,6 +103,13 @@ class SellerOrdersScreen extends StatelessWidget {
                     SellerOrdersEvent.markReadyRequested(orderId: id),
                   );
                 },
+                onMarkCompleted: (id) {
+                  context.read<SellerOrdersBloc>().add(
+                    SellerOrdersEvent.markCompletedRequested(
+                      orderId: id,
+                    ),
+                  );
+                },
                 onRefreshRequested: refreshOrders,
               );
             },

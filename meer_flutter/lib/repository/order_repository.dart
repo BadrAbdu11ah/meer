@@ -59,6 +59,26 @@ class OrderRepository {
     }
   }
 
+  /// إلغاء طلب المشتري الحالي.
+  Future<Either<Failure, bool>> cancelMyOrder(
+    int orderId,
+  ) async {
+    return _executeOrderAction(
+      action: () => client.order.cancelMyOrder(orderId),
+      failureMessage: 'تعذر إلغاء الطلب.',
+    );
+  }
+
+  /// تأكيد تسليم الطلب للمشتري.
+  Future<Either<Failure, bool>> markMyOrderCompleted(
+    int orderId,
+  ) async {
+    return _executeOrderAction(
+      action: () => client.order.markMyOrderCompleted(orderId),
+      failureMessage: 'تعذر تأكيد تسليم الطلب.',
+    );
+  }
+
   /// قبول الطلب.
   Future<Either<Failure, bool>> acceptMyOrder(
     int orderId,

@@ -9,6 +9,7 @@ class SellerOrderCard extends StatelessWidget {
     required this.onAccept,
     required this.onReject,
     required this.onMarkReady,
+    required this.onMarkCompleted,
   });
 
   final OrderInfo order;
@@ -16,12 +17,13 @@ class SellerOrderCard extends StatelessWidget {
   final VoidCallback onAccept;
   final VoidCallback onReject;
   final VoidCallback onMarkReady;
+  final VoidCallback onMarkCompleted;
 
   String get _statusLabel {
     return switch (order.status) {
       'pending' => 'طلب جديد',
       'preparing' => 'قيد التجهيز',
-      'ready' => 'جاهز للتوصيل',
+      'ready' => 'جاهز للتسليم',
       'delivering' => 'جارٍ التوصيل',
       'completed' => 'مكتمل',
       'cancelled' => 'ملغي',
@@ -76,6 +78,32 @@ class SellerOrderCard extends StatelessWidget {
 
     if (confirmed == true) {
       onReject();
+    }
+  }
+
+  Future<void> _confirmMarkCompleted(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('تأكيد تسليم الطلب'),
+        content: Text(
+          'هل سلمت الطلب رقم #${order.id} للمشتري بالفعل؟',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('رجوع'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('نعم، تم التسليم'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      onMarkCompleted();
     }
   }
 
@@ -236,6 +264,19 @@ class SellerOrderCard extends StatelessWidget {
                   onPressed: isUpdating ? null : onMarkReady,
                   icon: const Icon(Icons.check_circle_outline),
                   label: const Text('الطلب جاهز للتوصيل'),
+                ),
+              ),
+            ],
+            if (order.status == 'ready') ...[
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: isUpdating
+                      ? null
+                      : () => _confirmMarkCompleted(context),
+                  icon: const Icon(Icons.check_circle_outline),
+                  label: const Text('تأكيد تسليم الطلب'),
                 ),
               ),
             ],

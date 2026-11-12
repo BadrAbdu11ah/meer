@@ -7,9 +7,13 @@ class CustomerOrderCard extends StatelessWidget {
   const CustomerOrderCard({
     super.key,
     required this.order,
+    required this.isCancelling,
+    required this.onCancel,
   });
 
   final OrderInfo order;
+  final bool isCancelling;
+  final VoidCallback onCancel;
 
   String _statusLabel(String status) {
     return switch (status) {
@@ -47,6 +51,35 @@ class CustomerOrderCard extends StatelessWidget {
     final minute = localDate.minute.toString().padLeft(2, '0');
 
     return '$day/$month/${localDate.year} - $hour:$minute';
+  }
+
+  Future<void> _confirmCancel(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('إلغاء الطلب'),
+        content: Text(
+          'هل أنت متأكد من إلغاء الطلب رقم #${order.id}؟',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('رجوع'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('تأكيد الإلغاء'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      onCancel();
+    }
   }
 
   @override
@@ -119,6 +152,32 @@ class CustomerOrderCard extends StatelessWidget {
             OrderStatusTracker(status: order.status),
 
             const SizedBox(height: 16),
+            if (order.status == 'pending') ...[
+              const SizedBox(height: 8),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: isCancelling
+                      ? null
+                      : () => _confirmCancel(context),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: colors.error,
+                  ),
+                  icon: isCancelling
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Icon(Icons.cancel_outlined),
+                  label: Text(
+                    isCancelling ? 'جارٍ إلغاء الطلب...' : 'إلغاء الطلب',
+                  ),
+                ),
+              ),
+            ],
             const Divider(),
 
             // الإجمالي.

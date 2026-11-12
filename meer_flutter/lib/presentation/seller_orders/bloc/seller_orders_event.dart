@@ -19,5 +19,9 @@ sealed class SellerOrdersEvent with _$SellerOrdersEvent {
     required int orderId,
   }) = SellerOrderMarkReadyRequested;
 
+  const factory SellerOrdersEvent.markCompletedRequested({
+    required int orderId,
+  }) = SellerOrderMarkCompletedRequested;
+
   const factory SellerOrdersEvent.messageCleared() = SellerOrdersMessageCleared;
 }

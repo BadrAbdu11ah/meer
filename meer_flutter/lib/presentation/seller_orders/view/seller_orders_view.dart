@@ -10,6 +10,7 @@ class SellerOrdersView extends StatelessWidget {
   final ValueChanged<int> onAccept;
   final ValueChanged<int> onReject;
   final ValueChanged<int> onMarkReady;
+  final ValueChanged<int> onMarkCompleted;
 
   const SellerOrdersView({
     super.key,
@@ -18,6 +19,7 @@ class SellerOrdersView extends StatelessWidget {
     required this.onAccept,
     required this.onReject,
     required this.onMarkReady,
+    required this.onMarkCompleted,
     this.onRefreshRequested,
   });
 
@@ -81,6 +83,11 @@ class SellerOrdersView extends StatelessWidget {
             },
             onMarkReady: () {
               if (orderId != null) onMarkReady(orderId);
+            },
+            onMarkCompleted: () {
+              if (orderId != null) {
+                onMarkCompleted(orderId);
+              }
             },
           );
         },
