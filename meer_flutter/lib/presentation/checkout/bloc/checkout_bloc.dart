@@ -87,18 +87,10 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
           ),
         );
 
-    var latitude = saved?.latitude;
-    var longitude = saved?.longitude;
-
-    // الحصول على الموقع الحالي إذا لم يكن محفوظاً.
-    if (latitude == null || longitude == null) {
-      final current = await _locationService.currentCoordinates();
-
-      if (current != null) {
-        latitude = current.latitude;
-        longitude = current.longitude;
-      }
-    }
+    // الموقع المحفوظ فقط. لا نطلب إذن الموقع عند فتح الصفحة،
+    // لأن الاستلام هو الاختيار الافتراضي ولا يحتاج موقعًا.
+    final latitude = saved?.latitude;
+    final longitude = saved?.longitude;
 
     final phone = saved?.phone ?? '';
 
@@ -183,6 +175,12 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
         errorMessage: null,
       ),
     );
+
+    // التوصيل يحتاج موقع العميل: نطلبه الآن إن لم يكن محفوظًا.
+    if (event.method == 'delivery' &&
+        (current.latitude == null || current.longitude == null)) {
+      add(const CheckoutEvent.locationRequested());
+    }
   }
 
   Future<void> _onPhoneCodeRequested(
@@ -294,9 +292,8 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
 
     emit(
       current.copyWith(
+        // الإحداثيات تصف مكان العميل، فلا تُمسح بتعديل نص العنوان.
         address: event.address,
-        latitude: null,
-        longitude: null,
         errorMessage: null,
       ),
     );

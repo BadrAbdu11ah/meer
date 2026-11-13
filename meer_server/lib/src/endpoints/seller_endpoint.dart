@@ -2,6 +2,9 @@ import 'package:meer_server/src/generated/protocol.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_idp_server/core.dart';
 
+/// أعلى رسوم توصيل تسمح بها المنصة (بالريال).
+const double maxDeliveryFee = 500;
+
 class SellerEndpoint extends Endpoint {
   @override
   bool get requireLogin => true;
@@ -93,8 +96,10 @@ class SellerEndpoint extends Endpoint {
       throw FormatException('إحداثيات الموقع غير صحيحة.');
     }
 
-    if (!deliveryFee.isFinite || deliveryFee < 0) {
-      throw FormatException('رسوم التوصيل غير صحيحة.');
+    if (!deliveryFee.isFinite || deliveryFee < 0 || deliveryFee > maxDeliveryFee) {
+      throw FormatException(
+        'رسوم التوصيل يجب أن تكون بين 0 و${maxDeliveryFee.toStringAsFixed(0)} ريال.',
+      );
     }
 
     // حفظ بيانات المتجر في ملف المستخدم الحالي.

@@ -208,6 +208,11 @@ class OrderEndpoint extends Endpoint {
           );
         }
 
+        // لا يطلب البائع من متجره نفسه.
+        if (seller.id == customer.id) {
+          throw FormatException('لا يمكنك طلب منتجات من متجرك.');
+        }
+
         // التحقق من توفر طريقة التنفيذ المطلوبة.
         if (fulfillmentMethod == 'delivery' && !seller.offersDelivery) {
           throw FormatException(

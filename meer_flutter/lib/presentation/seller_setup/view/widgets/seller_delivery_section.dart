@@ -19,8 +19,8 @@ class SellerDeliverySection extends StatelessWidget {
   String? _validateDeliveryFee(String? value) {
     final number = double.tryParse(value?.trim() ?? '');
 
-    if (number == null || !number.isFinite || number < 0) {
-      return 'أدخل رسوم توصيل صحيحة، ولا يمكن أن تكون سالبة.';
+    if (number == null || !number.isFinite || number < 0 || number > 500) {
+      return 'أدخل رسوم توصيل بين 0 و500 ريال.';
     }
 
     return null;

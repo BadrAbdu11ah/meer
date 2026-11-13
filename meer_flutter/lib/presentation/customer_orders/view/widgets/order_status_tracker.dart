@@ -77,10 +77,6 @@ class OrderStatusTracker extends StatelessWidget {
               description: 'اكتمل تجهيز طلبك وأصبح جاهزًا للتوصيل.',
             ),
             (
-              title: 'جارٍ التوصيل',
-              description: 'طلبك في طريقه إليك.',
-            ),
-            (
               title: 'تم التسليم',
               description: 'تم تأكيد تسليم الطلب.',
             ),
@@ -90,7 +86,8 @@ class OrderStatusTracker extends StatelessWidget {
       'pending' => 0,
       'preparing' => 1,
       'ready' => 2,
-      'delivering' when !_isPickup => 3,
+      // حالة قديمة لا تُنشأ من أي مسار حاليًا: نعاملها كـ «جاهز».
+      'delivering' => 2,
       'completed' => steps.length - 1,
       _ => -1,
     };
