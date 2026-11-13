@@ -67,6 +67,8 @@ class SellerSetupBloc extends Bloc<SellerSetupEvent, SellerSetupState> {
         district: event.district,
         latitude: event.latitude,
         longitude: event.longitude,
+        offersDelivery: event.offersDelivery,
+        deliveryFee: event.deliveryFee,
       );
 
       result.fold(

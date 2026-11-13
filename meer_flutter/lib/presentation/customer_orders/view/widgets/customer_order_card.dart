@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meer_client/meer_client.dart';
+import 'package:meer_flutter/presentation/customer_orders/view/widgets/customer_order_amounts_section.dart';
+import 'package:meer_flutter/presentation/customer_orders/view/widgets/customer_order_fulfillment_section.dart';
 import 'package:meer_flutter/presentation/customer_orders/view/widgets/order_item_tile.dart';
 import 'package:meer_flutter/presentation/customer_orders/view/widgets/order_status_tracker.dart';
 
@@ -16,10 +18,12 @@ class CustomerOrderCard extends StatelessWidget {
   final VoidCallback onCancel;
 
   String _statusLabel(String status) {
+    final isPickup = order.fulfillmentMethod == 'pickup';
+
     return switch (status) {
       'pending' => 'بانتظار قبول الأسرة',
       'preparing' => 'قيد التجهيز',
-      'ready' => 'طلبك جاهز',
+      'ready' => isPickup ? 'طلبك جاهز للاستلام' : 'طلبك جاهز للتوصيل',
       'delivering' => 'جارٍ التوصيل',
       'completed' => 'مكتمل',
       'cancelled' => 'تم إلغاء الطلب',
@@ -149,7 +153,16 @@ class CustomerOrderCard extends StatelessWidget {
             const SizedBox(height: 18),
 
             // مسار متابعة الطلب.
-            OrderStatusTracker(status: order.status),
+            OrderStatusTracker(
+              status: order.status,
+              fulfillmentMethod: order.fulfillmentMethod,
+            ),
+
+            const SizedBox(height: 16),
+
+            CustomerOrderFulfillmentSection(
+              order: order,
+            ),
 
             const SizedBox(height: 16),
             if (order.status == 'pending') ...[
@@ -180,29 +193,13 @@ class CustomerOrderCard extends StatelessWidget {
             ],
             const Divider(),
 
-            // الإجمالي.
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'إجمالي الطلب',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Text(
-                  '${order.totalAmount.toStringAsFixed(2)} ر.س',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: colors.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+            const Divider(),
+
+            CustomerOrderAmountsSection(
+              order: order,
             ),
 
-            SizedBox(
-              height: 20,
-            ),
+            const SizedBox(height: 16),
 
             // تفاصيل المنتجات والعنوان.
             ExpansionTile(
@@ -226,17 +223,6 @@ class CustomerOrderCard extends StatelessWidget {
                   ...items.map(
                     (item) => OrderItemTile(item: item),
                   ),
-
-                const Divider(),
-
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: const Icon(
-                    Icons.location_on_outlined,
-                  ),
-                  title: const Text('عنوان التوصيل'),
-                  subtitle: Text(order.deliveryAddress),
-                ),
               ],
             ),
           ],

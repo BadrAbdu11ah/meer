@@ -27,12 +27,24 @@ abstract class OrderInfo
     this.driverId,
     required this.status,
     required this.totalAmount,
-    required this.deliveryAddress,
+    String? fulfillmentMethod,
+    this.productsSubtotal,
+    double? deliveryFee,
+    this.deliveryAddress,
     this.deliveryLatitude,
     this.deliveryLongitude,
+    this.pickupAddress,
+    this.commissionBaseAmount,
+    this.commissionRate,
+    this.commissionAmount,
+    String? paymentMethod,
+    String? paymentStatus,
     required this.createdAt,
     this.items,
-  });
+  }) : fulfillmentMethod = fulfillmentMethod ?? 'delivery',
+       deliveryFee = deliveryFee ?? 0.0,
+       paymentMethod = paymentMethod ?? 'manual',
+       paymentStatus = paymentStatus ?? 'unpaid';
 
   factory OrderInfo({
     int? id,
@@ -43,9 +55,18 @@ abstract class OrderInfo
     int? driverId,
     required String status,
     required double totalAmount,
-    required String deliveryAddress,
+    String? fulfillmentMethod,
+    double? productsSubtotal,
+    double? deliveryFee,
+    String? deliveryAddress,
     double? deliveryLatitude,
     double? deliveryLongitude,
+    String? pickupAddress,
+    double? commissionBaseAmount,
+    double? commissionRate,
+    double? commissionAmount,
+    String? paymentMethod,
+    String? paymentStatus,
     required DateTime createdAt,
     List<_ixwt4bxc.OrderItem>? items,
   }) = _OrderInfoImpl;
@@ -68,11 +89,23 @@ abstract class OrderInfo
       driverId: jsonSerialization['driverId'] as int?,
       status: jsonSerialization['status'] as String,
       totalAmount: (jsonSerialization['totalAmount'] as num).toDouble(),
-      deliveryAddress: jsonSerialization['deliveryAddress'] as String,
+      fulfillmentMethod: jsonSerialization['fulfillmentMethod'] as String?,
+      productsSubtotal: (jsonSerialization['productsSubtotal'] as num?)
+          ?.toDouble(),
+      deliveryFee: (jsonSerialization['deliveryFee'] as num?)?.toDouble(),
+      deliveryAddress: jsonSerialization['deliveryAddress'] as String?,
       deliveryLatitude: (jsonSerialization['deliveryLatitude'] as num?)
           ?.toDouble(),
       deliveryLongitude: (jsonSerialization['deliveryLongitude'] as num?)
           ?.toDouble(),
+      pickupAddress: jsonSerialization['pickupAddress'] as String?,
+      commissionBaseAmount: (jsonSerialization['commissionBaseAmount'] as num?)
+          ?.toDouble(),
+      commissionRate: (jsonSerialization['commissionRate'] as num?)?.toDouble(),
+      commissionAmount: (jsonSerialization['commissionAmount'] as num?)
+          ?.toDouble(),
+      paymentMethod: jsonSerialization['paymentMethod'] as String?,
+      paymentStatus: jsonSerialization['paymentStatus'] as String?,
       createdAt: _is.DateTimeJsonExtension.fromJson(
         jsonSerialization['createdAt'],
       ),
@@ -105,11 +138,29 @@ abstract class OrderInfo
 
   double totalAmount;
 
-  String deliveryAddress;
+  String fulfillmentMethod;
+
+  double? productsSubtotal;
+
+  double deliveryFee;
+
+  String? deliveryAddress;
 
   double? deliveryLatitude;
 
   double? deliveryLongitude;
+
+  String? pickupAddress;
+
+  double? commissionBaseAmount;
+
+  double? commissionRate;
+
+  double? commissionAmount;
+
+  String paymentMethod;
+
+  String paymentStatus;
 
   DateTime createdAt;
 
@@ -130,9 +181,18 @@ abstract class OrderInfo
     int? driverId,
     String? status,
     double? totalAmount,
+    String? fulfillmentMethod,
+    double? productsSubtotal,
+    double? deliveryFee,
     String? deliveryAddress,
     double? deliveryLatitude,
     double? deliveryLongitude,
+    String? pickupAddress,
+    double? commissionBaseAmount,
+    double? commissionRate,
+    double? commissionAmount,
+    String? paymentMethod,
+    String? paymentStatus,
     DateTime? createdAt,
     List<_ixwt4bxc.OrderItem>? items,
   });
@@ -148,9 +208,19 @@ abstract class OrderInfo
       if (driverId != null) 'driverId': driverId,
       'status': status,
       'totalAmount': totalAmount,
-      'deliveryAddress': deliveryAddress,
+      'fulfillmentMethod': fulfillmentMethod,
+      if (productsSubtotal != null) 'productsSubtotal': productsSubtotal,
+      'deliveryFee': deliveryFee,
+      if (deliveryAddress != null) 'deliveryAddress': deliveryAddress,
       if (deliveryLatitude != null) 'deliveryLatitude': deliveryLatitude,
       if (deliveryLongitude != null) 'deliveryLongitude': deliveryLongitude,
+      if (pickupAddress != null) 'pickupAddress': pickupAddress,
+      if (commissionBaseAmount != null)
+        'commissionBaseAmount': commissionBaseAmount,
+      if (commissionRate != null) 'commissionRate': commissionRate,
+      if (commissionAmount != null) 'commissionAmount': commissionAmount,
+      'paymentMethod': paymentMethod,
+      'paymentStatus': paymentStatus,
       'createdAt': createdAt.toJson(),
       if (items != null) 'items': items?.toJson(valueToJson: (v) => v.toJson()),
     };
@@ -168,9 +238,19 @@ abstract class OrderInfo
       if (driverId != null) 'driverId': driverId,
       'status': status,
       'totalAmount': totalAmount,
-      'deliveryAddress': deliveryAddress,
+      'fulfillmentMethod': fulfillmentMethod,
+      if (productsSubtotal != null) 'productsSubtotal': productsSubtotal,
+      'deliveryFee': deliveryFee,
+      if (deliveryAddress != null) 'deliveryAddress': deliveryAddress,
       if (deliveryLatitude != null) 'deliveryLatitude': deliveryLatitude,
       if (deliveryLongitude != null) 'deliveryLongitude': deliveryLongitude,
+      if (pickupAddress != null) 'pickupAddress': pickupAddress,
+      if (commissionBaseAmount != null)
+        'commissionBaseAmount': commissionBaseAmount,
+      if (commissionRate != null) 'commissionRate': commissionRate,
+      if (commissionAmount != null) 'commissionAmount': commissionAmount,
+      'paymentMethod': paymentMethod,
+      'paymentStatus': paymentStatus,
       'createdAt': createdAt.toJson(),
       if (items != null)
         'items': items?.toJson(valueToJson: (v) => v.toJsonForProtocol()),
@@ -225,9 +305,18 @@ class _OrderInfoImpl extends OrderInfo {
     int? driverId,
     required String status,
     required double totalAmount,
-    required String deliveryAddress,
+    String? fulfillmentMethod,
+    double? productsSubtotal,
+    double? deliveryFee,
+    String? deliveryAddress,
     double? deliveryLatitude,
     double? deliveryLongitude,
+    String? pickupAddress,
+    double? commissionBaseAmount,
+    double? commissionRate,
+    double? commissionAmount,
+    String? paymentMethod,
+    String? paymentStatus,
     required DateTime createdAt,
     List<_ixwt4bxc.OrderItem>? items,
   }) : super._(
@@ -239,9 +328,18 @@ class _OrderInfoImpl extends OrderInfo {
          driverId: driverId,
          status: status,
          totalAmount: totalAmount,
+         fulfillmentMethod: fulfillmentMethod,
+         productsSubtotal: productsSubtotal,
+         deliveryFee: deliveryFee,
          deliveryAddress: deliveryAddress,
          deliveryLatitude: deliveryLatitude,
          deliveryLongitude: deliveryLongitude,
+         pickupAddress: pickupAddress,
+         commissionBaseAmount: commissionBaseAmount,
+         commissionRate: commissionRate,
+         commissionAmount: commissionAmount,
+         paymentMethod: paymentMethod,
+         paymentStatus: paymentStatus,
          createdAt: createdAt,
          items: items,
        );
@@ -259,9 +357,18 @@ class _OrderInfoImpl extends OrderInfo {
     Object? driverId = _Undefined,
     String? status,
     double? totalAmount,
-    String? deliveryAddress,
+    String? fulfillmentMethod,
+    Object? productsSubtotal = _Undefined,
+    double? deliveryFee,
+    Object? deliveryAddress = _Undefined,
     Object? deliveryLatitude = _Undefined,
     Object? deliveryLongitude = _Undefined,
+    Object? pickupAddress = _Undefined,
+    Object? commissionBaseAmount = _Undefined,
+    Object? commissionRate = _Undefined,
+    Object? commissionAmount = _Undefined,
+    String? paymentMethod,
+    String? paymentStatus,
     DateTime? createdAt,
     Object? items = _Undefined,
   }) {
@@ -278,13 +385,34 @@ class _OrderInfoImpl extends OrderInfo {
       driverId: driverId is int? ? driverId : this.driverId,
       status: status ?? this.status,
       totalAmount: totalAmount ?? this.totalAmount,
-      deliveryAddress: deliveryAddress ?? this.deliveryAddress,
+      fulfillmentMethod: fulfillmentMethod ?? this.fulfillmentMethod,
+      productsSubtotal: productsSubtotal is double?
+          ? productsSubtotal
+          : this.productsSubtotal,
+      deliveryFee: deliveryFee ?? this.deliveryFee,
+      deliveryAddress: deliveryAddress is String?
+          ? deliveryAddress
+          : this.deliveryAddress,
       deliveryLatitude: deliveryLatitude is double?
           ? deliveryLatitude
           : this.deliveryLatitude,
       deliveryLongitude: deliveryLongitude is double?
           ? deliveryLongitude
           : this.deliveryLongitude,
+      pickupAddress: pickupAddress is String?
+          ? pickupAddress
+          : this.pickupAddress,
+      commissionBaseAmount: commissionBaseAmount is double?
+          ? commissionBaseAmount
+          : this.commissionBaseAmount,
+      commissionRate: commissionRate is double?
+          ? commissionRate
+          : this.commissionRate,
+      commissionAmount: commissionAmount is double?
+          ? commissionAmount
+          : this.commissionAmount,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
       createdAt: createdAt ?? this.createdAt,
       items: items is List<_ixwt4bxc.OrderItem>?
           ? items
@@ -321,7 +449,24 @@ class OrderInfoUpdateTable extends _is.UpdateTable<OrderInfoTable> {
     value,
   );
 
-  _is.ColumnValue<String, String> deliveryAddress(String value) =>
+  _is.ColumnValue<String, String> fulfillmentMethod(String value) =>
+      _is.ColumnValue(
+        table.fulfillmentMethod,
+        value,
+      );
+
+  _is.ColumnValue<double, double> productsSubtotal(double? value) =>
+      _is.ColumnValue(
+        table.productsSubtotal,
+        value,
+      );
+
+  _is.ColumnValue<double, double> deliveryFee(double value) => _is.ColumnValue(
+    table.deliveryFee,
+    value,
+  );
+
+  _is.ColumnValue<String, String> deliveryAddress(String? value) =>
       _is.ColumnValue(
         table.deliveryAddress,
         value,
@@ -336,6 +481,42 @@ class OrderInfoUpdateTable extends _is.UpdateTable<OrderInfoTable> {
   _is.ColumnValue<double, double> deliveryLongitude(double? value) =>
       _is.ColumnValue(
         table.deliveryLongitude,
+        value,
+      );
+
+  _is.ColumnValue<String, String> pickupAddress(String? value) =>
+      _is.ColumnValue(
+        table.pickupAddress,
+        value,
+      );
+
+  _is.ColumnValue<double, double> commissionBaseAmount(double? value) =>
+      _is.ColumnValue(
+        table.commissionBaseAmount,
+        value,
+      );
+
+  _is.ColumnValue<double, double> commissionRate(double? value) =>
+      _is.ColumnValue(
+        table.commissionRate,
+        value,
+      );
+
+  _is.ColumnValue<double, double> commissionAmount(double? value) =>
+      _is.ColumnValue(
+        table.commissionAmount,
+        value,
+      );
+
+  _is.ColumnValue<String, String> paymentMethod(String value) =>
+      _is.ColumnValue(
+        table.paymentMethod,
+        value,
+      );
+
+  _is.ColumnValue<String, String> paymentStatus(String value) =>
+      _is.ColumnValue(
+        table.paymentStatus,
         value,
       );
 
@@ -369,6 +550,20 @@ class OrderInfoTable extends _is.Table<int?> {
       'totalAmount',
       this,
     );
+    fulfillmentMethod = _is.ColumnString(
+      'fulfillmentMethod',
+      this,
+      hasDefault: true,
+    );
+    productsSubtotal = _is.ColumnDouble(
+      'productsSubtotal',
+      this,
+    );
+    deliveryFee = _is.ColumnDouble(
+      'deliveryFee',
+      this,
+      hasDefault: true,
+    );
     deliveryAddress = _is.ColumnString(
       'deliveryAddress',
       this,
@@ -380,6 +575,32 @@ class OrderInfoTable extends _is.Table<int?> {
     deliveryLongitude = _is.ColumnDouble(
       'deliveryLongitude',
       this,
+    );
+    pickupAddress = _is.ColumnString(
+      'pickupAddress',
+      this,
+    );
+    commissionBaseAmount = _is.ColumnDouble(
+      'commissionBaseAmount',
+      this,
+    );
+    commissionRate = _is.ColumnDouble(
+      'commissionRate',
+      this,
+    );
+    commissionAmount = _is.ColumnDouble(
+      'commissionAmount',
+      this,
+    );
+    paymentMethod = _is.ColumnString(
+      'paymentMethod',
+      this,
+      hasDefault: true,
+    );
+    paymentStatus = _is.ColumnString(
+      'paymentStatus',
+      this,
+      hasDefault: true,
     );
     createdAt = _is.ColumnDateTime(
       'createdAt',
@@ -403,11 +624,29 @@ class OrderInfoTable extends _is.Table<int?> {
 
   late final _is.ColumnDouble totalAmount;
 
+  late final _is.ColumnString fulfillmentMethod;
+
+  late final _is.ColumnDouble productsSubtotal;
+
+  late final _is.ColumnDouble deliveryFee;
+
   late final _is.ColumnString deliveryAddress;
 
   late final _is.ColumnDouble deliveryLatitude;
 
   late final _is.ColumnDouble deliveryLongitude;
+
+  late final _is.ColumnString pickupAddress;
+
+  late final _is.ColumnDouble commissionBaseAmount;
+
+  late final _is.ColumnDouble commissionRate;
+
+  late final _is.ColumnDouble commissionAmount;
+
+  late final _is.ColumnString paymentMethod;
+
+  late final _is.ColumnString paymentStatus;
 
   late final _is.ColumnDateTime createdAt;
 
@@ -481,9 +720,18 @@ class OrderInfoTable extends _is.Table<int?> {
     driverId,
     status,
     totalAmount,
+    fulfillmentMethod,
+    productsSubtotal,
+    deliveryFee,
     deliveryAddress,
     deliveryLatitude,
     deliveryLongitude,
+    pickupAddress,
+    commissionBaseAmount,
+    commissionRate,
+    commissionAmount,
+    paymentMethod,
+    paymentStatus,
     createdAt,
   ];
 

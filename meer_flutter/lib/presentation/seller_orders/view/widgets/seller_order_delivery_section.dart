@@ -4,11 +4,9 @@ class SellerOrderDeliverySection extends StatelessWidget {
   const SellerOrderDeliverySection({
     super.key,
     required this.createdAt,
-    required this.deliveryAddress,
   });
 
   final DateTime createdAt;
-  final String deliveryAddress;
 
   String _formatDate(DateTime date) {
     final localDate = date.toLocal();
@@ -40,10 +38,6 @@ class SellerOrderDeliverySection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 5),
-        Text(
-          deliveryAddress,
-          style: theme.textTheme.bodyMedium,
-        ),
       ],
     );
   }

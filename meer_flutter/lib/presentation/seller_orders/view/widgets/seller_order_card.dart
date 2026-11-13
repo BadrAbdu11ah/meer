@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:meer_client/meer_client.dart';
 import 'package:meer_flutter/presentation/seller_orders/view/widgets/seller_order_actions.dart';
+import 'package:meer_flutter/presentation/seller_orders/view/widgets/seller_order_amounts_section.dart';
 import 'package:meer_flutter/presentation/seller_orders/view/widgets/seller_order_delivery_section.dart';
+import 'package:meer_flutter/presentation/seller_orders/view/widgets/seller_order_fulfillment_section.dart';
 import 'package:meer_flutter/presentation/seller_orders/view/widgets/seller_order_items_section.dart';
 import 'package:meer_flutter/presentation/seller_orders/view/widgets/seller_order_status_badge.dart';
 
@@ -41,16 +43,24 @@ class SellerOrderCard extends StatelessWidget {
 
             SellerOrderDeliverySection(
               createdAt: order.createdAt,
-              deliveryAddress: order.deliveryAddress,
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
+
+            SellerOrderFulfillmentSection(
+              order: order,
+            ),
+            const SizedBox(height: 12),
+
             const Divider(),
 
             SellerOrderItemsSection(items: items),
 
             const Divider(),
-            _buildTotal(theme),
+
+            SellerOrderAmountsSection(
+              order: order,
+            ),
 
             if (_hasActions) ...[
               const SizedBox(height: 16),
@@ -89,25 +99,6 @@ class SellerOrderCard extends StatelessWidget {
         SellerOrderStatusBadge(
           status: order.status,
           isUpdating: isUpdating,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTotal(ThemeData theme) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        const Text(
-          'إجمالي الطلب',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        Text(
-          '${order.totalAmount.toStringAsFixed(2)} ر.س',
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: theme.colorScheme.primary,
-            fontWeight: FontWeight.bold,
-          ),
         ),
       ],
     );

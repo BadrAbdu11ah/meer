@@ -119,10 +119,10 @@ return locationRequested(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String storeName,  String? storeDescription,  String storeAddress,  MeerCity city,  String? district,  double latitude,  double longitude)?  submitted,TResult Function()?  locationRequested,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String storeName,  String? storeDescription,  String storeAddress,  MeerCity city,  String? district,  double latitude,  double longitude,  bool offersDelivery,  double deliveryFee)?  submitted,TResult Function()?  locationRequested,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SellerSetupSubmitted() when submitted != null:
-return submitted(_that.storeName,_that.storeDescription,_that.storeAddress,_that.city,_that.district,_that.latitude,_that.longitude);case _SellerSetupLocationRequested() when locationRequested != null:
+return submitted(_that.storeName,_that.storeDescription,_that.storeAddress,_that.city,_that.district,_that.latitude,_that.longitude,_that.offersDelivery,_that.deliveryFee);case _SellerSetupLocationRequested() when locationRequested != null:
 return locationRequested();case _:
   return orElse();
 
@@ -141,10 +141,10 @@ return locationRequested();case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String storeName,  String? storeDescription,  String storeAddress,  MeerCity city,  String? district,  double latitude,  double longitude)  submitted,required TResult Function()  locationRequested,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String storeName,  String? storeDescription,  String storeAddress,  MeerCity city,  String? district,  double latitude,  double longitude,  bool offersDelivery,  double deliveryFee)  submitted,required TResult Function()  locationRequested,}) {final _that = this;
 switch (_that) {
 case _SellerSetupSubmitted():
-return submitted(_that.storeName,_that.storeDescription,_that.storeAddress,_that.city,_that.district,_that.latitude,_that.longitude);case _SellerSetupLocationRequested():
+return submitted(_that.storeName,_that.storeDescription,_that.storeAddress,_that.city,_that.district,_that.latitude,_that.longitude,_that.offersDelivery,_that.deliveryFee);case _SellerSetupLocationRequested():
 return locationRequested();}
 }
 /// A variant of `when` that fallback to returning `null`
@@ -159,10 +159,10 @@ return locationRequested();}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String storeName,  String? storeDescription,  String storeAddress,  MeerCity city,  String? district,  double latitude,  double longitude)?  submitted,TResult? Function()?  locationRequested,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String storeName,  String? storeDescription,  String storeAddress,  MeerCity city,  String? district,  double latitude,  double longitude,  bool offersDelivery,  double deliveryFee)?  submitted,TResult? Function()?  locationRequested,}) {final _that = this;
 switch (_that) {
 case _SellerSetupSubmitted() when submitted != null:
-return submitted(_that.storeName,_that.storeDescription,_that.storeAddress,_that.city,_that.district,_that.latitude,_that.longitude);case _SellerSetupLocationRequested() when locationRequested != null:
+return submitted(_that.storeName,_that.storeDescription,_that.storeAddress,_that.city,_that.district,_that.latitude,_that.longitude,_that.offersDelivery,_that.deliveryFee);case _SellerSetupLocationRequested() when locationRequested != null:
 return locationRequested();case _:
   return null;
 
@@ -175,7 +175,7 @@ return locationRequested();case _:
 
 
 class _SellerSetupSubmitted implements SellerSetupEvent {
-  const _SellerSetupSubmitted({required this.storeName, required this.storeDescription, required this.storeAddress, required this.city, required this.district, required this.latitude, required this.longitude});
+  const _SellerSetupSubmitted({required this.storeName, required this.storeDescription, required this.storeAddress, required this.city, required this.district, required this.latitude, required this.longitude, required this.offersDelivery, required this.deliveryFee});
   
 
  final  String storeName;
@@ -185,6 +185,8 @@ class _SellerSetupSubmitted implements SellerSetupEvent {
  final  String? district;
  final  double latitude;
  final  double longitude;
+ final  bool offersDelivery;
+ final  double deliveryFee;
 
 /// Create a copy of SellerSetupEvent
 /// with the given fields replaced by the non-null parameter values.
@@ -196,16 +198,16 @@ _$SellerSetupSubmittedCopyWith<_SellerSetupSubmitted> get copyWith => __$SellerS
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SellerSetupSubmitted&&(identical(other.storeName, storeName) || other.storeName == storeName)&&(identical(other.storeDescription, storeDescription) || other.storeDescription == storeDescription)&&(identical(other.storeAddress, storeAddress) || other.storeAddress == storeAddress)&&(identical(other.city, city) || other.city == city)&&(identical(other.district, district) || other.district == district)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _SellerSetupSubmitted&&(identical(other.storeName, storeName) || other.storeName == storeName)&&(identical(other.storeDescription, storeDescription) || other.storeDescription == storeDescription)&&(identical(other.storeAddress, storeAddress) || other.storeAddress == storeAddress)&&(identical(other.city, city) || other.city == city)&&(identical(other.district, district) || other.district == district)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.offersDelivery, offersDelivery) || other.offersDelivery == offersDelivery)&&(identical(other.deliveryFee, deliveryFee) || other.deliveryFee == deliveryFee));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,storeName,storeDescription,storeAddress,city,district,latitude,longitude);
+int get hashCode => Object.hash(runtimeType,storeName,storeDescription,storeAddress,city,district,latitude,longitude,offersDelivery,deliveryFee);
 
 @override
 String toString() {
-  return 'SellerSetupEvent.submitted(storeName: $storeName, storeDescription: $storeDescription, storeAddress: $storeAddress, city: $city, district: $district, latitude: $latitude, longitude: $longitude)';
+  return 'SellerSetupEvent.submitted(storeName: $storeName, storeDescription: $storeDescription, storeAddress: $storeAddress, city: $city, district: $district, latitude: $latitude, longitude: $longitude, offersDelivery: $offersDelivery, deliveryFee: $deliveryFee)';
 }
 
 
@@ -216,7 +218,7 @@ abstract mixin class _$SellerSetupSubmittedCopyWith<$Res> implements $SellerSetu
   factory _$SellerSetupSubmittedCopyWith(_SellerSetupSubmitted value, $Res Function(_SellerSetupSubmitted) _then) = __$SellerSetupSubmittedCopyWithImpl;
 @useResult
 $Res call({
- String storeName, String? storeDescription, String storeAddress, MeerCity city, String? district, double latitude, double longitude
+ String storeName, String? storeDescription, String storeAddress, MeerCity city, String? district, double latitude, double longitude, bool offersDelivery, double deliveryFee
 });
 
 
@@ -233,7 +235,7 @@ class __$SellerSetupSubmittedCopyWithImpl<$Res>
 
 /// Create a copy of SellerSetupEvent
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? storeName = null,Object? storeDescription = freezed,Object? storeAddress = null,Object? city = null,Object? district = freezed,Object? latitude = null,Object? longitude = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? storeName = null,Object? storeDescription = freezed,Object? storeAddress = null,Object? city = null,Object? district = freezed,Object? latitude = null,Object? longitude = null,Object? offersDelivery = null,Object? deliveryFee = null,}) {
   return _then(_SellerSetupSubmitted(
 storeName: null == storeName ? _self.storeName : storeName // ignore: cast_nullable_to_non_nullable
 as String,storeDescription: freezed == storeDescription ? _self.storeDescription : storeDescription // ignore: cast_nullable_to_non_nullable
@@ -242,6 +244,8 @@ as String,city: null == city ? _self.city : city // ignore: cast_nullable_to_non
 as MeerCity,district: freezed == district ? _self.district : district // ignore: cast_nullable_to_non_nullable
 as String?,latitude: null == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double,longitude: null == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
+as double,offersDelivery: null == offersDelivery ? _self.offersDelivery : offersDelivery // ignore: cast_nullable_to_non_nullable
+as bool,deliveryFee: null == deliveryFee ? _self.deliveryFee : deliveryFee // ignore: cast_nullable_to_non_nullable
 as double,
   ));
 }

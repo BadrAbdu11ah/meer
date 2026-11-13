@@ -24,7 +24,6 @@ class SellerRepository {
     }
   }
 
-  // 2.
   /// تفعيل حساب البائع
   Future<Either<Failure, MeerUserProfile>> activateSeller({
     required String storeName,
@@ -34,6 +33,8 @@ class SellerRepository {
     required double latitude,
     required double longitude,
     String? storeDescription,
+    required bool offersDelivery,
+    required double deliveryFee,
   }) async {
     try {
       final profile = await client.seller.activateSeller(
@@ -44,6 +45,8 @@ class SellerRepository {
         district,
         latitude,
         longitude,
+        offersDelivery,
+        deliveryFee,
       );
 
       return Right(profile);

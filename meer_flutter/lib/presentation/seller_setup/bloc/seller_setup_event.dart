@@ -10,6 +10,8 @@ sealed class SellerSetupEvent with _$SellerSetupEvent {
     required String? district,
     required double latitude,
     required double longitude,
+    required bool offersDelivery,
+    required double deliveryFee,
   }) = _SellerSetupSubmitted;
 
   /// زر «استخدم موقعي الحالي» لتعبئة إحداثيات المتجر.

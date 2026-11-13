@@ -3,4 +3,5 @@ fields:
   sellerId: int
   storeName: String
   storeDescription: String?
-  storeAddress: String?
+  offersDelivery: bool
+  deliveryFee: double

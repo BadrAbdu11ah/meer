@@ -322,9 +322,10 @@ class EndpointOrder extends _isc.EndpointRef {
 
   _ida.Future<_iiv379dz.OrderInfo> createOrder(
     List<_ix7syfm6.OrderItemRequest> requestedItems,
-    String deliveryAddress,
+    String? deliveryAddress,
     double? deliveryLatitude,
     double? deliveryLongitude,
+    String fulfillmentMethod,
   ) => caller.callServerEndpoint<_iiv379dz.OrderInfo>(
     'order',
     'createOrder',
@@ -333,6 +334,7 @@ class EndpointOrder extends _isc.EndpointRef {
       'deliveryAddress': deliveryAddress,
       'deliveryLatitude': deliveryLatitude,
       'deliveryLongitude': deliveryLongitude,
+      'fulfillmentMethod': fulfillmentMethod,
     },
   );
 
@@ -490,6 +492,8 @@ class EndpointSeller extends _isc.EndpointRef {
     String? storeDistrict,
     double latitude,
     double longitude,
+    bool offersDelivery,
+    double deliveryFee,
   ) => caller.callServerEndpoint<_ihcobg5g.MeerUserProfile>(
     'seller',
     'activateSeller',
@@ -501,6 +505,8 @@ class EndpointSeller extends _isc.EndpointRef {
       'storeDistrict': storeDistrict,
       'latitude': latitude,
       'longitude': longitude,
+      'offersDelivery': offersDelivery,
+      'deliveryFee': deliveryFee,
     },
   );
 

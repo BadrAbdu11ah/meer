@@ -18,14 +18,16 @@ abstract class SellerPublicInfo
     required this.sellerId,
     required this.storeName,
     this.storeDescription,
-    this.storeAddress,
+    required this.offersDelivery,
+    required this.deliveryFee,
   });
 
   factory SellerPublicInfo({
     required int sellerId,
     required String storeName,
     String? storeDescription,
-    String? storeAddress,
+    required bool offersDelivery,
+    required double deliveryFee,
   }) = _SellerPublicInfoImpl;
 
   factory SellerPublicInfo.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -33,7 +35,10 @@ abstract class SellerPublicInfo
       sellerId: jsonSerialization['sellerId'] as int,
       storeName: jsonSerialization['storeName'] as String,
       storeDescription: jsonSerialization['storeDescription'] as String?,
-      storeAddress: jsonSerialization['storeAddress'] as String?,
+      offersDelivery: _isc.BoolJsonExtension.fromJson(
+        jsonSerialization['offersDelivery'],
+      ),
+      deliveryFee: (jsonSerialization['deliveryFee'] as num).toDouble(),
     );
   }
 
@@ -43,7 +48,9 @@ abstract class SellerPublicInfo
 
   String? storeDescription;
 
-  String? storeAddress;
+  bool offersDelivery;
+
+  double deliveryFee;
 
   /// Returns a shallow copy of this [SellerPublicInfo]
   /// with some or all fields replaced by the given arguments.
@@ -52,7 +59,8 @@ abstract class SellerPublicInfo
     int? sellerId,
     String? storeName,
     String? storeDescription,
-    String? storeAddress,
+    bool? offersDelivery,
+    double? deliveryFee,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -61,7 +69,8 @@ abstract class SellerPublicInfo
       'sellerId': sellerId,
       'storeName': storeName,
       if (storeDescription != null) 'storeDescription': storeDescription,
-      if (storeAddress != null) 'storeAddress': storeAddress,
+      'offersDelivery': offersDelivery,
+      'deliveryFee': deliveryFee,
     };
   }
 
@@ -72,7 +81,8 @@ abstract class SellerPublicInfo
       'sellerId': sellerId,
       'storeName': storeName,
       if (storeDescription != null) 'storeDescription': storeDescription,
-      if (storeAddress != null) 'storeAddress': storeAddress,
+      'offersDelivery': offersDelivery,
+      'deliveryFee': deliveryFee,
     };
   }
 
@@ -89,12 +99,14 @@ class _SellerPublicInfoImpl extends SellerPublicInfo {
     required int sellerId,
     required String storeName,
     String? storeDescription,
-    String? storeAddress,
+    required bool offersDelivery,
+    required double deliveryFee,
   }) : super._(
          sellerId: sellerId,
          storeName: storeName,
          storeDescription: storeDescription,
-         storeAddress: storeAddress,
+         offersDelivery: offersDelivery,
+         deliveryFee: deliveryFee,
        );
 
   /// Returns a shallow copy of this [SellerPublicInfo]
@@ -105,7 +117,8 @@ class _SellerPublicInfoImpl extends SellerPublicInfo {
     int? sellerId,
     String? storeName,
     Object? storeDescription = _Undefined,
-    Object? storeAddress = _Undefined,
+    bool? offersDelivery,
+    double? deliveryFee,
   }) {
     return SellerPublicInfo(
       sellerId: sellerId ?? this.sellerId,
@@ -113,7 +126,8 @@ class _SellerPublicInfoImpl extends SellerPublicInfo {
       storeDescription: storeDescription is String?
           ? storeDescription
           : this.storeDescription,
-      storeAddress: storeAddress is String? ? storeAddress : this.storeAddress,
+      offersDelivery: offersDelivery ?? this.offersDelivery,
+      deliveryFee: deliveryFee ?? this.deliveryFee,
     );
   }
 }

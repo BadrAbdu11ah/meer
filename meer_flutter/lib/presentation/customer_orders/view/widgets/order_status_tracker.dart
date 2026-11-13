@@ -4,9 +4,13 @@ class OrderStatusTracker extends StatelessWidget {
   const OrderStatusTracker({
     super.key,
     required this.status,
+    required this.fulfillmentMethod,
   });
 
   final String status;
+  final String fulfillmentMethod;
+
+  bool get _isPickup => fulfillmentMethod == 'pickup';
 
   @override
   Widget build(BuildContext context) {
@@ -40,36 +44,60 @@ class OrderStatusTracker extends StatelessWidget {
       );
     }
 
+    final steps = _isPickup
+        ? [
+            (
+              title: 'تم استلام الطلب',
+              description: 'تم إرسال طلبك بنجاح.',
+            ),
+            (
+              title: 'قيد التجهيز',
+              description: 'الأسرة تعمل على تجهيز طلبك.',
+            ),
+            (
+              title: 'جاهز للاستلام',
+              description: 'يمكنك استلام طلبك من موقع الأسرة.',
+            ),
+            (
+              title: 'تم الاستلام',
+              description: 'تم تأكيد استلامك للطلب.',
+            ),
+          ]
+        : [
+            (
+              title: 'تم استلام الطلب',
+              description: 'تم إرسال طلبك بنجاح.',
+            ),
+            (
+              title: 'قيد التجهيز',
+              description: 'الأسرة تعمل على تجهيز طلبك.',
+            ),
+            (
+              title: 'جاهز للتوصيل',
+              description: 'اكتمل تجهيز طلبك وأصبح جاهزًا للتوصيل.',
+            ),
+            (
+              title: 'جارٍ التوصيل',
+              description: 'طلبك في طريقه إليك.',
+            ),
+            (
+              title: 'تم التسليم',
+              description: 'تم تأكيد تسليم الطلب.',
+            ),
+          ];
+
     final currentIndex = switch (status) {
       'pending' => 0,
       'preparing' => 1,
       'ready' => 2,
-      'completed' => 3,
+      'delivering' when !_isPickup => 3,
+      'completed' => steps.length - 1,
       _ => -1,
     };
 
     if (currentIndex == -1) {
       return const SizedBox.shrink();
     }
-
-    const steps = [
-      (
-        title: 'تم استلام الطلب',
-        description: 'تم إرسال طلبك بنجاح.',
-      ),
-      (
-        title: 'قيد التجهيز',
-        description: 'الأسرة تعمل على تجهيز طلبك.',
-      ),
-      (
-        title: 'الطلب جاهز',
-        description: 'اكتمل تجهيز طلبك.',
-      ),
-      (
-        title: 'تم التسليم',
-        description: 'أكدت الأسرة تسليم الطلب.',
-      ),
-    ];
 
     return Column(
       children: List.generate(steps.length, (index) {
@@ -97,7 +125,6 @@ class OrderStatusTracker extends StatelessWidget {
                     size: 22,
                     color: color,
                   ),
-
                   if (index != steps.length - 1)
                     Container(
                       width: 2,
@@ -109,9 +136,7 @@ class OrderStatusTracker extends StatelessWidget {
                 ],
               ),
             ),
-
             const SizedBox(width: 12),
-
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 20),

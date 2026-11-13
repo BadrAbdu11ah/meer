@@ -20,8 +20,14 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
   ) : super(const CheckoutState.initial()) {
     on<CheckoutStarted>(_onStarted);
     on<CheckoutLocationRequested>(_onLocationRequested);
+    on<CheckoutFulfillmentMethodChanged>(
+      _onFulfillmentMethodChanged,
+    );
     on<CheckoutPhoneCodeRequested>(_onPhoneCodeRequested);
-    on<CheckoutPhoneVerificationSubmitted>(_onPhoneVerificationSubmitted);
+    on<CheckoutPhoneVerificationSubmitted>(
+      _onPhoneVerificationSubmitted,
+    );
+    on<CheckoutAddressChanged>(_onAddressChanged);
     on<CheckoutSubmitted>(_onSubmitted);
   }
 
@@ -40,6 +46,27 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
     CheckoutStarted event,
     Emitter<CheckoutState> emit,
   ) async {
+    // تحميل معلومات الأسرة أولاً.
+    final sellerResult = await _sellerRepository.getPublicSellerInfo(
+      sellerId: event.sellerId,
+    );
+
+    final seller = sellerResult.fold(
+      (failure) => null,
+      (profile) => profile,
+    );
+
+    if (seller == null) {
+      final message = sellerResult.fold(
+        (failure) => failure.message,
+        (_) => 'تعذر تحميل معلومات الأسرة.',
+      );
+
+      emit(CheckoutState.failure(message));
+      return;
+    }
+
+    // تحميل بيانات العميل المحفوظة.
     final result = await _sellerRepository.getMyProfile();
 
     final saved = result
@@ -63,6 +90,7 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
     var latitude = saved?.latitude;
     var longitude = saved?.longitude;
 
+    // الحصول على الموقع الحالي إذا لم يكن محفوظاً.
     if (latitude == null || longitude == null) {
       final current = await _locationService.currentCoordinates();
 
@@ -81,6 +109,9 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
         longitude: longitude,
         phone: phone,
         isPhoneVerified: _isVerifiedSaudiPhone(phone),
+        sellerOffersDelivery: seller.offersDelivery,
+        sellerDeliveryFee: seller.deliveryFee,
+        fulfillmentMethod: 'pickup',
       ),
     );
   }
@@ -122,6 +153,36 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
         ),
       );
     }
+  }
+
+  void _onFulfillmentMethodChanged(
+    CheckoutFulfillmentMethodChanged event,
+    Emitter<CheckoutState> emit,
+  ) {
+    final current = state;
+
+    if (current is! CheckoutReady) return;
+
+    if (event.method != 'delivery' && event.method != 'pickup') {
+      return;
+    }
+
+    // لا تسمح باختيار التوصيل إذا كانت الأسرة لا توفره.
+    if (event.method == 'delivery' && !current.sellerOffersDelivery) {
+      emit(
+        current.copyWith(
+          errorMessage: 'هذه الأسرة لا توفر خدمة التوصيل.',
+        ),
+      );
+      return;
+    }
+
+    emit(
+      current.copyWith(
+        fulfillmentMethod: event.method,
+        errorMessage: null,
+      ),
+    );
   }
 
   Future<void> _onPhoneCodeRequested(
@@ -223,6 +284,24 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
     );
   }
 
+  void _onAddressChanged(
+    CheckoutAddressChanged event,
+    Emitter<CheckoutState> emit,
+  ) {
+    final current = state;
+
+    if (current is! CheckoutReady) return;
+
+    emit(
+      current.copyWith(
+        address: event.address,
+        latitude: null,
+        longitude: null,
+        errorMessage: null,
+      ),
+    );
+  }
+
   Future<void> _onSubmitted(
     CheckoutSubmitted event,
     Emitter<CheckoutState> emit,
@@ -240,16 +319,32 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
       return;
     }
 
-    if (state.maybeWhen(
-      submitting: () => true,
-      orElse: () => false,
-    )) {
+    if (event.items.isEmpty) {
+      emit(
+        readyState.copyWith(
+          errorMessage: 'السلة فارغة، أضف منتجات أولاً.',
+        ),
+      );
       return;
     }
 
-    final address = event.deliveryAddress.trim();
+    final fulfillmentMethod = readyState.fulfillmentMethod;
 
-    if (address.isEmpty) {
+    final isDelivery = fulfillmentMethod == 'delivery';
+
+    if (isDelivery && !readyState.sellerOffersDelivery) {
+      emit(
+        readyState.copyWith(
+          errorMessage: 'هذه الأسرة لا توفر خدمة التوصيل.',
+        ),
+      );
+      return;
+    }
+
+    // عنوان العميل مطلوب للتوصيل فقط.
+    final address = isDelivery ? event.deliveryAddress?.trim() : null;
+
+    if (isDelivery && (address == null || address.isEmpty)) {
       emit(
         readyState.copyWith(
           errorMessage: 'يرجى إدخال عنوان التوصيل.',
@@ -258,10 +353,14 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
       return;
     }
 
-    if (event.items.isEmpty) {
+    // التحقق من الإحداثيات عند التوصيل فقط.
+    final latitude = isDelivery ? event.latitude : null;
+    final longitude = isDelivery ? event.longitude : null;
+
+    if (isDelivery && (latitude == null) != (longitude == null)) {
       emit(
         readyState.copyWith(
-          errorMessage: 'السلة فارغة، أضف منتجات أولاً.',
+          errorMessage: 'بيانات موقع التوصيل غير مكتملة.',
         ),
       );
       return;
@@ -294,9 +393,10 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
 
       final result = await _orderRepository.createOrder(
         items: requestedItems,
+        fulfillmentMethod: fulfillmentMethod,
         deliveryAddress: address,
-        deliveryLatitude: event.latitude,
-        deliveryLongitude: event.longitude,
+        deliveryLatitude: latitude,
+        deliveryLongitude: longitude,
       );
 
       OrderInfo? createdOrder;
@@ -320,14 +420,11 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
 
       emit(CheckoutState.success(order));
 
-      // نحفظ موقع التوصيل في ملفه ليُستخدم في الطلبات القادمة.
-      // فشل الحفظ لا يؤثر على الطلب الذي تم إنشاؤه.
-      final latitude = event.latitude;
-      final longitude = event.longitude;
-
-      if (latitude != null && longitude != null) {
+      // نحفظ عنوان وموقع العميل عند إنشاء طلب توصيل فقط.
+      // فشل الحفظ لا يؤثر على الطلب المنشأ.
+      if (isDelivery && latitude != null && longitude != null) {
         await _sellerRepository.updateMyDeliveryLocation(
-          address: address,
+          address: address!,
           latitude: latitude,
           longitude: longitude,
         );

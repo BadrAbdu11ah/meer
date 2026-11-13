@@ -37,8 +37,12 @@ abstract class MeerUserProfile
     this.storeDistrict,
     this.storeLatitude,
     this.storeLongitude,
+    bool? offersDelivery,
+    double? deliveryFee,
     required this.createdAt,
-  }) : isSeller = isSeller ?? false;
+  }) : isSeller = isSeller ?? false,
+       offersDelivery = offersDelivery ?? false,
+       deliveryFee = deliveryFee ?? 0.0;
 
   factory MeerUserProfile({
     int? id,
@@ -59,6 +63,8 @@ abstract class MeerUserProfile
     String? storeDistrict,
     double? storeLatitude,
     double? storeLongitude,
+    bool? offersDelivery,
+    double? deliveryFee,
     required DateTime createdAt,
   }) = _MeerUserProfileImpl;
 
@@ -96,6 +102,12 @@ abstract class MeerUserProfile
       storeDistrict: jsonSerialization['storeDistrict'] as String?,
       storeLatitude: (jsonSerialization['storeLatitude'] as num?)?.toDouble(),
       storeLongitude: (jsonSerialization['storeLongitude'] as num?)?.toDouble(),
+      offersDelivery: jsonSerialization['offersDelivery'] == null
+          ? null
+          : _isc.BoolJsonExtension.fromJson(
+              jsonSerialization['offersDelivery'],
+            ),
+      deliveryFee: (jsonSerialization['deliveryFee'] as num?)?.toDouble(),
       createdAt: _isc.DateTimeJsonExtension.fromJson(
         jsonSerialization['createdAt'],
       ),
@@ -141,6 +153,10 @@ abstract class MeerUserProfile
 
   double? storeLongitude;
 
+  bool offersDelivery;
+
+  double deliveryFee;
+
   DateTime createdAt;
 
   /// Returns a shallow copy of this [MeerUserProfile]
@@ -165,6 +181,8 @@ abstract class MeerUserProfile
     String? storeDistrict,
     double? storeLatitude,
     double? storeLongitude,
+    bool? offersDelivery,
+    double? deliveryFee,
     DateTime? createdAt,
   });
   @override
@@ -189,6 +207,8 @@ abstract class MeerUserProfile
       if (storeDistrict != null) 'storeDistrict': storeDistrict,
       if (storeLatitude != null) 'storeLatitude': storeLatitude,
       if (storeLongitude != null) 'storeLongitude': storeLongitude,
+      'offersDelivery': offersDelivery,
+      'deliveryFee': deliveryFee,
       'createdAt': createdAt.toJson(),
     };
   }
@@ -215,6 +235,8 @@ abstract class MeerUserProfile
       if (storeDistrict != null) 'storeDistrict': storeDistrict,
       if (storeLatitude != null) 'storeLatitude': storeLatitude,
       if (storeLongitude != null) 'storeLongitude': storeLongitude,
+      'offersDelivery': offersDelivery,
+      'deliveryFee': deliveryFee,
       'createdAt': createdAt.toJson(),
     };
   }
@@ -247,6 +269,8 @@ class _MeerUserProfileImpl extends MeerUserProfile {
     String? storeDistrict,
     double? storeLatitude,
     double? storeLongitude,
+    bool? offersDelivery,
+    double? deliveryFee,
     required DateTime createdAt,
   }) : super._(
          id: id,
@@ -267,6 +291,8 @@ class _MeerUserProfileImpl extends MeerUserProfile {
          storeDistrict: storeDistrict,
          storeLatitude: storeLatitude,
          storeLongitude: storeLongitude,
+         offersDelivery: offersDelivery,
+         deliveryFee: deliveryFee,
          createdAt: createdAt,
        );
 
@@ -293,6 +319,8 @@ class _MeerUserProfileImpl extends MeerUserProfile {
     Object? storeDistrict = _Undefined,
     Object? storeLatitude = _Undefined,
     Object? storeLongitude = _Undefined,
+    bool? offersDelivery,
+    double? deliveryFee,
     DateTime? createdAt,
   }) {
     return MeerUserProfile(
@@ -324,6 +352,8 @@ class _MeerUserProfileImpl extends MeerUserProfile {
       storeLongitude: storeLongitude is double?
           ? storeLongitude
           : this.storeLongitude,
+      offersDelivery: offersDelivery ?? this.offersDelivery,
+      deliveryFee: deliveryFee ?? this.deliveryFee,
       createdAt: createdAt ?? this.createdAt,
     );
   }

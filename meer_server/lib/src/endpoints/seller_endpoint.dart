@@ -28,7 +28,6 @@ class SellerEndpoint extends Endpoint {
     }
 
     final description = profile.storeDescription?.trim();
-    final address = profile.storeAddress?.trim();
 
     return SellerPublicInfo(
       sellerId: profile.id!,
@@ -36,7 +35,8 @@ class SellerEndpoint extends Endpoint {
       storeDescription: description == null || description.isEmpty
           ? null
           : description,
-      storeAddress: address == null || address.isEmpty ? null : address,
+      offersDelivery: profile.offersDelivery,
+      deliveryFee: profile.offersDelivery ? profile.deliveryFee : 0,
     );
   }
 
@@ -51,6 +51,8 @@ class SellerEndpoint extends Endpoint {
     String? storeDistrict,
     double latitude,
     double longitude,
+    bool offersDelivery,
+    double deliveryFee,
   ) async {
     // استخراج هوية المستخدم من جلسة المصادقة.
     final authUserId = session.authenticated?.authUserId;
@@ -80,7 +82,7 @@ class SellerEndpoint extends Endpoint {
     }
 
     if (normalizedAddress.isEmpty) {
-      throw FormatException('عنوان المتجر مطلوب.');
+      throw FormatException('عنوان الاستلام مطلوب.');
     }
 
     if (!latitude.isFinite || latitude < -90 || latitude > 90) {
@@ -91,6 +93,10 @@ class SellerEndpoint extends Endpoint {
       throw FormatException('إحداثيات الموقع غير صحيحة.');
     }
 
+    if (!deliveryFee.isFinite || deliveryFee < 0) {
+      throw FormatException('رسوم التوصيل غير صحيحة.');
+    }
+
     // حفظ بيانات المتجر في ملف المستخدم الحالي.
     profile.storeName = normalizedStoreName;
     profile.storeDescription = storeDescription?.trim();
@@ -98,12 +104,18 @@ class SellerEndpoint extends Endpoint {
     profile.storeCity = storeCity;
 
     final normalizedDistrict = storeDistrict?.trim();
+
     profile.storeDistrict =
         normalizedDistrict == null || normalizedDistrict.isEmpty
         ? null
         : normalizedDistrict;
+
     profile.storeLatitude = latitude;
     profile.storeLongitude = longitude;
+
+    // حفظ إعدادات التوصيل.
+    profile.offersDelivery = offersDelivery;
+    profile.deliveryFee = offersDelivery ? deliveryFee : 0;
 
     // تفعيل البيع دون تغيير هوية المستخدم أو تعطيل الشراء.
     profile.isSeller = true;

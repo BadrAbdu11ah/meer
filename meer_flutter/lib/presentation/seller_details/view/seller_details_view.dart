@@ -58,25 +58,6 @@ class SellerDetailsView extends StatelessWidget {
                       style: theme.textTheme.bodyMedium,
                     ),
                   ],
-                  if (seller.storeAddress?.trim().isNotEmpty == true) ...[
-                    const SizedBox(height: 16),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          Icons.location_on_outlined,
-                          color: colors.onSurfaceVariant,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            seller.storeAddress!.trim(),
-                            style: theme.textTheme.bodyMedium,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
                 ],
               ),
             ),

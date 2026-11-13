@@ -30,6 +30,9 @@ class _SellerSetupScreenState extends State<SellerSetupScreen> {
   MeerCity _city = MeerCity.madinah;
   final _latitudeController = TextEditingController();
   final _longitudeController = TextEditingController();
+  bool _offersDelivery = false;
+
+  final _deliveryFeeController = TextEditingController(text: '0');
 
   @override
   void initState() {
@@ -45,6 +48,8 @@ class _SellerSetupScreenState extends State<SellerSetupScreen> {
       _city = profile.storeCity ?? MeerCity.madinah;
       _latitudeController.text = profile.storeLatitude?.toString() ?? '';
       _longitudeController.text = profile.storeLongitude?.toString() ?? '';
+      _offersDelivery = profile.offersDelivery;
+      _deliveryFeeController.text = profile.deliveryFee.toString();
     }
   }
 
@@ -56,6 +61,7 @@ class _SellerSetupScreenState extends State<SellerSetupScreen> {
     _districtController.dispose();
     _latitudeController.dispose();
     _longitudeController.dispose();
+    _deliveryFeeController.dispose();
     super.dispose();
   }
 
@@ -77,12 +83,12 @@ class _SellerSetupScreenState extends State<SellerSetupScreen> {
         district: _districtController.text.trim().isEmpty
             ? null
             : _districtController.text.trim(),
-        latitude: double.parse(
-          _latitudeController.text.trim(),
-        ),
-        longitude: double.parse(
-          _longitudeController.text.trim(),
-        ),
+        latitude: double.parse(_latitudeController.text.trim()),
+        longitude: double.parse(_longitudeController.text.trim()),
+        offersDelivery: _offersDelivery,
+        deliveryFee: _offersDelivery
+            ? double.parse(_deliveryFeeController.text.trim())
+            : 0,
       ),
     );
   }
@@ -153,6 +159,11 @@ class _SellerSetupScreenState extends State<SellerSetupScreen> {
             onCityChanged: (city) => setState(() => _city = city),
             latitudeController: _latitudeController,
             longitudeController: _longitudeController,
+            offersDelivery: _offersDelivery,
+            deliveryFeeController: _deliveryFeeController,
+            onOffersDeliveryChanged: (value) {
+              setState(() => _offersDelivery = value);
+            },
             isSubmitting: isSubmitting,
             isEditing: widget.isEditing,
             isLocating: isLocating,

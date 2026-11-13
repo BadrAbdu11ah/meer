@@ -41,9 +41,10 @@ class OrderEndpoint extends Endpoint {
   Future<OrderInfo> createOrder(
     Session session,
     List<OrderItemRequest> requestedItems,
-    String deliveryAddress,
+    String? deliveryAddress,
     double? deliveryLatitude,
     double? deliveryLongitude,
+    String fulfillmentMethod,
   ) async {
     final customer = await _getCurrentProfile(session);
 
@@ -59,33 +60,47 @@ class OrderEndpoint extends Endpoint {
       );
     }
 
-    final normalizedAddress = deliveryAddress.trim();
-
-    if (normalizedAddress.isEmpty) {
-      throw FormatException(
-        'عنوان التوصيل مطلوب.',
-      );
+    // التحقق من طريقة تنفيذ الطلب.
+    if (!const {'delivery', 'pickup'}.contains(fulfillmentMethod)) {
+      throw FormatException('طريقة تنفيذ الطلب غير صحيحة.');
     }
 
-    // يجب إرسال الإحداثيين معًا أو تركهما فارغين.
-    if ((deliveryLatitude == null) != (deliveryLongitude == null)) {
-      throw FormatException(
-        'يجب تحديد إحداثيات الموقع كاملة.',
-      );
-    }
+    // تجهيز عنوان وإحداثيات التوصيل.
+    String? normalizedAddress;
+    double? normalizedLatitude;
+    double? normalizedLongitude;
 
-    if (deliveryLatitude != null &&
-        (!deliveryLatitude.isFinite ||
-            deliveryLatitude < -90 ||
-            deliveryLatitude > 90)) {
-      throw FormatException('خط العرض غير صحيح.');
-    }
+    if (fulfillmentMethod == 'delivery') {
+      final address = deliveryAddress?.trim();
 
-    if (deliveryLongitude != null &&
-        (!deliveryLongitude.isFinite ||
-            deliveryLongitude < -180 ||
-            deliveryLongitude > 180)) {
-      throw FormatException('خط الطول غير صحيح.');
+      if (address == null || address.isEmpty) {
+        throw FormatException('عنوان التوصيل مطلوب.');
+      }
+
+      // يجب إرسال الإحداثيين معًا أو تركهما فارغين.
+      if ((deliveryLatitude == null) != (deliveryLongitude == null)) {
+        throw FormatException(
+          'يجب تحديد إحداثيات الموقع كاملة.',
+        );
+      }
+
+      if (deliveryLatitude != null &&
+          (!deliveryLatitude.isFinite ||
+              deliveryLatitude < -90 ||
+              deliveryLatitude > 90)) {
+        throw FormatException('خط العرض غير صحيح.');
+      }
+
+      if (deliveryLongitude != null &&
+          (!deliveryLongitude.isFinite ||
+              deliveryLongitude < -180 ||
+              deliveryLongitude > 180)) {
+        throw FormatException('خط الطول غير صحيح.');
+      }
+
+      normalizedAddress = address;
+      normalizedLatitude = deliveryLatitude;
+      normalizedLongitude = deliveryLongitude;
     }
 
     // تجميع الكميات المكررة للمنتج نفسه.
@@ -119,7 +134,7 @@ class OrderEndpoint extends Endpoint {
         final validatedProducts = <Product>[];
 
         int? sellerId;
-        double totalAmount = 0;
+        double productsSubtotal = 0;
 
         // جلب المنتجات والتحقق منها من قاعدة البيانات.
         for (final productId in quantities.keys) {
@@ -165,11 +180,11 @@ class OrderEndpoint extends Endpoint {
             );
           }
 
-          totalAmount += lineTotal;
+          productsSubtotal += lineTotal;
 
-          if (!totalAmount.isFinite) {
+          if (!productsSubtotal.isFinite) {
             throw FormatException(
-              'إجمالي الطلب غير صالح.',
+              'إجمالي المنتجات غير صالح.',
             );
           }
 
@@ -180,7 +195,7 @@ class OrderEndpoint extends Endpoint {
           throw Exception('تعذر تحديد الأسرة المنتجة.');
         }
 
-        // التحقق من أن صاحب المنتجات لا يزال بائعًا.
+        // جلب بيانات الأسرة والتحقق من قدرتها على تنفيذ الطلب.
         final seller = await MeerUserProfile.db.findById(
           session,
           sellerId,
@@ -193,15 +208,76 @@ class OrderEndpoint extends Endpoint {
           );
         }
 
-        // الخادم يحدد جميع البيانات الحساسة.
+        // التحقق من توفر طريقة التنفيذ المطلوبة.
+        if (fulfillmentMethod == 'delivery' && !seller.offersDelivery) {
+          throw FormatException(
+            'هذه الأسرة لا توفر خدمة التوصيل.',
+          );
+        }
+
+        if (fulfillmentMethod == 'pickup') {
+          final pickupAddress = seller.storeAddress?.trim();
+
+          if (pickupAddress == null || pickupAddress.isEmpty) {
+            throw Exception(
+              'الأسرة لم تحدد عنوان الاستلام بعد.',
+            );
+          }
+        }
+
+        // الخادم وحده يحدد رسوم التوصيل.
+        var deliveryFee = 0.0;
+
+        if (fulfillmentMethod == 'delivery') {
+          if (!seller.deliveryFee.isFinite || seller.deliveryFee < 0) {
+            throw Exception(
+              'رسوم التوصيل المحددة من الأسرة غير صالحة.',
+            );
+          }
+
+          deliveryFee = seller.deliveryFee;
+        }
+
+        // تقريب المبالغ إلى منزلتين عشريتين.
+        productsSubtotal = double.parse(
+          productsSubtotal.toStringAsFixed(2),
+        );
+
+        deliveryFee = double.parse(
+          deliveryFee.toStringAsFixed(2),
+        );
+
+        final totalAmount = double.parse(
+          (productsSubtotal + deliveryFee).toStringAsFixed(2),
+        );
+
+        if (!totalAmount.isFinite) {
+          throw FormatException('إجمالي الطلب غير صالح.');
+        }
+
+        // إنشاء الطلب بالقيم المحسوبة والمتحقق منها من الخادم.
         final order = OrderInfo(
           customerId: customer.id!,
           sellerId: sellerId,
           status: 'pending',
+          fulfillmentMethod: fulfillmentMethod,
+          productsSubtotal: productsSubtotal,
+          deliveryFee: deliveryFee,
           totalAmount: totalAmount,
           deliveryAddress: normalizedAddress,
-          deliveryLatitude: deliveryLatitude,
-          deliveryLongitude: deliveryLongitude,
+          deliveryLatitude: normalizedLatitude,
+          deliveryLongitude: normalizedLongitude,
+          pickupAddress: null,
+
+          // العمولة تحسب على المنتجات فقط.
+          commissionBaseAmount: productsSubtotal,
+          commissionRate: null,
+          commissionAmount: null,
+
+          // الدفع اليدوي للتجربة الأولية.
+          paymentMethod: 'manual',
+          paymentStatus: 'unpaid',
+
           createdAt: DateTime.now().toUtc(),
         );
 
@@ -439,6 +515,29 @@ class OrderEndpoint extends Endpoint {
         // التحقق من الحالة بعد الحصول على القفل.
         if (order.status != expectedStatus) {
           return false;
+        }
+
+        // عند قبول طلب الاستلام، ننسخ عنوان الأسرة إلى الطلب.
+        // لن يكون العنوان موجودًا في الطلب قبل هذه اللحظة.
+        if (newStatus == 'preparing' && order.fulfillmentMethod == 'pickup') {
+          final currentSeller = await MeerUserProfile.db.findById(
+            session,
+            seller.id!,
+            transaction: transaction,
+          );
+
+          final pickupAddress = currentSeller?.storeAddress?.trim();
+
+          if (currentSeller == null ||
+              !currentSeller.isSeller ||
+              pickupAddress == null ||
+              pickupAddress.isEmpty) {
+            throw Exception(
+              'تعذر قبول الطلب؛ لم يتم تحديد عنوان الاستلام.',
+            );
+          }
+
+          order.pickupAddress = pickupAddress;
         }
 
         order.status = newStatus;

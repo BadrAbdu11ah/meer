@@ -2,16 +2,19 @@ part of 'checkout_bloc.dart';
 
 @freezed
 sealed class CheckoutEvent with _$CheckoutEvent {
-  /// عند فتح الشاشة: تحميل موقع التوصيل المحفوظ،
-  /// وإن لم يوجد نحاول أخذ موقعه الحالي.
-  const factory CheckoutEvent.started() = CheckoutStarted;
+  const factory CheckoutEvent.started({
+    required int sellerId,
+  }) = CheckoutStarted;
 
-  /// زر «استخدم موقعي الحالي».
   const factory CheckoutEvent.locationRequested() = CheckoutLocationRequested;
+
+  const factory CheckoutEvent.fulfillmentMethodChanged({
+    required String method,
+  }) = CheckoutFulfillmentMethodChanged;
 
   const factory CheckoutEvent.submitted({
     required List<CartItem> items,
-    required String deliveryAddress,
+    String? deliveryAddress,
     double? latitude,
     double? longitude,
   }) = CheckoutSubmitted;
@@ -24,4 +27,8 @@ sealed class CheckoutEvent with _$CheckoutEvent {
     required String phone,
     required String code,
   }) = CheckoutPhoneVerificationSubmitted;
+
+  const factory CheckoutEvent.addressChanged({
+    required String address,
+  }) = CheckoutAddressChanged;
 }

@@ -979,9 +979,10 @@ class _OrderEndpoint {
   _ida.Future<_i8hwzj5x.OrderInfo> createOrder(
     _ist.TestSessionBuilder sessionBuilder,
     List<_i4g4bzck.OrderItemRequest> requestedItems,
-    String deliveryAddress,
+    String? deliveryAddress,
     double? deliveryLatitude,
     double? deliveryLongitude,
+    String fulfillmentMethod,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -999,6 +1000,7 @@ class _OrderEndpoint {
             'deliveryAddress': deliveryAddress,
             'deliveryLatitude': deliveryLatitude,
             'deliveryLongitude': deliveryLongitude,
+            'fulfillmentMethod': fulfillmentMethod,
           }),
           serializationManager: _serializationManager,
         );
@@ -1547,6 +1549,8 @@ class _SellerEndpoint {
     String? storeDistrict,
     double latitude,
     double longitude,
+    bool offersDelivery,
+    double deliveryFee,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1567,6 +1571,8 @@ class _SellerEndpoint {
             'storeDistrict': storeDistrict,
             'latitude': latitude,
             'longitude': longitude,
+            'offersDelivery': offersDelivery,
+            'deliveryFee': deliveryFee,
           }),
           serializationManager: _serializationManager,
         );

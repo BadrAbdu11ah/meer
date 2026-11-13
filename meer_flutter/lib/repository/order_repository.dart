@@ -7,16 +7,20 @@ class OrderRepository {
   /// إنشاء طلب جديد للمشتري الحالي.
   Future<Either<Failure, OrderInfo>> createOrder({
     required List<OrderItemRequest> items,
-    required String deliveryAddress,
+    required String fulfillmentMethod,
+    String? deliveryAddress,
     double? deliveryLatitude,
     double? deliveryLongitude,
   }) async {
     try {
+      final isDelivery = fulfillmentMethod == 'delivery';
+
       final order = await client.order.createOrder(
         items,
-        deliveryAddress,
-        deliveryLatitude,
-        deliveryLongitude,
+        isDelivery ? deliveryAddress : null,
+        isDelivery ? deliveryLatitude : null,
+        isDelivery ? deliveryLongitude : null,
+        fulfillmentMethod,
       );
 
       return Right(order);

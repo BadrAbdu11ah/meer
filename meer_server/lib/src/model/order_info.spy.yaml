@@ -8,8 +8,19 @@ fields:
   driverId: int?, relation(parent=user)
   status: String
   totalAmount: double
-  deliveryAddress: String
+  fulfillmentMethod: String, default='delivery'
+  productsSubtotal: double?
+  deliveryFee: double, default=0
+  deliveryAddress: String?
   deliveryLatitude: double?
   deliveryLongitude: double?
+  pickupAddress: String?
+
+  commissionBaseAmount: double?
+  commissionRate: double?
+  commissionAmount: double?
+
+  paymentMethod: String, default='manual'
+  paymentStatus: String, default='unpaid'
   createdAt: DateTime
   items: List<OrderItem>?, relation(name=order_items) # رابط جلب قائمة عناصر الطلب

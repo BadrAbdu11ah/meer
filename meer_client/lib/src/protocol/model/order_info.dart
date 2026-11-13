@@ -26,12 +26,24 @@ abstract class OrderInfo
     this.driverId,
     required this.status,
     required this.totalAmount,
-    required this.deliveryAddress,
+    String? fulfillmentMethod,
+    this.productsSubtotal,
+    double? deliveryFee,
+    this.deliveryAddress,
     this.deliveryLatitude,
     this.deliveryLongitude,
+    this.pickupAddress,
+    this.commissionBaseAmount,
+    this.commissionRate,
+    this.commissionAmount,
+    String? paymentMethod,
+    String? paymentStatus,
     required this.createdAt,
     this.items,
-  });
+  }) : fulfillmentMethod = fulfillmentMethod ?? 'delivery',
+       deliveryFee = deliveryFee ?? 0.0,
+       paymentMethod = paymentMethod ?? 'manual',
+       paymentStatus = paymentStatus ?? 'unpaid';
 
   factory OrderInfo({
     int? id,
@@ -42,9 +54,18 @@ abstract class OrderInfo
     int? driverId,
     required String status,
     required double totalAmount,
-    required String deliveryAddress,
+    String? fulfillmentMethod,
+    double? productsSubtotal,
+    double? deliveryFee,
+    String? deliveryAddress,
     double? deliveryLatitude,
     double? deliveryLongitude,
+    String? pickupAddress,
+    double? commissionBaseAmount,
+    double? commissionRate,
+    double? commissionAmount,
+    String? paymentMethod,
+    String? paymentStatus,
     required DateTime createdAt,
     List<_ixwt4bxc.OrderItem>? items,
   }) = _OrderInfoImpl;
@@ -67,11 +88,23 @@ abstract class OrderInfo
       driverId: jsonSerialization['driverId'] as int?,
       status: jsonSerialization['status'] as String,
       totalAmount: (jsonSerialization['totalAmount'] as num).toDouble(),
-      deliveryAddress: jsonSerialization['deliveryAddress'] as String,
+      fulfillmentMethod: jsonSerialization['fulfillmentMethod'] as String?,
+      productsSubtotal: (jsonSerialization['productsSubtotal'] as num?)
+          ?.toDouble(),
+      deliveryFee: (jsonSerialization['deliveryFee'] as num?)?.toDouble(),
+      deliveryAddress: jsonSerialization['deliveryAddress'] as String?,
       deliveryLatitude: (jsonSerialization['deliveryLatitude'] as num?)
           ?.toDouble(),
       deliveryLongitude: (jsonSerialization['deliveryLongitude'] as num?)
           ?.toDouble(),
+      pickupAddress: jsonSerialization['pickupAddress'] as String?,
+      commissionBaseAmount: (jsonSerialization['commissionBaseAmount'] as num?)
+          ?.toDouble(),
+      commissionRate: (jsonSerialization['commissionRate'] as num?)?.toDouble(),
+      commissionAmount: (jsonSerialization['commissionAmount'] as num?)
+          ?.toDouble(),
+      paymentMethod: jsonSerialization['paymentMethod'] as String?,
+      paymentStatus: jsonSerialization['paymentStatus'] as String?,
       createdAt: _isc.DateTimeJsonExtension.fromJson(
         jsonSerialization['createdAt'],
       ),
@@ -102,11 +135,29 @@ abstract class OrderInfo
 
   double totalAmount;
 
-  String deliveryAddress;
+  String fulfillmentMethod;
+
+  double? productsSubtotal;
+
+  double deliveryFee;
+
+  String? deliveryAddress;
 
   double? deliveryLatitude;
 
   double? deliveryLongitude;
+
+  String? pickupAddress;
+
+  double? commissionBaseAmount;
+
+  double? commissionRate;
+
+  double? commissionAmount;
+
+  String paymentMethod;
+
+  String paymentStatus;
 
   DateTime createdAt;
 
@@ -124,9 +175,18 @@ abstract class OrderInfo
     int? driverId,
     String? status,
     double? totalAmount,
+    String? fulfillmentMethod,
+    double? productsSubtotal,
+    double? deliveryFee,
     String? deliveryAddress,
     double? deliveryLatitude,
     double? deliveryLongitude,
+    String? pickupAddress,
+    double? commissionBaseAmount,
+    double? commissionRate,
+    double? commissionAmount,
+    String? paymentMethod,
+    String? paymentStatus,
     DateTime? createdAt,
     List<_ixwt4bxc.OrderItem>? items,
   });
@@ -142,9 +202,19 @@ abstract class OrderInfo
       if (driverId != null) 'driverId': driverId,
       'status': status,
       'totalAmount': totalAmount,
-      'deliveryAddress': deliveryAddress,
+      'fulfillmentMethod': fulfillmentMethod,
+      if (productsSubtotal != null) 'productsSubtotal': productsSubtotal,
+      'deliveryFee': deliveryFee,
+      if (deliveryAddress != null) 'deliveryAddress': deliveryAddress,
       if (deliveryLatitude != null) 'deliveryLatitude': deliveryLatitude,
       if (deliveryLongitude != null) 'deliveryLongitude': deliveryLongitude,
+      if (pickupAddress != null) 'pickupAddress': pickupAddress,
+      if (commissionBaseAmount != null)
+        'commissionBaseAmount': commissionBaseAmount,
+      if (commissionRate != null) 'commissionRate': commissionRate,
+      if (commissionAmount != null) 'commissionAmount': commissionAmount,
+      'paymentMethod': paymentMethod,
+      'paymentStatus': paymentStatus,
       'createdAt': createdAt.toJson(),
       if (items != null) 'items': items?.toJson(valueToJson: (v) => v.toJson()),
     };
@@ -162,9 +232,19 @@ abstract class OrderInfo
       if (driverId != null) 'driverId': driverId,
       'status': status,
       'totalAmount': totalAmount,
-      'deliveryAddress': deliveryAddress,
+      'fulfillmentMethod': fulfillmentMethod,
+      if (productsSubtotal != null) 'productsSubtotal': productsSubtotal,
+      'deliveryFee': deliveryFee,
+      if (deliveryAddress != null) 'deliveryAddress': deliveryAddress,
       if (deliveryLatitude != null) 'deliveryLatitude': deliveryLatitude,
       if (deliveryLongitude != null) 'deliveryLongitude': deliveryLongitude,
+      if (pickupAddress != null) 'pickupAddress': pickupAddress,
+      if (commissionBaseAmount != null)
+        'commissionBaseAmount': commissionBaseAmount,
+      if (commissionRate != null) 'commissionRate': commissionRate,
+      if (commissionAmount != null) 'commissionAmount': commissionAmount,
+      'paymentMethod': paymentMethod,
+      'paymentStatus': paymentStatus,
       'createdAt': createdAt.toJson(),
       if (items != null)
         'items': items?.toJson(valueToJson: (v) => v.toJsonForProtocol()),
@@ -189,9 +269,18 @@ class _OrderInfoImpl extends OrderInfo {
     int? driverId,
     required String status,
     required double totalAmount,
-    required String deliveryAddress,
+    String? fulfillmentMethod,
+    double? productsSubtotal,
+    double? deliveryFee,
+    String? deliveryAddress,
     double? deliveryLatitude,
     double? deliveryLongitude,
+    String? pickupAddress,
+    double? commissionBaseAmount,
+    double? commissionRate,
+    double? commissionAmount,
+    String? paymentMethod,
+    String? paymentStatus,
     required DateTime createdAt,
     List<_ixwt4bxc.OrderItem>? items,
   }) : super._(
@@ -203,9 +292,18 @@ class _OrderInfoImpl extends OrderInfo {
          driverId: driverId,
          status: status,
          totalAmount: totalAmount,
+         fulfillmentMethod: fulfillmentMethod,
+         productsSubtotal: productsSubtotal,
+         deliveryFee: deliveryFee,
          deliveryAddress: deliveryAddress,
          deliveryLatitude: deliveryLatitude,
          deliveryLongitude: deliveryLongitude,
+         pickupAddress: pickupAddress,
+         commissionBaseAmount: commissionBaseAmount,
+         commissionRate: commissionRate,
+         commissionAmount: commissionAmount,
+         paymentMethod: paymentMethod,
+         paymentStatus: paymentStatus,
          createdAt: createdAt,
          items: items,
        );
@@ -223,9 +321,18 @@ class _OrderInfoImpl extends OrderInfo {
     Object? driverId = _Undefined,
     String? status,
     double? totalAmount,
-    String? deliveryAddress,
+    String? fulfillmentMethod,
+    Object? productsSubtotal = _Undefined,
+    double? deliveryFee,
+    Object? deliveryAddress = _Undefined,
     Object? deliveryLatitude = _Undefined,
     Object? deliveryLongitude = _Undefined,
+    Object? pickupAddress = _Undefined,
+    Object? commissionBaseAmount = _Undefined,
+    Object? commissionRate = _Undefined,
+    Object? commissionAmount = _Undefined,
+    String? paymentMethod,
+    String? paymentStatus,
     DateTime? createdAt,
     Object? items = _Undefined,
   }) {
@@ -242,13 +349,34 @@ class _OrderInfoImpl extends OrderInfo {
       driverId: driverId is int? ? driverId : this.driverId,
       status: status ?? this.status,
       totalAmount: totalAmount ?? this.totalAmount,
-      deliveryAddress: deliveryAddress ?? this.deliveryAddress,
+      fulfillmentMethod: fulfillmentMethod ?? this.fulfillmentMethod,
+      productsSubtotal: productsSubtotal is double?
+          ? productsSubtotal
+          : this.productsSubtotal,
+      deliveryFee: deliveryFee ?? this.deliveryFee,
+      deliveryAddress: deliveryAddress is String?
+          ? deliveryAddress
+          : this.deliveryAddress,
       deliveryLatitude: deliveryLatitude is double?
           ? deliveryLatitude
           : this.deliveryLatitude,
       deliveryLongitude: deliveryLongitude is double?
           ? deliveryLongitude
           : this.deliveryLongitude,
+      pickupAddress: pickupAddress is String?
+          ? pickupAddress
+          : this.pickupAddress,
+      commissionBaseAmount: commissionBaseAmount is double?
+          ? commissionBaseAmount
+          : this.commissionBaseAmount,
+      commissionRate: commissionRate is double?
+          ? commissionRate
+          : this.commissionRate,
+      commissionAmount: commissionAmount is double?
+          ? commissionAmount
+          : this.commissionAmount,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
       createdAt: createdAt ?? this.createdAt,
       items: items is List<_ixwt4bxc.OrderItem>?
           ? items

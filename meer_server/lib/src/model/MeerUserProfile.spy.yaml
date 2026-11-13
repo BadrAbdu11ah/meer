@@ -24,6 +24,8 @@ fields:
   storeDistrict: String?
   storeLatitude: double?
   storeLongitude: double?
+  offersDelivery: bool, default=false
+  deliveryFee: double, default=0
 
   createdAt: DateTime
 

@@ -515,8 +515,8 @@ class Endpoints extends _is.EndpointDispatch {
             ),
             'deliveryAddress': _is.ParameterDescription(
               name: 'deliveryAddress',
-              type: _is.getType<String>(),
-              nullable: false,
+              type: _is.getType<String?>(),
+              nullable: true,
             ),
             'deliveryLatitude': _is.ParameterDescription(
               name: 'deliveryLatitude',
@@ -527,6 +527,11 @@ class Endpoints extends _is.EndpointDispatch {
               name: 'deliveryLongitude',
               type: _is.getType<double?>(),
               nullable: true,
+            ),
+            'fulfillmentMethod': _is.ParameterDescription(
+              name: 'fulfillmentMethod',
+              type: _is.getType<String>(),
+              nullable: false,
             ),
           },
           call:
@@ -540,6 +545,7 @@ class Endpoints extends _is.EndpointDispatch {
                     params['deliveryAddress'],
                     params['deliveryLatitude'],
                     params['deliveryLongitude'],
+                    params['fulfillmentMethod'],
                   ),
         ),
         'getMyCustomerOrders': _is.MethodConnector(
@@ -881,6 +887,16 @@ class Endpoints extends _is.EndpointDispatch {
               type: _is.getType<double>(),
               nullable: false,
             ),
+            'offersDelivery': _is.ParameterDescription(
+              name: 'offersDelivery',
+              type: _is.getType<bool>(),
+              nullable: false,
+            ),
+            'deliveryFee': _is.ParameterDescription(
+              name: 'deliveryFee',
+              type: _is.getType<double>(),
+              nullable: false,
+            ),
           },
           call:
               (
@@ -896,6 +912,8 @@ class Endpoints extends _is.EndpointDispatch {
                     params['storeDistrict'],
                     params['latitude'],
                     params['longitude'],
+                    params['offersDelivery'],
+                    params['deliveryFee'],
                   ),
         ),
         'getMyProfile': _is.MethodConnector(
