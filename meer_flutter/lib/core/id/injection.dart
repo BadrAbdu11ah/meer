@@ -120,6 +120,7 @@ Future<void> initGetIt() async {
       sl<OrderRepository>(),
       sl<SellerRepository>(),
       sl<LocationService>(),
+      sl<AuthRepository>(),
     ),
   );
 

@@ -152,6 +152,19 @@ class EndpointAppAuth extends _isc.EndpointRef {
     authenticated: false,
   );
 
+  /// ربط رقم هاتف موثّق بحساب المستخدم الحالي.
+  _ida.Future<_ihcobg5g.MeerUserProfile> linkVerifiedPhone(
+    String phone,
+    String code,
+  ) => caller.callServerEndpoint<_ihcobg5g.MeerUserProfile>(
+    'appAuth',
+    'linkVerifiedPhone',
+    {
+      'phone': phone,
+      'code': code,
+    },
+  );
+
   _ida.Future<_iacc.AuthSuccess> verifyOtp(
     String phone,
     String code,

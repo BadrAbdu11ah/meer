@@ -6,6 +6,10 @@ class OrderEndpoint extends Endpoint {
   @override
   bool get requireLogin => true;
 
+  bool _isValidSaudiPhone(String phone) {
+    return RegExp(r'^9665\d{8}$').hasMatch(phone);
+  }
+
   /// استخراج ملف المستخدم الحالي من جلسة المصادقة.
   Future<MeerUserProfile> _getCurrentProfile(
     Session session,
@@ -42,6 +46,12 @@ class OrderEndpoint extends Endpoint {
     double? deliveryLongitude,
   ) async {
     final customer = await _getCurrentProfile(session);
+
+    if (!_isValidSaudiPhone(customer.phone.trim())) {
+      throw FormatException(
+        'يجب توثيق رقم جوالك قبل إتمام الطلب.',
+      );
+    }
 
     if (requestedItems.isEmpty) {
       throw FormatException(

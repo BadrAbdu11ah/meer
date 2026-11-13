@@ -14,6 +14,10 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   final _formKey = GlobalKey<FormState>();
   final _addressController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _codeController = TextEditingController();
+
+  CheckoutReady? _lastReadyState;
 
   // موقع التوصيل (من الموقع الحالي، ولاحقًا من الخريطة).
   double? _latitude;
@@ -28,7 +32,57 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   @override
   void dispose() {
     _addressController.dispose();
+    _phoneController.dispose();
+    _codeController.dispose();
     super.dispose();
+  }
+
+  bool _isValidSaudiPhone(String phone) {
+    var value = phone.trim().replaceAll(RegExp(r'[\s\-()]'), '');
+
+    value = value.replaceFirst(
+      RegExp(r'^(?:\+?966|00966|0)+'),
+      '',
+    );
+
+    return RegExp(r'^5\d{8}$').hasMatch(value);
+  }
+
+  void _sendPhoneCode() {
+    final phone = _phoneController.text.trim();
+
+    if (!_isValidSaudiPhone(phone)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('أدخل رقم جوال سعودي صحيحًا.'),
+        ),
+      );
+      return;
+    }
+
+    context.read<CheckoutBloc>().add(
+      CheckoutEvent.phoneCodeRequested(phone: phone),
+    );
+  }
+
+  void _verifyPhone() {
+    final code = _codeController.text.trim();
+
+    if (code.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('أدخل رمز التحقق الذي وصلك.'),
+        ),
+      );
+      return;
+    }
+
+    context.read<CheckoutBloc>().add(
+      CheckoutEvent.phoneVerificationSubmitted(
+        phone: _phoneController.text.trim(),
+        code: code,
+      ),
+    );
   }
 
   void _submitOrder() {
@@ -52,21 +106,40 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Widget build(BuildContext context) {
     return BlocConsumer<CheckoutBloc, CheckoutState>(
       listener: (context, state) {
-        state.whenOrNull(
-          ready: (address, latitude, longitude) {
-            setState(() {
-              if (address != null &&
-                  address.trim().isNotEmpty &&
-                  _addressController.text.trim().isEmpty) {
-                _addressController.text = address;
-              }
+        if (state is CheckoutReady) {
+          _lastReadyState = state;
 
-              _latitude = latitude;
-              _longitude = longitude;
-            });
-          },
+          if (state.address != null &&
+              state.address!.trim().isNotEmpty &&
+              _addressController.text.trim().isEmpty) {
+            _addressController.text = state.address!;
+          }
+
+          if (state.phone.isNotEmpty &&
+              (state.isPhoneVerified || _phoneController.text.isEmpty)) {
+            _phoneController.text = state.phone;
+          }
+
+          if (state.isPhoneVerified) {
+            _codeController.clear();
+          }
+
+          final message = state.errorMessage;
+
+          if (message != null) {
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(message),
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+              );
+          }
+        }
+
+        state.whenOrNull(
           success: (_) {
-            // تفريغ السلة بعد أن يؤكد الخادم إنشاء الطلب.
             context.read<CartBloc>().add(
               const CartEvent.cleared(),
             );
@@ -94,6 +167,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           orElse: () => false,
         );
 
+        final readyState = state is CheckoutReady ? state : _lastReadyState;
+
         return state.maybeWhen(
           success: (order) {
             return Scaffold(
@@ -117,6 +192,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         'تم استلام طلبك بنجاح',
                         style: Theme.of(context).textTheme.headlineSmall,
                         textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'ستتواصل الأسرة معك على رقم هاتفك الموثّق '
+                        'لتأكيد طريقة الدفع ورسوم التوصيل وتفاصيل التسليم.',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       const SizedBox(height: 12),
                       Text('رقم الطلب: ${order.id}'),
@@ -157,9 +239,23 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       : CheckoutView(
                           items: cartState.items,
                           addressController: _addressController,
+                          phoneController: _phoneController,
+                          codeController: _codeController,
+                          isPhoneVerified: readyState?.isPhoneVerified ?? false,
+                          isSendingPhoneCode:
+                              readyState?.isSendingPhoneCode ?? false,
+                          isPhoneCodeSent: readyState?.isPhoneCodeSent ?? false,
+                          isVerifyingPhone:
+                              readyState?.isVerifyingPhone ?? false,
+                          onSendPhoneCode: _sendPhoneCode,
+                          onVerifyPhone: _verifyPhone,
                           formKey: _formKey,
                           hasLocation: _latitude != null && _longitude != null,
                           isLocating: isLocating,
+                          onAddressChanged: (_) {
+                            _latitude = null;
+                            _longitude = null;
+                          },
                           onUseCurrentLocation: () {
                             context.read<CheckoutBloc>().add(
                               const CheckoutEvent.locationRequested(),

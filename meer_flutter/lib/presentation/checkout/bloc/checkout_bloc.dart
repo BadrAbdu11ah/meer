@@ -3,6 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:meer_client/meer_client.dart';
 import 'package:meer_flutter/core/services/location_service.dart';
 import 'package:meer_flutter/presentation/cart/models/cart_item.dart';
+import 'package:meer_flutter/repository/auth_repository.dart';
 import 'package:meer_flutter/repository/order_repository.dart';
 import 'package:meer_flutter/repository/seller_repository.dart';
 
@@ -15,15 +16,23 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
     this._orderRepository,
     this._sellerRepository,
     this._locationService,
+    this._authRepository,
   ) : super(const CheckoutState.initial()) {
     on<CheckoutStarted>(_onStarted);
     on<CheckoutLocationRequested>(_onLocationRequested);
+    on<CheckoutPhoneCodeRequested>(_onPhoneCodeRequested);
+    on<CheckoutPhoneVerificationSubmitted>(_onPhoneVerificationSubmitted);
     on<CheckoutSubmitted>(_onSubmitted);
   }
 
   final OrderRepository _orderRepository;
   final SellerRepository _sellerRepository;
   final LocationService _locationService;
+  final AuthRepository _authRepository;
+
+  bool _isVerifiedSaudiPhone(String phone) {
+    return RegExp(r'^9665\d{8}$').hasMatch(phone.trim());
+  }
 
   /// تحميل موقع التوصيل المحفوظ في ملف المستخدم.
   /// إذا لم يكن له موقع محفوظ (أول طلب) نحاول أخذ موقعه الحالي.
@@ -34,12 +43,20 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
     final result = await _sellerRepository.getMyProfile();
 
     final saved = result
-        .fold<({String? address, double? latitude, double? longitude})?>(
+        .fold<
+          ({
+            String? address,
+            double? latitude,
+            double? longitude,
+            String phone,
+          })?
+        >(
           (_) => null,
           (profile) => (
             address: profile.address,
             latitude: profile.latitude,
             longitude: profile.longitude,
+            phone: profile.phone,
           ),
         );
 
@@ -55,11 +72,15 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
       }
     }
 
+    final phone = saved?.phone ?? '';
+
     emit(
       CheckoutState.ready(
         address: saved?.address,
         latitude: latitude,
         longitude: longitude,
+        phone: phone,
+        isPhoneVerified: _isVerifiedSaudiPhone(phone),
       ),
     );
   }
@@ -68,24 +89,137 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
     CheckoutLocationRequested event,
     Emitter<CheckoutState> emit,
   ) async {
+    final previousState = state;
     emit(const CheckoutState.locating());
 
     final current = await _locationService.currentCoordinates();
 
     if (current == null) {
+      const message =
+          'تعذر تحديد موقعك. تأكد من تفعيل الموقع ومن السماح للتطبيق بالوصول إليه.';
+
+      if (previousState is CheckoutReady) {
+        emit(previousState.copyWith(errorMessage: message));
+      } else {
+        emit(const CheckoutState.failure(message));
+      }
+      return;
+    }
+
+    if (previousState is CheckoutReady) {
       emit(
-        const CheckoutState.failure(
-          'تعذر تحديد موقعك. تأكد من تفعيل الموقع ومن السماح للتطبيق بالوصول إليه.',
+        previousState.copyWith(
+          latitude: current.latitude,
+          longitude: current.longitude,
+          errorMessage: null,
         ),
       );
+    } else {
+      emit(
+        CheckoutState.ready(
+          latitude: current.latitude,
+          longitude: current.longitude,
+        ),
+      );
+    }
+  }
+
+  Future<void> _onPhoneCodeRequested(
+    CheckoutPhoneCodeRequested event,
+    Emitter<CheckoutState> emit,
+  ) async {
+    final current = state;
+
+    if (current is! CheckoutReady ||
+        current.isSendingPhoneCode ||
+        current.isVerifyingPhone) {
       return;
     }
 
     emit(
-      CheckoutState.ready(
-        latitude: current.latitude,
-        longitude: current.longitude,
+      current.copyWith(
+        phone: event.phone.trim(),
+        isSendingPhoneCode: true,
+        isPhoneCodeSent: false,
+        errorMessage: null,
       ),
+    );
+
+    final result = await _authRepository.sendOtp(
+      phone: event.phone.trim(),
+    );
+
+    final latest = state;
+    if (latest is! CheckoutReady) return;
+
+    result.fold(
+      (failure) {
+        emit(
+          latest.copyWith(
+            isSendingPhoneCode: false,
+            errorMessage: failure.message,
+          ),
+        );
+      },
+      (_) {
+        emit(
+          latest.copyWith(
+            isSendingPhoneCode: false,
+            isPhoneCodeSent: true,
+            errorMessage: null,
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _onPhoneVerificationSubmitted(
+    CheckoutPhoneVerificationSubmitted event,
+    Emitter<CheckoutState> emit,
+  ) async {
+    final current = state;
+
+    if (current is! CheckoutReady ||
+        !current.isPhoneCodeSent ||
+        current.isVerifyingPhone) {
+      return;
+    }
+
+    emit(
+      current.copyWith(
+        isVerifyingPhone: true,
+        errorMessage: null,
+      ),
+    );
+
+    final result = await _authRepository.linkVerifiedPhone(
+      phone: event.phone.trim(),
+      code: event.code.trim(),
+    );
+
+    final latest = state;
+    if (latest is! CheckoutReady) return;
+
+    result.fold(
+      (failure) {
+        emit(
+          latest.copyWith(
+            isVerifyingPhone: false,
+            errorMessage: failure.message,
+          ),
+        );
+      },
+      (profile) {
+        emit(
+          latest.copyWith(
+            phone: profile.phone,
+            isPhoneVerified: _isVerifiedSaudiPhone(profile.phone),
+            isPhoneCodeSent: false,
+            isVerifyingPhone: false,
+            errorMessage: null,
+          ),
+        );
+      },
     );
   }
 
@@ -93,6 +227,19 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
     CheckoutSubmitted event,
     Emitter<CheckoutState> emit,
   ) async {
+    final readyState = state;
+
+    if (readyState is! CheckoutReady) return;
+
+    if (!readyState.isPhoneVerified) {
+      emit(
+        readyState.copyWith(
+          errorMessage: 'يجب توثيق رقم هاتفك قبل تأكيد الطلب.',
+        ),
+      );
+      return;
+    }
+
     if (state.maybeWhen(
       submitting: () => true,
       orElse: () => false,
@@ -104,8 +251,8 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
 
     if (address.isEmpty) {
       emit(
-        const CheckoutState.failure(
-          'يرجى إدخال عنوان التوصيل.',
+        readyState.copyWith(
+          errorMessage: 'يرجى إدخال عنوان التوصيل.',
         ),
       );
       return;
@@ -113,8 +260,8 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
 
     if (event.items.isEmpty) {
       emit(
-        const CheckoutState.failure(
-          'السلة فارغة، أضف منتجات أولاً.',
+        readyState.copyWith(
+          errorMessage: 'السلة فارغة، أضف منتجات أولاً.',
         ),
       );
       return;
@@ -130,8 +277,8 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
 
         if (productId == null || item.quantity <= 0) {
           emit(
-            const CheckoutState.failure(
-              'توجد بيانات غير صحيحة لأحد منتجات السلة.',
+            readyState.copyWith(
+              errorMessage: 'توجد بيانات غير صحيحة لأحد منتجات السلة.',
             ),
           );
           return;
@@ -164,8 +311,8 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
 
       if (order == null) {
         emit(
-          CheckoutState.failure(
-            failureMessage ?? 'تعذر إنشاء الطلب. حاول مرة أخرى.',
+          readyState.copyWith(
+            errorMessage: failureMessage ?? 'تعذر إنشاء الطلب. حاول مرة أخرى.',
           ),
         );
         return;
@@ -189,8 +336,8 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
       addError(error, stackTrace);
 
       emit(
-        const CheckoutState.failure(
-          'حدث خطأ أثناء إرسال الطلب. حاول مرة أخرى.',
+        readyState.copyWith(
+          errorMessage: 'حدث خطأ أثناء إرسال الطلب. حاول مرة أخرى.',
         ),
       );
     }

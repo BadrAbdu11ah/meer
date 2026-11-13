@@ -50,6 +50,50 @@ class AuthRepository {
     }
   }
 
+  Future<Either<Failure, MeerUserProfile>> linkVerifiedPhone({
+    required String phone,
+    required String code,
+  }) async {
+    try {
+      final profile = await client.appAuth.linkVerifiedPhone(
+        phone,
+        code,
+      );
+
+      return Right(profile);
+    } catch (e) {
+      final errorMessage = e.toString().toLowerCase();
+
+      if (errorMessage.contains('invalid_phone_otp')) {
+        return Left(
+          AuthFailure('رمز التحقق غير صحيح أو انتهت صلاحيته.'),
+        );
+      }
+
+      if (errorMessage.contains('invalid_phone_format')) {
+        return Left(
+          AuthFailure('صيغة رقم الهاتف غير صحيحة.'),
+        );
+      }
+
+      if (errorMessage.contains('phone_already_in_use')) {
+        return Left(
+          AuthFailure('رقم الهاتف مرتبط بحساب آخر.'),
+        );
+      }
+
+      if (errorMessage.contains('هذا الحساب مرتبط')) {
+        return Left(
+          AuthFailure('لا يمكن تغيير رقم الهاتف المرتبط بهذا الحساب.'),
+        );
+      }
+
+      return Left(
+        ServerFailure('تعذر توثيق رقم الهاتف. حاول مرة أخرى.'),
+      );
+    }
+  }
+
   Future<Either<Failure, MeerUserProfile>> verifyOtp({
     required String phone,
     required String code,

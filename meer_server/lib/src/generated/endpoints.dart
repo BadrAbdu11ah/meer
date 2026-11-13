@@ -227,6 +227,31 @@ class Endpoints extends _is.EndpointDispatch {
                     params['phone'],
                   ),
         ),
+        'linkVerifiedPhone': _is.MethodConnector(
+          name: 'linkVerifiedPhone',
+          params: {
+            'phone': _is.ParameterDescription(
+              name: 'phone',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'code': _is.ParameterDescription(
+              name: 'code',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['appAuth'] as _ifrhcmrx.AppAuthEndpoint)
+                  .linkVerifiedPhone(
+                    session,
+                    params['phone'],
+                    params['code'],
+                  ),
+        ),
         'verifyOtp': _is.MethodConnector(
           name: 'verifyOtp',
           params: {

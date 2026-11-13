@@ -55,13 +55,15 @@ extension CheckoutEventPatterns on CheckoutEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( CheckoutStarted value)?  started,TResult Function( CheckoutLocationRequested value)?  locationRequested,TResult Function( CheckoutSubmitted value)?  submitted,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( CheckoutStarted value)?  started,TResult Function( CheckoutLocationRequested value)?  locationRequested,TResult Function( CheckoutSubmitted value)?  submitted,TResult Function( CheckoutPhoneCodeRequested value)?  phoneCodeRequested,TResult Function( CheckoutPhoneVerificationSubmitted value)?  phoneVerificationSubmitted,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case CheckoutStarted() when started != null:
 return started(_that);case CheckoutLocationRequested() when locationRequested != null:
 return locationRequested(_that);case CheckoutSubmitted() when submitted != null:
-return submitted(_that);case _:
+return submitted(_that);case CheckoutPhoneCodeRequested() when phoneCodeRequested != null:
+return phoneCodeRequested(_that);case CheckoutPhoneVerificationSubmitted() when phoneVerificationSubmitted != null:
+return phoneVerificationSubmitted(_that);case _:
   return orElse();
 
 }
@@ -79,13 +81,15 @@ return submitted(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( CheckoutStarted value)  started,required TResult Function( CheckoutLocationRequested value)  locationRequested,required TResult Function( CheckoutSubmitted value)  submitted,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( CheckoutStarted value)  started,required TResult Function( CheckoutLocationRequested value)  locationRequested,required TResult Function( CheckoutSubmitted value)  submitted,required TResult Function( CheckoutPhoneCodeRequested value)  phoneCodeRequested,required TResult Function( CheckoutPhoneVerificationSubmitted value)  phoneVerificationSubmitted,}){
 final _that = this;
 switch (_that) {
 case CheckoutStarted():
 return started(_that);case CheckoutLocationRequested():
 return locationRequested(_that);case CheckoutSubmitted():
-return submitted(_that);}
+return submitted(_that);case CheckoutPhoneCodeRequested():
+return phoneCodeRequested(_that);case CheckoutPhoneVerificationSubmitted():
+return phoneVerificationSubmitted(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
 ///
@@ -99,13 +103,15 @@ return submitted(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( CheckoutStarted value)?  started,TResult? Function( CheckoutLocationRequested value)?  locationRequested,TResult? Function( CheckoutSubmitted value)?  submitted,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( CheckoutStarted value)?  started,TResult? Function( CheckoutLocationRequested value)?  locationRequested,TResult? Function( CheckoutSubmitted value)?  submitted,TResult? Function( CheckoutPhoneCodeRequested value)?  phoneCodeRequested,TResult? Function( CheckoutPhoneVerificationSubmitted value)?  phoneVerificationSubmitted,}){
 final _that = this;
 switch (_that) {
 case CheckoutStarted() when started != null:
 return started(_that);case CheckoutLocationRequested() when locationRequested != null:
 return locationRequested(_that);case CheckoutSubmitted() when submitted != null:
-return submitted(_that);case _:
+return submitted(_that);case CheckoutPhoneCodeRequested() when phoneCodeRequested != null:
+return phoneCodeRequested(_that);case CheckoutPhoneVerificationSubmitted() when phoneVerificationSubmitted != null:
+return phoneVerificationSubmitted(_that);case _:
   return null;
 
 }
@@ -122,12 +128,14 @@ return submitted(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  started,TResult Function()?  locationRequested,TResult Function( List<CartItem> items,  String deliveryAddress,  double? latitude,  double? longitude)?  submitted,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  started,TResult Function()?  locationRequested,TResult Function( List<CartItem> items,  String deliveryAddress,  double? latitude,  double? longitude)?  submitted,TResult Function( String phone)?  phoneCodeRequested,TResult Function( String phone,  String code)?  phoneVerificationSubmitted,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case CheckoutStarted() when started != null:
 return started();case CheckoutLocationRequested() when locationRequested != null:
 return locationRequested();case CheckoutSubmitted() when submitted != null:
-return submitted(_that.items,_that.deliveryAddress,_that.latitude,_that.longitude);case _:
+return submitted(_that.items,_that.deliveryAddress,_that.latitude,_that.longitude);case CheckoutPhoneCodeRequested() when phoneCodeRequested != null:
+return phoneCodeRequested(_that.phone);case CheckoutPhoneVerificationSubmitted() when phoneVerificationSubmitted != null:
+return phoneVerificationSubmitted(_that.phone,_that.code);case _:
   return orElse();
 
 }
@@ -145,12 +153,14 @@ return submitted(_that.items,_that.deliveryAddress,_that.latitude,_that.longitud
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  started,required TResult Function()  locationRequested,required TResult Function( List<CartItem> items,  String deliveryAddress,  double? latitude,  double? longitude)  submitted,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  started,required TResult Function()  locationRequested,required TResult Function( List<CartItem> items,  String deliveryAddress,  double? latitude,  double? longitude)  submitted,required TResult Function( String phone)  phoneCodeRequested,required TResult Function( String phone,  String code)  phoneVerificationSubmitted,}) {final _that = this;
 switch (_that) {
 case CheckoutStarted():
 return started();case CheckoutLocationRequested():
 return locationRequested();case CheckoutSubmitted():
-return submitted(_that.items,_that.deliveryAddress,_that.latitude,_that.longitude);}
+return submitted(_that.items,_that.deliveryAddress,_that.latitude,_that.longitude);case CheckoutPhoneCodeRequested():
+return phoneCodeRequested(_that.phone);case CheckoutPhoneVerificationSubmitted():
+return phoneVerificationSubmitted(_that.phone,_that.code);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -164,12 +174,14 @@ return submitted(_that.items,_that.deliveryAddress,_that.latitude,_that.longitud
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  started,TResult? Function()?  locationRequested,TResult? Function( List<CartItem> items,  String deliveryAddress,  double? latitude,  double? longitude)?  submitted,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  started,TResult? Function()?  locationRequested,TResult? Function( List<CartItem> items,  String deliveryAddress,  double? latitude,  double? longitude)?  submitted,TResult? Function( String phone)?  phoneCodeRequested,TResult? Function( String phone,  String code)?  phoneVerificationSubmitted,}) {final _that = this;
 switch (_that) {
 case CheckoutStarted() when started != null:
 return started();case CheckoutLocationRequested() when locationRequested != null:
 return locationRequested();case CheckoutSubmitted() when submitted != null:
-return submitted(_that.items,_that.deliveryAddress,_that.latitude,_that.longitude);case _:
+return submitted(_that.items,_that.deliveryAddress,_that.latitude,_that.longitude);case CheckoutPhoneCodeRequested() when phoneCodeRequested != null:
+return phoneCodeRequested(_that.phone);case CheckoutPhoneVerificationSubmitted() when phoneVerificationSubmitted != null:
+return phoneVerificationSubmitted(_that.phone,_that.code);case _:
   return null;
 
 }
@@ -320,6 +332,140 @@ as double?,
 }
 
 /// @nodoc
+
+
+class CheckoutPhoneCodeRequested implements CheckoutEvent {
+  const CheckoutPhoneCodeRequested({required this.phone});
+  
+
+ final  String phone;
+
+/// Create a copy of CheckoutEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CheckoutPhoneCodeRequestedCopyWith<CheckoutPhoneCodeRequested> get copyWith => _$CheckoutPhoneCodeRequestedCopyWithImpl<CheckoutPhoneCodeRequested>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CheckoutPhoneCodeRequested&&(identical(other.phone, phone) || other.phone == phone));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,phone);
+
+@override
+String toString() {
+  return 'CheckoutEvent.phoneCodeRequested(phone: $phone)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $CheckoutPhoneCodeRequestedCopyWith<$Res> implements $CheckoutEventCopyWith<$Res> {
+  factory $CheckoutPhoneCodeRequestedCopyWith(CheckoutPhoneCodeRequested value, $Res Function(CheckoutPhoneCodeRequested) _then) = _$CheckoutPhoneCodeRequestedCopyWithImpl;
+@useResult
+$Res call({
+ String phone
+});
+
+
+
+
+}
+/// @nodoc
+class _$CheckoutPhoneCodeRequestedCopyWithImpl<$Res>
+    implements $CheckoutPhoneCodeRequestedCopyWith<$Res> {
+  _$CheckoutPhoneCodeRequestedCopyWithImpl(this._self, this._then);
+
+  final CheckoutPhoneCodeRequested _self;
+  final $Res Function(CheckoutPhoneCodeRequested) _then;
+
+/// Create a copy of CheckoutEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? phone = null,}) {
+  return _then(CheckoutPhoneCodeRequested(
+phone: null == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class CheckoutPhoneVerificationSubmitted implements CheckoutEvent {
+  const CheckoutPhoneVerificationSubmitted({required this.phone, required this.code});
+  
+
+ final  String phone;
+ final  String code;
+
+/// Create a copy of CheckoutEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$CheckoutPhoneVerificationSubmittedCopyWith<CheckoutPhoneVerificationSubmitted> get copyWith => _$CheckoutPhoneVerificationSubmittedCopyWithImpl<CheckoutPhoneVerificationSubmitted>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CheckoutPhoneVerificationSubmitted&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.code, code) || other.code == code));
+}
+
+
+@override
+int get hashCode => Object.hash(runtimeType,phone,code);
+
+@override
+String toString() {
+  return 'CheckoutEvent.phoneVerificationSubmitted(phone: $phone, code: $code)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $CheckoutPhoneVerificationSubmittedCopyWith<$Res> implements $CheckoutEventCopyWith<$Res> {
+  factory $CheckoutPhoneVerificationSubmittedCopyWith(CheckoutPhoneVerificationSubmitted value, $Res Function(CheckoutPhoneVerificationSubmitted) _then) = _$CheckoutPhoneVerificationSubmittedCopyWithImpl;
+@useResult
+$Res call({
+ String phone, String code
+});
+
+
+
+
+}
+/// @nodoc
+class _$CheckoutPhoneVerificationSubmittedCopyWithImpl<$Res>
+    implements $CheckoutPhoneVerificationSubmittedCopyWith<$Res> {
+  _$CheckoutPhoneVerificationSubmittedCopyWithImpl(this._self, this._then);
+
+  final CheckoutPhoneVerificationSubmitted _self;
+  final $Res Function(CheckoutPhoneVerificationSubmitted) _then;
+
+/// Create a copy of CheckoutEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? phone = null,Object? code = null,}) {
+  return _then(CheckoutPhoneVerificationSubmitted(
+phone: null == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
+as String,code: null == code ? _self.code : code // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
 mixin _$CheckoutState {
 
 
@@ -439,12 +585,12 @@ return failure(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  locating,TResult Function( String? address,  double? latitude,  double? longitude)?  ready,TResult Function()?  submitting,TResult Function( OrderInfo order)?  success,TResult Function( String message)?  failure,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  locating,TResult Function( String? address,  double? latitude,  double? longitude,  String phone,  bool isPhoneVerified,  bool isSendingPhoneCode,  bool isPhoneCodeSent,  bool isVerifyingPhone,  String? errorMessage)?  ready,TResult Function()?  submitting,TResult Function( OrderInfo order)?  success,TResult Function( String message)?  failure,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case CheckoutInitial() when initial != null:
 return initial();case CheckoutLocating() when locating != null:
 return locating();case CheckoutReady() when ready != null:
-return ready(_that.address,_that.latitude,_that.longitude);case CheckoutSubmitting() when submitting != null:
+return ready(_that.address,_that.latitude,_that.longitude,_that.phone,_that.isPhoneVerified,_that.isSendingPhoneCode,_that.isPhoneCodeSent,_that.isVerifyingPhone,_that.errorMessage);case CheckoutSubmitting() when submitting != null:
 return submitting();case CheckoutSuccess() when success != null:
 return success(_that.order);case CheckoutFailure() when failure != null:
 return failure(_that.message);case _:
@@ -465,12 +611,12 @@ return failure(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  locating,required TResult Function( String? address,  double? latitude,  double? longitude)  ready,required TResult Function()  submitting,required TResult Function( OrderInfo order)  success,required TResult Function( String message)  failure,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  locating,required TResult Function( String? address,  double? latitude,  double? longitude,  String phone,  bool isPhoneVerified,  bool isSendingPhoneCode,  bool isPhoneCodeSent,  bool isVerifyingPhone,  String? errorMessage)  ready,required TResult Function()  submitting,required TResult Function( OrderInfo order)  success,required TResult Function( String message)  failure,}) {final _that = this;
 switch (_that) {
 case CheckoutInitial():
 return initial();case CheckoutLocating():
 return locating();case CheckoutReady():
-return ready(_that.address,_that.latitude,_that.longitude);case CheckoutSubmitting():
+return ready(_that.address,_that.latitude,_that.longitude,_that.phone,_that.isPhoneVerified,_that.isSendingPhoneCode,_that.isPhoneCodeSent,_that.isVerifyingPhone,_that.errorMessage);case CheckoutSubmitting():
 return submitting();case CheckoutSuccess():
 return success(_that.order);case CheckoutFailure():
 return failure(_that.message);}
@@ -487,12 +633,12 @@ return failure(_that.message);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  locating,TResult? Function( String? address,  double? latitude,  double? longitude)?  ready,TResult? Function()?  submitting,TResult? Function( OrderInfo order)?  success,TResult? Function( String message)?  failure,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  locating,TResult? Function( String? address,  double? latitude,  double? longitude,  String phone,  bool isPhoneVerified,  bool isSendingPhoneCode,  bool isPhoneCodeSent,  bool isVerifyingPhone,  String? errorMessage)?  ready,TResult? Function()?  submitting,TResult? Function( OrderInfo order)?  success,TResult? Function( String message)?  failure,}) {final _that = this;
 switch (_that) {
 case CheckoutInitial() when initial != null:
 return initial();case CheckoutLocating() when locating != null:
 return locating();case CheckoutReady() when ready != null:
-return ready(_that.address,_that.latitude,_that.longitude);case CheckoutSubmitting() when submitting != null:
+return ready(_that.address,_that.latitude,_that.longitude,_that.phone,_that.isPhoneVerified,_that.isSendingPhoneCode,_that.isPhoneCodeSent,_that.isVerifyingPhone,_that.errorMessage);case CheckoutSubmitting() when submitting != null:
 return submitting();case CheckoutSuccess() when success != null:
 return success(_that.order);case CheckoutFailure() when failure != null:
 return failure(_that.message);case _:
@@ -571,12 +717,18 @@ String toString() {
 
 
 class CheckoutReady implements CheckoutState {
-  const CheckoutReady({this.address, this.latitude, this.longitude});
+  const CheckoutReady({this.address, this.latitude, this.longitude, this.phone = '', this.isPhoneVerified = false, this.isSendingPhoneCode = false, this.isPhoneCodeSent = false, this.isVerifyingPhone = false, this.errorMessage});
   
 
  final  String? address;
  final  double? latitude;
  final  double? longitude;
+@JsonKey() final  String phone;
+@JsonKey() final  bool isPhoneVerified;
+@JsonKey() final  bool isSendingPhoneCode;
+@JsonKey() final  bool isPhoneCodeSent;
+@JsonKey() final  bool isVerifyingPhone;
+ final  String? errorMessage;
 
 /// Create a copy of CheckoutState
 /// with the given fields replaced by the non-null parameter values.
@@ -588,16 +740,16 @@ $CheckoutReadyCopyWith<CheckoutReady> get copyWith => _$CheckoutReadyCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CheckoutReady&&(identical(other.address, address) || other.address == address)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CheckoutReady&&(identical(other.address, address) || other.address == address)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.isPhoneVerified, isPhoneVerified) || other.isPhoneVerified == isPhoneVerified)&&(identical(other.isSendingPhoneCode, isSendingPhoneCode) || other.isSendingPhoneCode == isSendingPhoneCode)&&(identical(other.isPhoneCodeSent, isPhoneCodeSent) || other.isPhoneCodeSent == isPhoneCodeSent)&&(identical(other.isVerifyingPhone, isVerifyingPhone) || other.isVerifyingPhone == isVerifyingPhone)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,address,latitude,longitude);
+int get hashCode => Object.hash(runtimeType,address,latitude,longitude,phone,isPhoneVerified,isSendingPhoneCode,isPhoneCodeSent,isVerifyingPhone,errorMessage);
 
 @override
 String toString() {
-  return 'CheckoutState.ready(address: $address, latitude: $latitude, longitude: $longitude)';
+  return 'CheckoutState.ready(address: $address, latitude: $latitude, longitude: $longitude, phone: $phone, isPhoneVerified: $isPhoneVerified, isSendingPhoneCode: $isSendingPhoneCode, isPhoneCodeSent: $isPhoneCodeSent, isVerifyingPhone: $isVerifyingPhone, errorMessage: $errorMessage)';
 }
 
 
@@ -608,7 +760,7 @@ abstract mixin class $CheckoutReadyCopyWith<$Res> implements $CheckoutStateCopyW
   factory $CheckoutReadyCopyWith(CheckoutReady value, $Res Function(CheckoutReady) _then) = _$CheckoutReadyCopyWithImpl;
 @useResult
 $Res call({
- String? address, double? latitude, double? longitude
+ String? address, double? latitude, double? longitude, String phone, bool isPhoneVerified, bool isSendingPhoneCode, bool isPhoneCodeSent, bool isVerifyingPhone, String? errorMessage
 });
 
 
@@ -625,12 +777,18 @@ class _$CheckoutReadyCopyWithImpl<$Res>
 
 /// Create a copy of CheckoutState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? address = freezed,Object? latitude = freezed,Object? longitude = freezed,}) {
+@pragma('vm:prefer-inline') $Res call({Object? address = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? phone = null,Object? isPhoneVerified = null,Object? isSendingPhoneCode = null,Object? isPhoneCodeSent = null,Object? isVerifyingPhone = null,Object? errorMessage = freezed,}) {
   return _then(CheckoutReady(
 address: freezed == address ? _self.address : address // ignore: cast_nullable_to_non_nullable
 as String?,latitude: freezed == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
 as double?,longitude: freezed == longitude ? _self.longitude : longitude // ignore: cast_nullable_to_non_nullable
-as double?,
+as double?,phone: null == phone ? _self.phone : phone // ignore: cast_nullable_to_non_nullable
+as String,isPhoneVerified: null == isPhoneVerified ? _self.isPhoneVerified : isPhoneVerified // ignore: cast_nullable_to_non_nullable
+as bool,isSendingPhoneCode: null == isSendingPhoneCode ? _self.isSendingPhoneCode : isSendingPhoneCode // ignore: cast_nullable_to_non_nullable
+as bool,isPhoneCodeSent: null == isPhoneCodeSent ? _self.isPhoneCodeSent : isPhoneCodeSent // ignore: cast_nullable_to_non_nullable
+as bool,isVerifyingPhone: null == isVerifyingPhone ? _self.isVerifyingPhone : isVerifyingPhone // ignore: cast_nullable_to_non_nullable
+as bool,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

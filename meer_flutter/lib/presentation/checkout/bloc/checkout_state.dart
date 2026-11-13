@@ -12,6 +12,12 @@ sealed class CheckoutState with _$CheckoutState {
     String? address,
     double? latitude,
     double? longitude,
+    @Default('') String phone,
+    @Default(false) bool isPhoneVerified,
+    @Default(false) bool isSendingPhoneCode,
+    @Default(false) bool isPhoneCodeSent,
+    @Default(false) bool isVerifyingPhone,
+    String? errorMessage,
   }) = CheckoutReady;
 
   const factory CheckoutState.submitting() = CheckoutSubmitting;

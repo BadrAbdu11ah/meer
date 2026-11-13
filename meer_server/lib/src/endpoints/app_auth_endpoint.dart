@@ -39,6 +39,100 @@ class AppAuthEndpoint extends Endpoint {
     return _smsService.sendOtp(session, formattedPhone);
   }
 
+  /// ربط رقم هاتف موثّق بحساب المستخدم الحالي.
+  Future<MeerUserProfile> linkVerifiedPhone(
+    Session session,
+    String phone,
+    String code,
+  ) async {
+    final authUserId = session.authenticated?.authUserId;
+
+    if (authUserId == null) {
+      throw Exception('يجب تسجيل الدخول أولاً.');
+    }
+
+    final formattedPhone = _smsService.formatPhone(phone);
+
+    if (!_isValidSaudiPhone(formattedPhone)) {
+      throw FormatException('صيغة رقم الهاتف غير صحيحة.');
+    }
+
+    if (code.trim().isEmpty) {
+      throw FormatException('رمز التحقق مطلوب.');
+    }
+
+    final isValid = await _smsService.verifyOtp(
+      session,
+      formattedPhone,
+      code.trim(),
+    );
+
+    if (!isValid) {
+      throw Exception('INVALID_PHONE_OTP');
+    }
+
+    return session.db.transaction(
+      (transaction) async {
+        final profile = await MeerUserProfile.db.findFirstRow(
+          session,
+          where: (user) => user.authUserId.equals(authUserId),
+          transaction: transaction,
+        );
+
+        if (profile == null || profile.id == null) {
+          throw Exception('لم يتم العثور على ملف المستخدم.');
+        }
+
+        // لا نسمح بتغيير رقم حساب مرتبط بالهاتف من هذا المسار.
+        if (profile.phone.trim().isNotEmpty) {
+          if (profile.phone == formattedPhone) {
+            return profile;
+          }
+
+          throw Exception(
+            'هذا الحساب مرتبط برقم هاتف بالفعل.',
+          );
+        }
+
+        // التأكد من أن الرقم غير مرتبط بحساب آخر.
+        final existingAccount = await PhoneAuthAccount.db.findFirstRow(
+          session,
+          where: (account) => account.phone.equals(formattedPhone),
+          transaction: transaction,
+        );
+
+        if (existingAccount != null &&
+            existingAccount.authUserId != authUserId) {
+          throw Exception('PHONE_ALREADY_IN_USE');
+        }
+
+        // إنشاء ربط المصادقة إذا لم يكن موجودًا.
+        if (existingAccount == null) {
+          await PhoneAuthAccount.db.insertRow(
+            session,
+            PhoneAuthAccount(
+              authUserId: authUserId,
+              phone: formattedPhone,
+              createdAt: DateTime.now().toUtc(),
+            ),
+            transaction: transaction,
+          );
+        }
+
+        profile.phone = formattedPhone;
+
+        return MeerUserProfile.db.updateRow(
+          session,
+          profile,
+          transaction: transaction,
+        );
+      },
+      settings: TransactionSettings(
+        isolationLevel: IsolationLevel.serializable,
+      ),
+    );
+  }
+
   @unauthenticatedClientCall
   Future<AuthSuccess> verifyOtp(
     Session session,

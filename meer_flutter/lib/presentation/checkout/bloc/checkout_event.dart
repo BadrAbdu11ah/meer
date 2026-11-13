@@ -15,4 +15,13 @@ sealed class CheckoutEvent with _$CheckoutEvent {
     double? latitude,
     double? longitude,
   }) = CheckoutSubmitted;
+
+  const factory CheckoutEvent.phoneCodeRequested({
+    required String phone,
+  }) = CheckoutPhoneCodeRequested;
+
+  const factory CheckoutEvent.phoneVerificationSubmitted({
+    required String phone,
+    required String code,
+  }) = CheckoutPhoneVerificationSubmitted;
 }
