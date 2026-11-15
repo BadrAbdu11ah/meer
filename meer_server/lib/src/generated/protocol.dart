@@ -35,6 +35,7 @@ import 'model/MeerUserProfile.dart' as _ii0ycxhg;
 import 'model/order_info.dart' as _ig93noqx;
 import 'model/order_item.dart' as _iae72vfi;
 import 'model/order_item_request.dart' as _i52izl0k;
+import 'model/otp_attempt.dart' as _iqg2um0o;
 import 'model/phone_auth_account.dart' as _iv7s17wm;
 import 'model/phone_auth_result.dart' as _iu539ble;
 import 'model/product.dart' as _igfqb4xa;
@@ -48,6 +49,7 @@ export 'model/meer_city.dart';
 export 'model/order_info.dart';
 export 'model/order_item.dart';
 export 'model/order_item_request.dart';
+export 'model/otp_attempt.dart';
 export 'model/phone_auth_account.dart';
 export 'model/phone_auth_result.dart';
 export 'model/product.dart';
@@ -448,6 +450,91 @@ class Protocol extends _is.DatabaseSerializationManager {
       managed: true,
     ),
     _isp.TableDefinition(
+      name: 'otp_attempt',
+      dartName: 'OtpAttempt',
+      schema: 'public',
+      module: 'meer',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'phoneHash',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'ipHash',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'purpose',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'otp_attempt_phone_purpose_created_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'phoneHash',
+            ),
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'purpose',
+            ),
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'createdAt',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+        _isp.IndexDefinition(
+          indexName: 'otp_attempt_ip_purpose_created_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'ipHash',
+            ),
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'purpose',
+            ),
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'createdAt',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _isp.TableDefinition(
       name: 'phone_auth_account',
       dartName: 'PhoneAuthAccount',
       schema: 'public',
@@ -799,6 +886,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _i52izl0k.OrderItemRequest) {
       return _i52izl0k.OrderItemRequest.fromJson(data) as T;
     }
+    if (t == _iqg2um0o.OtpAttempt) {
+      return _iqg2um0o.OtpAttempt.fromJson(data) as T;
+    }
     if (t == _iv7s17wm.PhoneAuthAccount) {
       return _iv7s17wm.PhoneAuthAccount.fromJson(data) as T;
     }
@@ -844,6 +934,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _is.getType<_i52izl0k.OrderItemRequest?>()) {
       return (data != null ? _i52izl0k.OrderItemRequest.fromJson(data) : null)
           as T;
+    }
+    if (t == _is.getType<_iqg2um0o.OtpAttempt?>()) {
+      return (data != null ? _iqg2um0o.OtpAttempt.fromJson(data) : null) as T;
     }
     if (t == _is.getType<_iv7s17wm.PhoneAuthAccount?>()) {
       return (data != null ? _iv7s17wm.PhoneAuthAccount.fromJson(data) : null)
@@ -930,6 +1023,7 @@ class Protocol extends _is.DatabaseSerializationManager {
       _ig93noqx.OrderInfo => 'OrderInfo',
       _iae72vfi.OrderItem => 'OrderItem',
       _i52izl0k.OrderItemRequest => 'OrderItemRequest',
+      _iqg2um0o.OtpAttempt => 'OtpAttempt',
       _iv7s17wm.PhoneAuthAccount => 'PhoneAuthAccount',
       _iu539ble.PhoneAuthResult => 'PhoneAuthResult',
       _igfqb4xa.Product => 'Product',
@@ -966,6 +1060,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'OrderItem';
       case _i52izl0k.OrderItemRequest():
         return 'OrderItemRequest';
+      case _iqg2um0o.OtpAttempt():
+        return 'OtpAttempt';
       case _iv7s17wm.PhoneAuthAccount():
         return 'PhoneAuthAccount';
       case _iu539ble.PhoneAuthResult():
@@ -1030,6 +1126,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (dataClassName == 'OrderItemRequest') {
       return deserialize<_i52izl0k.OrderItemRequest>(data['data']);
+    }
+    if (dataClassName == 'OtpAttempt') {
+      return deserialize<_iqg2um0o.OtpAttempt>(data['data']);
     }
     if (dataClassName == 'PhoneAuthAccount') {
       return deserialize<_iv7s17wm.PhoneAuthAccount>(data['data']);
@@ -1105,6 +1204,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return _ig93noqx.OrderInfo.t;
       case _iae72vfi.OrderItem:
         return _iae72vfi.OrderItem.t;
+      case _iqg2um0o.OtpAttempt:
+        return _iqg2um0o.OtpAttempt.t;
       case _iv7s17wm.PhoneAuthAccount:
         return _iv7s17wm.PhoneAuthAccount.t;
       case _igfqb4xa.Product:

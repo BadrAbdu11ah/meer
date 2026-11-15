@@ -1,179 +1,289 @@
+import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
+
 import 'package:http/http.dart' as http;
 import 'package:serverpod/serverpod.dart';
 
+typedef SmsPasswordResolver =
+    String? Function(
+      Session session,
+      String key,
+    );
+
 class SmsService {
+  SmsService({
+    this._httpClient,
+    this._passwordResolver,
+    this.requestTimeout = const Duration(seconds: 15),
+  });
+
+  final http.Client? _httpClient;
+  final SmsPasswordResolver? _passwordResolver;
+
+  final Duration requestTimeout;
+
+  static const _defaultSendUrl = 'https://api.authentica.sa/api/v2/send-otp';
+
+  static const _defaultVerifyUrl =
+      'https://api.authentica.sa/api/v2/verify-otp';
+
+  // قراءة إعدادات المصادقة من Serverpod.
   String _getPassword(Session session, String key) {
-    // 1. Try session.serverpod.getPassword(key)
-    String? val = session.serverpod.getPassword(key);
-    if (val != null && val.isNotEmpty) return val;
+    final injectedValue = _passwordResolver?.call(session, key);
 
-    // 2. Try session.passwords[key]
-    val = session.passwords[key];
-    if (val != null && val.isNotEmpty) return val;
+    if (injectedValue != null && injectedValue.isNotEmpty) {
+      return injectedValue;
+    }
 
-    // 3. Fallback: read directly from passwords.yaml on disk so it works even before a server restart
-    try {
-      final candidates = [
-        'config/passwords.yaml',
-        'meer_server/config/passwords.yaml',
-        '../meer_server/config/passwords.yaml',
-      ];
-      for (var path in candidates) {
-        final file = File(path);
-        if (file.existsSync()) {
-          for (var line in file.readAsLinesSync()) {
-            final trimmed = line.trim();
-            if (trimmed.startsWith('$key:')) {
-              var raw = trimmed.substring('$key:'.length).trim();
-              if ((raw.startsWith('"') && raw.endsWith('"')) ||
-                  (raw.startsWith("'") && raw.endsWith("'"))) {
-                raw = raw.substring(1, raw.length - 1);
-              }
-              if (raw.isNotEmpty) return raw;
-            }
-          }
-        }
-      }
-    } catch (_) {}
+    final serverPassword = session.serverpod.getPassword(key);
+
+    if (serverPassword != null && serverPassword.isNotEmpty) {
+      return serverPassword;
+    }
+
+    final sessionPassword = session.passwords[key];
+
+    if (sessionPassword != null && sessionPassword.isNotEmpty) {
+      return sessionPassword;
+    }
 
     return '';
   }
 
-  // توحيد صيغة الرقم لتصبح بالصيغة الدولية 9665xxxxxxxx
+  // توحيد صيغة رقم الهاتف السعودي.
   String formatPhone(String phone) {
-    String cleaned = phone.replaceAll(RegExp(r'[\s\-\(\)]'), '').trim();
-    cleaned = cleaned.replaceAll(RegExp(r'^(?:\+?966|00966|0)+'), '');
+    var cleaned = phone.replaceAll(RegExp(r'[\s\-\(\)]'), '').trim();
+
+    cleaned = cleaned.replaceAll(
+      RegExp(r'^(?:\+?966|00966|0)+'),
+      '',
+    );
+
     return '966$cleaned';
   }
 
-  // دالة إرسال الـ OTP
+  // إرسال HTTP من خلال Client قابل للاستبدال في الاختبارات.
+  Future<http.Response> _post(
+    Uri uri, {
+    required Map<String, String> headers,
+    required String body,
+  }) {
+    final client = _httpClient;
+
+    if (client != null) {
+      return client.post(
+        uri,
+        headers: headers,
+        body: body,
+      );
+    }
+
+    return http.post(
+      uri,
+      headers: headers,
+      body: body,
+    );
+  }
+
+  // التحقق من صلاحية عنوان Authentica.
+  Uri? _parseSecureUrl(String value) {
+    final uri = Uri.tryParse(value);
+
+    if (uri == null ||
+        uri.scheme != 'https' ||
+        uri.host.isEmpty ||
+        uri.userInfo.isNotEmpty) {
+      return null;
+    }
+
+    return uri;
+  }
+
+  Map<String, String> _headers(String apiKey) {
+    return {
+      'X-Authorization': apiKey,
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    };
+  }
+
+  // إرسال OTP.
   Future<bool> sendOtp(Session session, String phone) async {
-    String formattedPhone = formatPhone(phone);
-    String apiPhone = '+$formattedPhone';
+    final formattedPhone = formatPhone(phone);
+    final apiPhone = '+$formattedPhone';
 
-    // جلب الإعدادات من باسوردات السيرفر أو من الملف مباشرة
-    String apiKey = _getPassword(session, 'authenticaApiKey');
-    String url = _getPassword(session, 'authenticaUrl');
-    if (url.trim().isEmpty) {
-      url = 'https://api.authentica.sa/api/v2/send-otp';
-    }
-    String templateId = _getPassword(session, 'authenticaTemplateId');
-    if (templateId.trim().isEmpty) {
-      templateId = '5';
-    }
-    final dynamic templateIdValue = int.tryParse(templateId) ?? templateId;
+    final apiKey = _getPassword(
+      session,
+      'authenticaApiKey',
+    ).trim();
 
-    if (apiKey.trim().isEmpty) {
+    final configuredUrl = _getPassword(
+      session,
+      'authenticaUrl',
+    ).trim();
+
+    final url = configuredUrl.isEmpty ? _defaultSendUrl : configuredUrl;
+
+    final templateId = _getPassword(
+      session,
+      'authenticaTemplateId',
+    ).trim();
+
+    final templateIdValue = templateId.isEmpty ? 5 : int.tryParse(templateId);
+
+    if (apiKey.isEmpty) {
       session.log(
-        'SMS Error: authenticaApiKey is not configured in passwords.yaml under shared:',
+        'Authentica API key is not configured.',
+        level: LogLevel.error,
+      );
+      return false;
+    }
+
+    if (templateIdValue == null || templateIdValue <= 0) {
+      session.log(
+        'Authentica template ID configuration is invalid.',
+        level: LogLevel.error,
+      );
+      return false;
+    }
+
+    final uri = _parseSecureUrl(url);
+
+    if (uri == null) {
+      session.log(
+        'Authentica send URL configuration is invalid.',
         level: LogLevel.error,
       );
       return false;
     }
 
     try {
-      session.log(
-        'Sending OTP to $apiPhone via $url',
-        level: LogLevel.info,
-      );
-
-      var response = await http.post(
-        Uri.parse(url),
-        headers: {
-          'X-Authorization': apiKey,
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
+      final response = await _post(
+        uri,
+        headers: _headers(apiKey),
         body: jsonEncode({
           'phone': apiPhone,
           'method': 'sms',
           'template_id': templateIdValue,
         }),
-      );
+      ).timeout(requestTimeout);
 
-      session.log(
-        'Authentica Send OTP response [${response.statusCode}]: ${response.body}',
-        level: response.statusCode == 200 ? LogLevel.info : LogLevel.warning,
-      );
-
-      if (response.statusCode == 200) {
-        try {
-          var data = jsonDecode(response.body);
-          if (data is Map) {
-            if (data.containsKey('status') && data['status'] == false) {
-              return false;
-            }
-            if (data.containsKey('success') && data['success'] == false) {
-              return false;
-            }
-          }
-        } catch (_) {}
-        return true;
+      if (response.statusCode != 200) {
+        session.log(
+          'Authentica OTP send failed. '
+          'HTTP status: ${response.statusCode}.',
+          level: LogLevel.warning,
+        );
+        return false;
       }
 
+      final data = jsonDecode(response.body);
+
+      if (data is! Map || data['success'] != true) {
+        session.log(
+          'Authentica did not confirm OTP sending.',
+          level: LogLevel.warning,
+        );
+        return false;
+      }
+
+      return true;
+    } on TimeoutException {
+      session.log(
+        'Authentica OTP send request timed out.',
+        level: LogLevel.warning,
+      );
       return false;
     } catch (e) {
-      session.log('SMS Exception: $e', level: LogLevel.error);
+      session.log(
+        'Authentica OTP send failed: ${e.runtimeType}.',
+        level: LogLevel.error,
+      );
       return false;
     }
   }
 
-  // دالة التحقق من الـ OTP
-  Future<bool> verifyOtp(Session session, String phone, String otp) async {
-    String formattedPhone = formatPhone(phone);
-    String apiPhone = '+$formattedPhone';
+  // التحقق من OTP.
+  Future<bool> verifyOtp(
+    Session session,
+    String phone,
+    String otp,
+  ) async {
+    final formattedPhone = formatPhone(phone);
+    final apiPhone = '+$formattedPhone';
 
-    String apiKey = _getPassword(session, 'authenticaApiKey');
-    String url = _getPassword(session, 'authenticaVerifyUrl');
-    if (url.trim().isEmpty) {
-      url = 'https://api.authentica.sa/api/v2/verify-otp';
+    if (otp.trim().isEmpty) {
+      return false;
     }
 
-    if (apiKey.trim().isEmpty) {
+    final apiKey = _getPassword(
+      session,
+      'authenticaApiKey',
+    ).trim();
+
+    final configuredUrl = _getPassword(
+      session,
+      'authenticaVerifyUrl',
+    ).trim();
+
+    final url = configuredUrl.isEmpty ? _defaultVerifyUrl : configuredUrl;
+
+    if (apiKey.isEmpty) {
       session.log(
-        'SMS Error: authenticaApiKey is not configured in passwords.yaml under shared:',
+        'Authentica API key is not configured.',
+        level: LogLevel.error,
+      );
+      return false;
+    }
+
+    final uri = _parseSecureUrl(url);
+
+    if (uri == null) {
+      session.log(
+        'Authentica verification URL configuration is invalid.',
         level: LogLevel.error,
       );
       return false;
     }
 
     try {
-      var response = await http.post(
-        Uri.parse(url),
-        headers: {
-          'X-Authorization': apiKey,
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
+      final response = await _post(
+        uri,
+        headers: _headers(apiKey),
         body: jsonEncode({
           'phone': apiPhone,
-          'otp': otp,
+          'otp': otp.trim(),
         }),
-      );
+      ).timeout(requestTimeout);
 
-      session.log(
-        'Authentica Verify OTP response [${response.statusCode}]: ${response.body}',
-        level: response.statusCode == 200 ? LogLevel.info : LogLevel.warning,
-      );
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-
-        if (data is Map) {
-          return data['verified'] == true ||
-              data['status'] == true ||
-              data['success'] == true ||
-              data['status'] == 'success';
-        }
-
+      if (response.statusCode != 200) {
+        session.log(
+          'Authentica OTP verification failed. '
+          'HTTP status: ${response.statusCode}.',
+          level: LogLevel.warning,
+        );
         return false;
       }
 
+      final data = jsonDecode(response.body);
+
+      if (data is! Map) {
+        return false;
+      }
+
+      // لا نعتبر نجاح HTTP دليلًا على صحة الرمز.
+      return data['verified'] == true;
+    } on TimeoutException {
+      session.log(
+        'Authentica OTP verification request timed out.',
+        level: LogLevel.warning,
+      );
       return false;
     } catch (e) {
-      session.log('SMS Verify Exception: $e', level: LogLevel.error);
+      session.log(
+        'Authentica OTP verification failed: ${e.runtimeType}.',
+        level: LogLevel.error,
+      );
       return false;
     }
   }

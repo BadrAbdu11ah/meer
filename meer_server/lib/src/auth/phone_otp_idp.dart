@@ -1,3 +1,4 @@
+import 'package:meer_server/src/auth/phone_auth_account_lock.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:meer_server/src/generated/protocol.dart';
@@ -22,14 +23,30 @@ class PhoneOtpIdp implements IdentityProvider {
       session.db,
       null,
       (transaction) async {
-        // 1. البحث عن حساب المصادقة المرتبط بهذا الرقم.
+        // قفل رقم الهاتف قبل البحث عن حساب المصادقة.
+        await PhoneAuthAccountLock.acquirePhone(
+          session: session,
+          transaction: transaction,
+          phone: phone,
+        );
+
+        // البحث عن حساب المصادقة المرتبط بالرقم.
         final account = await PhoneAuthAccount.db.findFirstRow(
           session,
           where: (t) => t.phone.equals(phone),
           transaction: transaction,
         );
 
-        // 2. البحث عن سجل المستخدم التجاري في مِيْر.
+        // إذا كان الرقم مرتبطًا بحساب، نقفل الحساب أيضًا.
+        if (account != null) {
+          await PhoneAuthAccountLock.acquireUser(
+            session: session,
+            transaction: transaction,
+            authUserId: account.authUserId.toString(),
+          );
+        }
+
+        // البحث عن ملف المستخدم التجاري.
         var appUser = await MeerUserProfile.db.findFirstRow(
           session,
           where: (t) => t.phone.equals(phone),

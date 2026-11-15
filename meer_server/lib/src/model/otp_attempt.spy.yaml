@@ -1,0 +1,16 @@
+class: OtpAttempt
+table: otp_attempt
+serverOnly: true
+
+fields:
+  phoneHash: String
+  ipHash: String?
+  purpose: String
+  createdAt: DateTime, defaultModel=now
+
+indexes:
+  otp_attempt_phone_purpose_created_idx:
+    fields: phoneHash, purpose, createdAt
+
+  otp_attempt_ip_purpose_created_idx:
+    fields: ipHash, purpose, createdAt

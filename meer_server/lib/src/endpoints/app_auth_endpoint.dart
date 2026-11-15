@@ -1,11 +1,20 @@
+import 'package:meer_server/src/auth/phone_auth_account_lock.dart';
 import 'package:meer_server/src/auth/phone_otp_idp.dart';
 import 'package:meer_server/src/generated/protocol.dart';
+import 'package:meer_server/src/services/otp_rate_limit_service.dart';
 import 'package:meer_server/src/services/sms_service.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_idp_server/core.dart';
 
 class AppAuthEndpoint extends Endpoint {
-  final SmsService _smsService = SmsService();
+  AppAuthEndpoint({
+    SmsService? smsService,
+    OtpRateLimitService? rateLimitService,
+  }) : _smsService = smsService ?? SmsService(),
+       _rateLimitService = rateLimitService ?? OtpRateLimitService();
+
+  final SmsService _smsService;
+  final OtpRateLimitService _rateLimitService;
 
   PhoneOtpIdp get _phoneOtpIdp =>
       AuthServices.getIdentityProvider<PhoneOtpIdp>();
@@ -36,6 +45,19 @@ class AppAuthEndpoint extends Endpoint {
       return false;
     }
 
+    // فحص حدود إرسال OTP
+    final allowed = await _rateLimitService.allowAttempt(
+      session,
+      phone: formattedPhone,
+      purpose: OtpRateLimitService.sendPurpose,
+    );
+
+    // رفض الطلب إذا تجاوز الحدود المسموحة
+    if (!allowed) {
+      return false;
+    }
+
+    // إرسال OTP بعد اجتياز فحص الحماية
     return _smsService.sendOtp(session, formattedPhone);
   }
 
@@ -61,6 +83,18 @@ class AppAuthEndpoint extends Endpoint {
       throw FormatException('رمز التحقق مطلوب.');
     }
 
+    // فحص حدود محاولات التحقق.
+    final allowed = await _rateLimitService.allowAttempt(
+      session,
+      phone: formattedPhone,
+      purpose: OtpRateLimitService.verifyPurpose,
+    );
+
+    if (!allowed) {
+      throw Exception('OTP_RATE_LIMITED');
+    }
+
+    // التحقق من الرمز عبر Authentica.
     final isValid = await _smsService.verifyOtp(
       session,
       formattedPhone,
@@ -73,6 +107,20 @@ class AppAuthEndpoint extends Endpoint {
 
     return session.db.transaction(
       (transaction) async {
+        // قفل رقم الهاتف وحساب المستخدم.
+        // نستخدم الترتيب نفسه في جميع العمليات لتجنب Deadlocks.
+        await PhoneAuthAccountLock.acquirePhone(
+          session: session,
+          transaction: transaction,
+          phone: formattedPhone,
+        );
+
+        await PhoneAuthAccountLock.acquireUser(
+          session: session,
+          transaction: transaction,
+          authUserId: authUserId.toString(),
+        );
+
         final profile = await MeerUserProfile.db.findFirstRow(
           session,
           where: (user) => user.authUserId.equals(authUserId),
@@ -106,7 +154,31 @@ class AppAuthEndpoint extends Endpoint {
           throw Exception('PHONE_ALREADY_IN_USE');
         }
 
-        // إنشاء ربط المصادقة إذا لم يكن موجودًا.
+        // إذا كان الحساب مرتبطًا بالفعل بالرقم نفسه.
+        if (profile.phone.trim().isNotEmpty) {
+          if (profile.phone.trim() != formattedPhone) {
+            throw Exception(
+              'هذا الحساب مرتبط برقم هاتف بالفعل.',
+            );
+          }
+
+          // إصلاح سجل الربط إذا كان مفقودًا.
+          if (existingAccount == null) {
+            await PhoneAuthAccount.db.insertRow(
+              session,
+              PhoneAuthAccount(
+                authUserId: authUserId,
+                phone: formattedPhone,
+                createdAt: DateTime.now().toUtc(),
+              ),
+              transaction: transaction,
+            );
+          }
+
+          return profile;
+        }
+
+        // إنشاء سجل الربط إذا لم يكن موجودًا.
         if (existingAccount == null) {
           await PhoneAuthAccount.db.insertRow(
             session,
@@ -128,7 +200,7 @@ class AppAuthEndpoint extends Endpoint {
         );
       },
       settings: TransactionSettings(
-        isolationLevel: IsolationLevel.serializable,
+        isolationLevel: IsolationLevel.readCommitted,
       ),
     );
   }
@@ -147,6 +219,17 @@ class AppAuthEndpoint extends Endpoint {
 
     if (!_isValidSaudiPhone(formattedPhone)) {
       throw Exception('INVALID_PHONE_FORMAT');
+    }
+
+    // فحص حدود محاولات التحقق.
+    final allowed = await _rateLimitService.allowAttempt(
+      session,
+      phone: formattedPhone,
+      purpose: OtpRateLimitService.verifyPurpose,
+    );
+
+    if (!allowed) {
+      throw Exception('OTP_RATE_LIMITED');
     }
 
     // التحقق من الرمز عبر Authentica.
