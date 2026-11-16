@@ -6,13 +6,14 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
     env:
       VERSION: '4.0.4'
-      SERVERPOD_PASSWORD_database: 'Zawi7GS_pW8YN6eDZI1CSnyTImt8xt96'
-      SERVERPOD_PASSWORD_redis: 'JcBTYoz3m11HZYt-_noZYKyDmcQfQts7'
 
     steps:
       - uses: actions/checkout@v4
@@ -21,15 +22,13 @@ jobs:
         with:
           flutter-version: '3.44.4'
 
-      # The test config sets `database.dataPath`, so the tests run against an
-      # embedded PostgreSQL that Serverpod starts itself. No Docker needed.
-      # The binaries are downloaded once and cached here between runs. The
-      # bundle changes with the Serverpod version, so the version is in the key.
+      # The test config uses an embedded PostgreSQL instance.
+      # Cache its binaries between workflow runs.
       - name: Cache embedded PostgreSQL binaries
         uses: actions/cache@v4
         with:
           path: ~/.cache/serverpod/pg-binaries
-          key: serverpod-pg-binaries-${{runner.os}}-${{env.VERSION}}
+          key: serverpod-pg-binaries-${{ runner.os }}-${{ env.VERSION }}
 
       - name: Install dependencies
         run: flutter pub get
@@ -37,8 +36,6 @@ jobs:
       - name: Install Serverpod CLI
         run: |
           dart install serverpod_cli@$VERSION
-          # `dart install` puts executables in the Dart data home, which is not
-          # on the PATH of a GitHub runner.
           echo "${XDG_STATE_HOME:-$HOME/.local/state}/Dart/install/bin" >> "$GITHUB_PATH"
 
       - name: Run Serverpod generator
@@ -47,4 +44,26 @@ jobs:
 
       - name: Run tests
         working-directory: meer_server
-        run: dart test
+        env:
+          SERVERPOD_PASSWORD_database: ${{ secrets.SERVERPOD_PASSWORD_DATABASE }}
+          SERVERPOD_PASSWORD_jwtHmacSha512PrivateKey: ${{ secrets.SERVERPOD_PASSWORD_JWT_HMAC_SHA512_PRIVATE_KEY }}
+          SERVERPOD_PASSWORD_jwtRefreshTokenHashPepper: ${{ secrets.SERVERPOD_PASSWORD_JWT_REFRESH_TOKEN_HASH_PEPPER }}
+          SERVERPOD_PASSWORD_otpRateLimitSecret: ${{ secrets.SERVERPOD_PASSWORD_OTP_RATE_LIMIT_SECRET }}
+        run: |
+          set -euo pipefail
+
+          for name in \
+            SERVERPOD_PASSWORD_database \
+            SERVERPOD_PASSWORD_jwtHmacSha512PrivateKey \
+            SERVERPOD_PASSWORD_jwtRefreshTokenHashPepper \
+            SERVERPOD_PASSWORD_otpRateLimitSecret
+          do
+            value="$(printenv "$name" 2>/dev/null || true)"
+
+            if [[ -z "$value" ]]; then
+              echo "::error::Missing required GitHub Actions secret for $name"
+              exit 1
+            fi
+          done
+
+          dart test
