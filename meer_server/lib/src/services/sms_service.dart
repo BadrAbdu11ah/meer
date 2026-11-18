@@ -268,11 +268,25 @@ class SmsService {
       final data = jsonDecode(response.body);
 
       if (data is! Map) {
+        session.log(
+          'Authentica OTP verification returned an unexpected response type.',
+          level: LogLevel.warning,
+        );
         return false;
       }
 
-      // لا نعتبر نجاح HTTP دليلًا على صحة الرمز.
-      return data['verified'] == true;
+      final status = data['status'];
+
+      if (status is! bool) {
+        session.log(
+          'Authentica OTP verification returned an invalid status field. '
+          'statusType=${status.runtimeType}.',
+          level: LogLevel.warning,
+        );
+        return false;
+      }
+
+      return status;
     } on TimeoutException {
       session.log(
         'Authentica OTP verification request timed out.',

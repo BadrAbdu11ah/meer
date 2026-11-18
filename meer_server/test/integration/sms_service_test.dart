@@ -124,7 +124,7 @@ void main() {
 
             return http.Response(
               jsonEncode({
-                'verified': true,
+                'status': true,
                 'message': 'OTP verified successfully',
               }),
               200,
@@ -165,8 +165,8 @@ void main() {
           final client = MockClient((request) async {
             return http.Response(
               jsonEncode({
-                'verified': false,
-                'success': true,
+                'status': false,
+                'message': 'OTP verification failed',
               }),
               200,
             );
