@@ -96,7 +96,9 @@ class SellerEndpoint extends Endpoint {
       throw FormatException('إحداثيات الموقع غير صحيحة.');
     }
 
-    if (!deliveryFee.isFinite || deliveryFee < 0 || deliveryFee > maxDeliveryFee) {
+    if (!deliveryFee.isFinite ||
+        deliveryFee < 0 ||
+        deliveryFee > maxDeliveryFee) {
       throw FormatException(
         'رسوم التوصيل يجب أن تكون بين 0 و${maxDeliveryFee.toStringAsFixed(0)} ريال.',
       );

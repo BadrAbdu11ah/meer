@@ -25,6 +25,10 @@ favorite:
 image:
   - createProductImageUpload:
   - verifyProductImageUpload:
+notification:
+  - registerInstallation:
+  - unregisterInstallation:
+  - sendTestNotificationToMyDevices:
 order:
   - createOrder:
   - getMyCustomerOrders:

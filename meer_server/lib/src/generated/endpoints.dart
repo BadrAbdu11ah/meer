@@ -26,6 +26,7 @@ import '../endpoints/app_auth_endpoint.dart' as _ifrhcmrx;
 import '../endpoints/cart_endpoint.dart' as _i4pgg4av;
 import '../endpoints/favorite_endpoint.dart' as _i5chwg2z;
 import '../endpoints/image_endpoint.dart' as _iu0td00j;
+import '../endpoints/notification_endpoint.dart' as _ihb11yhk;
 import '../endpoints/order_endpoint.dart' as _itwfdqvf;
 import '../endpoints/product_endpoint.dart' as _im5j1753;
 import '../endpoints/seller_endpoint.dart' as _ifhnucmp;
@@ -69,6 +70,12 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'image',
+          null,
+        ),
+      'notification': _ihb11yhk.NotificationEndpoint()
+        ..initialize(
+          server,
+          'notification',
           null,
         ),
       'order': _itwfdqvf.OrderEndpoint()
@@ -498,6 +505,69 @@ class Endpoints extends _is.EndpointDispatch {
                     session,
                     params['filePath'],
                   ),
+        ),
+      },
+    );
+    connectors['notification'] = _is.EndpointConnector(
+      name: 'notification',
+      endpoint: endpoints['notification']!,
+      methodConnectors: {
+        'registerInstallation': _is.MethodConnector(
+          name: 'registerInstallation',
+          params: {
+            'installationId': _is.ParameterDescription(
+              name: 'installationId',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'platform': _is.ParameterDescription(
+              name: 'platform',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['notification'] as _ihb11yhk.NotificationEndpoint)
+                      .registerInstallation(
+                        session,
+                        params['installationId'],
+                        params['platform'],
+                      ),
+        ),
+        'unregisterInstallation': _is.MethodConnector(
+          name: 'unregisterInstallation',
+          params: {
+            'installationId': _is.ParameterDescription(
+              name: 'installationId',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['notification'] as _ihb11yhk.NotificationEndpoint)
+                      .unregisterInstallation(
+                        session,
+                        params['installationId'],
+                      ),
+        ),
+        'sendTestNotificationToMyDevices': _is.MethodConnector(
+          name: 'sendTestNotificationToMyDevices',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['notification'] as _ihb11yhk.NotificationEndpoint)
+                      .sendTestNotificationToMyDevices(session),
         ),
       },
     );

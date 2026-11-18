@@ -314,6 +314,43 @@ class EndpointImage extends _isc.EndpointRef {
 }
 
 /// {@category Endpoint}
+class EndpointNotification extends _isc.EndpointRef {
+  EndpointNotification(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'notification';
+
+  /// تسجيل الجهاز وربطه بالمستخدم الحالي.
+  _ida.Future<void> registerInstallation(
+    String installationId,
+    String platform,
+  ) => caller.callServerEndpoint<void>(
+    'notification',
+    'registerInstallation',
+    {
+      'installationId': installationId,
+      'platform': platform,
+    },
+  );
+
+  /// حذف تسجيل الجهاز من حساب المستخدم الحالي.
+  _ida.Future<void> unregisterInstallation(String installationId) =>
+      caller.callServerEndpoint<void>(
+        'notification',
+        'unregisterInstallation',
+        {'installationId': installationId},
+      );
+
+  /// إرسال إشعار تجريبي إلى أجهزة المستخدم الحالي فقط.
+  _ida.Future<int> sendTestNotificationToMyDevices() =>
+      caller.callServerEndpoint<int>(
+        'notification',
+        'sendTestNotificationToMyDevices',
+        {},
+      );
+}
+
+/// {@category Endpoint}
 class EndpointOrder extends _isc.EndpointRef {
   EndpointOrder(_isc.EndpointCaller caller) : super(caller);
 
@@ -599,6 +636,7 @@ class Client extends _isc.ServerpodClientShared {
     cart = EndpointCart(this);
     favorite = EndpointFavorite(this);
     image = EndpointImage(this);
+    notification = EndpointNotification(this);
     order = EndpointOrder(this);
     product = EndpointProduct(this);
     seller = EndpointSeller(this);
@@ -618,6 +656,8 @@ class Client extends _isc.ServerpodClientShared {
 
   late final EndpointImage image;
 
+  late final EndpointNotification notification;
+
   late final EndpointOrder order;
 
   late final EndpointProduct product;
@@ -636,6 +676,7 @@ class Client extends _isc.ServerpodClientShared {
     'cart': cart,
     'favorite': favorite,
     'image': image,
+    'notification': notification,
     'order': order,
     'product': product,
     'seller': seller,

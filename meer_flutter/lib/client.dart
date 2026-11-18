@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:meer_client/meer_client.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
@@ -28,13 +26,13 @@ Future<void> initializeClient() async {
   client = Client(await serverUrl)
     ..connectivityMonitor = FlutterConnectivityMonitor()
     ..authSessionManager = FlutterAuthSessionManager();
-  unawaited(client.auth.initialize());
 
+  // استعادة جلسة المستخدم المحفوظة والتحقق منها.
   await client.auth.initialize();
 
-  // تفعيل تسجيل الدخول بـ Google مباشرة من حزمة idp
+  // تهيئة تسجيل الدخول بـ Google.
   client.auth.initializeGoogleSignIn(
     serverClientId:
-        '845088443476-sccb74o87mj41oluk6m44ddoti6p9nhu.apps.googleusercontent.com', // مطلوب لـ Android و Web
+        '845088443476-sccb74o87mj41oluk6m44ddoti6p9nhu.apps.googleusercontent.com',
   );
 }

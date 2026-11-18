@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meer_flutter/client.dart';
 import 'package:meer_flutter/core/constant/app_route.dart';
+import 'package:meer_flutter/core/id/injection.dart';
+import 'package:meer_flutter/core/services/notification_registration_service.dart';
 import 'package:meer_flutter/presentation/account/bloc/account_bloc.dart';
 import 'package:meer_flutter/presentation/account/view/account_view.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
@@ -14,11 +16,67 @@ class AccountScreen extends StatefulWidget {
 }
 
 class _AccountScreenState extends State<AccountScreen> {
-  Future<void> signOut() async {
+  Future<void> sendTestNotification() async {
     try {
-      // أولًا: تسجيل الخروج من Serverpod.
+      final sentCount = await client.notification
+          .sendTestNotificationToMyDevices();
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              sentCount > 0
+                  ? 'تم إرسال الإشعار إلى $sentCount جهاز.'
+                  : 'لا توجد أجهزة مسجلة لحسابك.',
+            ),
+          ),
+        );
+    } catch (error, stackTrace) {
+      debugPrint('Test notification failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('فشل إرسال الإشعار التجريبي. راجع سجل الخادم.'),
+          ),
+        );
+    }
+  }
+
+  Future<void> signOut() async {
+    final notificationRegistration = sl<NotificationRegistrationService>();
+
+    // أولًا: حذف ربط الجهاز بحساب المستخدم.
+    try {
+      await notificationRegistration.unregisterCurrentInstallation();
+    } catch (error) {
+      notificationRegistration.resumeAfterSignOutFailure();
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'تعذر إلغاء ربط الإشعارات. تحقق من الاتصال وحاول مجددًا.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    // ثانيًا: تسجيل الخروج من Serverpod.
+    try {
       await client.auth.signOutDevice();
     } catch (error) {
+      notificationRegistration.resumeAfterSignOutFailure();
+
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -31,12 +89,42 @@ class _AccountScreenState extends State<AccountScreen> {
 
     if (!mounted) return;
 
-    // ثالثًا: الانتقال إلى تسجيل الدخول.
     Navigator.pushNamedAndRemoveUntil(
       context,
       AppRoute.loginScreen,
       (route) => false,
     );
+  }
+
+  Future<void> enableNotifications() async {
+    try {
+      final enabled = await sl<NotificationRegistrationService>()
+          .enableNotifications();
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              enabled
+                  ? 'تم تفعيل الإشعارات وربط هذا الجهاز بحسابك.'
+                  : 'لم يتم منح إذن الإشعارات.',
+            ),
+          ),
+        );
+    } catch (error) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+            content: Text('تعذر تفعيل الإشعارات. حاول مرة أخرى.'),
+          ),
+        );
+    }
   }
 
   @override
@@ -71,6 +159,7 @@ class _AccountScreenState extends State<AccountScreen> {
               ),
               body: AccountView(
                 isSeller: profile.isSeller,
+                profile: profile,
 
                 onManageProducts: () {
                   Navigator.pushNamed(
@@ -92,24 +181,27 @@ class _AccountScreenState extends State<AccountScreen> {
                     AppRoute.sellerSetupScreen,
                     arguments: profile,
                   );
+
                   if (!context.mounted) return;
 
-                  // تحديث ملف المستخدم بعد العودة من تعديل بيانات الأسرة.
                   context.read<AccountBloc>().add(
                     const AccountEvent.refreshRequested(),
                   );
                 },
 
                 onSignOut: signOut,
+                onEnableNotifications: enableNotifications,
+
+                onSendTestNotification: sendTestNotification,
 
                 onStartSelling: () async {
                   await Navigator.pushNamed(
                     context,
                     AppRoute.sellerSetupScreen,
                   );
+
                   if (!context.mounted) return;
 
-                  // تحديث ملف المستخدم بعد العودة من إعداد المتجر.
                   context.read<AccountBloc>().add(
                     const AccountEvent.refreshRequested(),
                   );

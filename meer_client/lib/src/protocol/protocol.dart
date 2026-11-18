@@ -38,6 +38,7 @@ import 'model/order_item_request.dart' as _i52izl0k;
 import 'model/phone_auth_result.dart' as _iu539ble;
 import 'model/product.dart' as _igfqb4xa;
 import 'model/seller_public_info.dart' as _iigi60b2;
+import 'model/user_device_installation.dart' as _iavwcg9k;
 export 'greetings/greeting.dart';
 export 'model/MeerUserProfile.dart';
 export 'model/cart_item_record.dart';
@@ -51,6 +52,7 @@ export 'model/order_item_request.dart';
 export 'model/phone_auth_result.dart';
 export 'model/product.dart';
 export 'model/seller_public_info.dart';
+export 'model/user_device_installation.dart';
 export 'client.dart';
 
 class Protocol extends _isc.SerializationManager {
@@ -126,6 +128,9 @@ class Protocol extends _isc.SerializationManager {
     if (t == _iigi60b2.SellerPublicInfo) {
       return _iigi60b2.SellerPublicInfo.fromJson(data) as T;
     }
+    if (t == _iavwcg9k.UserDeviceInstallation) {
+      return _iavwcg9k.UserDeviceInstallation.fromJson(data) as T;
+    }
     if (t == _isc.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
     }
@@ -173,6 +178,12 @@ class Protocol extends _isc.SerializationManager {
     }
     if (t == _isc.getType<_iigi60b2.SellerPublicInfo?>()) {
       return (data != null ? _iigi60b2.SellerPublicInfo.fromJson(data) : null)
+          as T;
+    }
+    if (t == _isc.getType<_iavwcg9k.UserDeviceInstallation?>()) {
+      return (data != null
+              ? _iavwcg9k.UserDeviceInstallation.fromJson(data)
+              : null)
           as T;
     }
     if (t == List<_iae72vfi.OrderItem>) {
@@ -246,6 +257,7 @@ class Protocol extends _isc.SerializationManager {
       _iu539ble.PhoneAuthResult => 'PhoneAuthResult',
       _igfqb4xa.Product => 'Product',
       _iigi60b2.SellerPublicInfo => 'SellerPublicInfo',
+      _iavwcg9k.UserDeviceInstallation => 'UserDeviceInstallation',
       _ => null,
     };
   }
@@ -286,6 +298,8 @@ class Protocol extends _isc.SerializationManager {
         return 'Product';
       case _iigi60b2.SellerPublicInfo():
         return 'SellerPublicInfo';
+      case _iavwcg9k.UserDeviceInstallation():
+        return 'UserDeviceInstallation';
     }
     className = _iaic.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -350,6 +364,9 @@ class Protocol extends _isc.SerializationManager {
     }
     if (dataClassName == 'SellerPublicInfo') {
       return deserialize<_iigi60b2.SellerPublicInfo>(data['data']);
+    }
+    if (dataClassName == 'UserDeviceInstallation') {
+      return deserialize<_iavwcg9k.UserDeviceInstallation>(data['data']);
     }
     if (dataClassName.startsWith('serverpod_auth_idp.')) {
       data['className'] = dataClassName.substring(19);

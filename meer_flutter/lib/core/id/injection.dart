@@ -1,6 +1,8 @@
 import 'package:get_it/get_it.dart';
 // import 'package:meer_flutter/client.dart';
 import 'package:meer_flutter/core/services/app_service.dart';
+import 'package:meer_flutter/core/services/notification_registration_service.dart';
+import 'package:meer_flutter/core/services/notification_service.dart';
 import 'package:meer_flutter/core/services/location_service.dart';
 import 'package:meer_flutter/presentation/account/bloc/account_bloc.dart';
 import 'package:meer_flutter/presentation/auth/login/bloc/login_bloc.dart';
@@ -22,6 +24,7 @@ import 'package:meer_flutter/repository/cart_repository.dart';
 import 'package:meer_flutter/repository/favorites_repository.dart';
 import 'package:meer_flutter/repository/image_repository.dart';
 import 'package:meer_flutter/repository/local/city_local_repository.dart';
+import 'package:meer_flutter/repository/notification_repository.dart';
 import 'package:meer_flutter/repository/order_repository.dart';
 import 'package:meer_flutter/repository/product_repository.dart';
 import 'package:meer_flutter/repository/search_repository.dart';
@@ -32,9 +35,15 @@ final sl = GetIt.instance; // sl تعني Service Locator
 Future<void> initGetIt() async {
   // 1. Services (الأدوات الأساسية)
   sl.registerLazySingleton(() => AppService());
-
+  sl.registerLazySingleton<NotificationService>(
+    () => NotificationService(),
+    dispose: (service) => service.dispose(),
+  );
   // 2. Repositories
   sl.registerLazySingleton(() => AuthRepository());
+  sl.registerLazySingleton(
+    () => NotificationRepository(),
+  );
   sl.registerLazySingleton(
     () => ProductRepository(),
   );
@@ -53,6 +62,16 @@ Future<void> initGetIt() async {
   sl.registerLazySingleton(() => CartRepository());
   sl.registerLazySingleton(
     () => FavoritesRepository(),
+  );
+
+  // // Notification Registration Service
+  sl.registerLazySingleton<NotificationRegistrationService>(
+    () => NotificationRegistrationService(
+      notificationService: sl<NotificationService>(),
+      notificationRepository: sl<NotificationRepository>(),
+      preferences: AppService().sharedPreferences,
+    ),
+    dispose: (service) => service.dispose(),
   );
 
   // 3. Blocs

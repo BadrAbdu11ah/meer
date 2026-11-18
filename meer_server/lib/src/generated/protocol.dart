@@ -41,6 +41,7 @@ import 'model/phone_auth_account.dart' as _iv7s17wm;
 import 'model/phone_auth_result.dart' as _iu539ble;
 import 'model/product.dart' as _igfqb4xa;
 import 'model/seller_public_info.dart' as _iigi60b2;
+import 'model/user_device_installation.dart' as _iavwcg9k;
 export 'greetings/greeting.dart';
 export 'model/MeerUserProfile.dart';
 export 'model/cart_item_record.dart';
@@ -56,6 +57,7 @@ export 'model/phone_auth_account.dart';
 export 'model/phone_auth_result.dart';
 export 'model/product.dart';
 export 'model/seller_public_info.dart';
+export 'model/user_device_installation.dart';
 
 class Protocol extends _is.DatabaseSerializationManager {
   Protocol._();
@@ -858,6 +860,94 @@ class Protocol extends _is.DatabaseSerializationManager {
       ],
       managed: true,
     ),
+    _isp.TableDefinition(
+      name: 'user_device_installation',
+      dartName: 'UserDeviceInstallation',
+      schema: 'public',
+      module: 'meer',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'authUserId',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+        ),
+        _isp.ColumnDefinition(
+          name: 'installationId',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'platform',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+          columnDefault: 'now',
+        ),
+        _isp.ColumnDefinition(
+          name: 'lastSeenAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+          columnDefault: 'now',
+        ),
+      ],
+      foreignKeys: [
+        _isp.ForeignKeyDefinition(
+          constraintName: 'user_device_installation_fk_0',
+          columns: ['authUserId'],
+          referenceTable: 'serverpod_auth_core_user',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _isp.ForeignKeyAction.noAction,
+          onDelete: _isp.ForeignKeyAction.cascade,
+          matchType: null,
+        ),
+      ],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'user_device_installation__installationId__unique_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'installationId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+        _isp.IndexDefinition(
+          indexName: 'user_device_installation_auth_user_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'authUserId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
     ..._iais.Protocol.targetTableDefinitions,
     ..._i1n3uhu0.Protocol.targetTableDefinitions,
     ..._iacs.Protocol.targetTableDefinitions,
@@ -936,6 +1026,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _iigi60b2.SellerPublicInfo) {
       return _iigi60b2.SellerPublicInfo.fromJson(data) as T;
     }
+    if (t == _iavwcg9k.UserDeviceInstallation) {
+      return _iavwcg9k.UserDeviceInstallation.fromJson(data) as T;
+    }
     if (t == _is.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
     }
@@ -990,6 +1083,12 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (t == _is.getType<_iigi60b2.SellerPublicInfo?>()) {
       return (data != null ? _iigi60b2.SellerPublicInfo.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_iavwcg9k.UserDeviceInstallation?>()) {
+      return (data != null
+              ? _iavwcg9k.UserDeviceInstallation.fromJson(data)
+              : null)
           as T;
     }
     if (t == List<_iae72vfi.OrderItem>) {
@@ -1068,6 +1167,7 @@ class Protocol extends _is.DatabaseSerializationManager {
       _iu539ble.PhoneAuthResult => 'PhoneAuthResult',
       _igfqb4xa.Product => 'Product',
       _iigi60b2.SellerPublicInfo => 'SellerPublicInfo',
+      _iavwcg9k.UserDeviceInstallation => 'UserDeviceInstallation',
       _ => null,
     };
   }
@@ -1112,6 +1212,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'Product';
       case _iigi60b2.SellerPublicInfo():
         return 'SellerPublicInfo';
+      case _iavwcg9k.UserDeviceInstallation():
+        return 'UserDeviceInstallation';
     }
     className = _iais.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -1187,6 +1289,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (dataClassName == 'SellerPublicInfo') {
       return deserialize<_iigi60b2.SellerPublicInfo>(data['data']);
     }
+    if (dataClassName == 'UserDeviceInstallation') {
+      return deserialize<_iavwcg9k.UserDeviceInstallation>(data['data']);
+    }
     if (dataClassName.startsWith('serverpod_auth_idp.')) {
       data['className'] = dataClassName.substring(19);
       return _iais.Protocol().deserializeByClassName(data);
@@ -1255,6 +1360,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return _iv7s17wm.PhoneAuthAccount.t;
       case _igfqb4xa.Product:
         return _igfqb4xa.Product.t;
+      case _iavwcg9k.UserDeviceInstallation:
+        return _iavwcg9k.UserDeviceInstallation.t;
     }
     return null;
   }

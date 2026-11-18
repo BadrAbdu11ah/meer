@@ -5,6 +5,8 @@ import 'package:meer_flutter/core/constant/app_route.dart';
 import 'package:meer_flutter/core/id/injection.dart';
 import 'package:meer_flutter/core/routes/app_route_observer.dart';
 import 'package:meer_flutter/core/services/app_service.dart';
+import 'package:meer_flutter/core/services/notification_registration_service.dart';
+import 'package:meer_flutter/core/services/notification_service.dart';
 import 'package:meer_flutter/presentation/cart/bloc/cart_bloc.dart';
 import 'package:meer_flutter/presentation/favorites/bloc/favorites_bloc.dart';
 import 'package:meer_flutter/presentation/search/bloc/search_bloc.dart';
@@ -18,6 +20,10 @@ void main() async {
   await initialService();
   await initializeClient();
   await initGetIt();
+
+  await sl<NotificationService>().initialize();
+
+  await sl<NotificationRegistrationService>().initialize();
 
   runApp(
     MultiBlocProvider(

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "482216965117",
+    "project_id": "meer-b9762",
+    "storage_bucket": "meer-b9762.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:482216965117:android:bf0efa52d769d45dbd1f94",
+        "android_client_info": {
+          "package_name": "com.example.meer_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAn2Dq3noT8YKgx0OHStUmvCH-5KMYHde0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

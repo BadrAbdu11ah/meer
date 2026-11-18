@@ -1,0 +1,14 @@
+class: UserDeviceInstallation
+
+table: user_device_installation
+
+fields:
+  authUserId: UuidValue, relation(parent=serverpod_auth_core_user, onDelete=Cascade)
+  installationId: String, unique
+  platform: String
+  createdAt: DateTime, default=now
+  lastSeenAt: DateTime, default=now
+
+indexes:
+  user_device_installation_auth_user_idx:
+    fields: authUserId

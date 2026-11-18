@@ -28,7 +28,7 @@ Future<void> main(List<String> args) async {
     await pod.start();
     started = true;
 
-    final insertedCount = await pod.withSession((session) async {
+    await pod.withSession((session) async {
       // البحث عن الأسرة التجريبية حتى لا تتكرر.
       var seller = await MeerUserProfile.db.findFirstRow(
         session,
@@ -58,7 +58,7 @@ Future<void> main(List<String> args) async {
           ),
         );
 
-        print('تم إنشاء الأسرة التجريبية.');
+        // print('تم إنشاء الأسرة التجريبية.');
       } else {
         // الأسرة موجودة من تشغيل سابق: نحدّث بياناتها بدل تخطيها.
         seller.isSeller = true;
@@ -72,7 +72,7 @@ Future<void> main(List<String> args) async {
 
         seller = await MeerUserProfile.db.updateRow(session, seller);
 
-        print('تم تحديث بيانات الأسرة التجريبية.');
+        // print('تم تحديث بيانات الأسرة التجريبية.');
       }
 
       final sellerId = seller.id;
@@ -162,7 +162,7 @@ Future<void> main(List<String> args) async {
         );
 
         if (existing != null) {
-          print('تخطي المنتج الموجود: ${demo.name}');
+          // print('تخطي المنتج الموجود: ${demo.name}');
           continue;
         }
 
@@ -180,15 +180,15 @@ Future<void> main(List<String> args) async {
         );
 
         inserted++;
-        print('تمت إضافة المنتج: ${demo.name}');
+        // print('تمت إضافة المنتج: ${demo.name}');
       }
 
       return inserted;
     });
 
-    print('');
-    print('اكتمل Seeder بنجاح.');
-    print('عدد المنتجات الجديدة: $insertedCount');
+    // print('');
+    // print('اكتمل Seeder بنجاح.');
+    // print('عدد المنتجات الجديدة: $insertedCount');
   } catch (error, stackTrace) {
     stderr.writeln('فشل تشغيل Seeder: $error');
     stderr.writeln(stackTrace);
