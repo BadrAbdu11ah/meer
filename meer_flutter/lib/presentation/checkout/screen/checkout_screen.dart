@@ -268,6 +268,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 isPhoneVerified: readyState.isPhoneVerified,
                 isSendingPhoneCode: readyState.isSendingPhoneCode,
                 isPhoneCodeSent: readyState.isPhoneCodeSent,
+                codeSentAt: readyState.codeSentAt,
                 isVerifyingPhone: readyState.isVerifyingPhone,
                 isSubmitting: isSubmitting,
                 onSendPhoneCode: _sendPhoneCode,

@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:meer_server/src/auth/auth_errors.dart';
 import 'package:meer_server/src/auth/phone_otp_idp_config.dart';
 import 'package:meer_server/src/endpoints/app_auth_endpoint.dart';
 import 'package:meer_server/src/generated/protocol.dart';
@@ -10,6 +12,14 @@ import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:test/test.dart';
 
 import 'test_tools/serverpod_test_tools.dart';
+
+/// يتحقق أن الخطأ MeerException قابل للإرسال للعميل وبالرمز المتوقع.
+Matcher throwsMeerException(String code) => throwsA(
+  isA<MeerException>()
+      .having((e) => e, 'serializable', isA<SerializableException>())
+      .having((e) => e.code, 'code', code)
+      .having((e) => e.message.trim(), 'message', isNotEmpty),
+);
 
 void main() {
   withServerpod(
@@ -28,6 +38,41 @@ void main() {
           rateLimitService: rateLimitService,
         );
       });
+
+      /// ينشئ مستخدمًا مصادقًا عليه مع ملف مِيْر، ويعيد جلسته.
+      Future<Session> authenticatedSessionWithProfile({
+        String phone = '',
+      }) async {
+        final session = sessionBuilder.build();
+        final authUser = await const AuthUsers().create(session);
+
+        await MeerUserProfile.db.insertRow(
+          session,
+          MeerUserProfile(
+            authUserId: authUser.id,
+            fullName: 'OTP Test User',
+            phone: phone,
+            role: 'customer',
+            isSeller: false,
+            storeName: null,
+            storeAddress: null,
+            storeCity: null,
+            offersDelivery: false,
+            deliveryFee: 0,
+            createdAt: DateTime.now().toUtc(),
+          ),
+        );
+
+        return sessionBuilder
+            .copyWith(
+              authentication: AuthenticationOverride.authenticationInfo(
+                authUser.id.toString(),
+                {},
+              ),
+            )
+            .build();
+      }
+
       setUpAll(() {
         AuthServices.set(
           tokenManagerBuilders: [
@@ -43,14 +88,33 @@ void main() {
         test(
           'when phone format is invalid then request is rejected',
           () async {
+            for (final phone in ['invalid-phone', '', '   ', '0412345678']) {
+              await expectLater(
+                endpoint.sendOtp(sessionBuilder.build(), phone),
+                throwsMeerException('INVALID_PHONE_FORMAT'),
+                reason: 'phone: "$phone"',
+              );
+            }
+
+            expect(rateLimitService.calls, 0);
+            expect(smsService.sendCalls, 0);
+          },
+        );
+
+        test(
+          'when the SMS provider fails then false is returned instead of an '
+          'invalid phone error',
+          () async {
+            smsService.sendResult = false;
+
             final result = await endpoint.sendOtp(
               sessionBuilder.build(),
-              'invalid-phone',
+              '0501234567',
             );
 
             expect(result, isFalse);
-            expect(rateLimitService.calls, 0);
-            expect(smsService.sendCalls, 0);
+            expect(rateLimitService.calls, 1);
+            expect(smsService.sendCalls, 1);
           },
         );
 
@@ -59,12 +123,14 @@ void main() {
           () async {
             rateLimitService.allowed = false;
 
-            final result = await endpoint.sendOtp(
-              sessionBuilder.build(),
-              '0501234567',
+            await expectLater(
+              endpoint.sendOtp(
+                sessionBuilder.build(),
+                '0501234567',
+              ),
+              throwsMeerException('OTP_RATE_LIMITED'),
             );
 
-            expect(result, isFalse);
             expect(rateLimitService.calls, 1);
             expect(
               rateLimitService.lastPurpose,
@@ -186,7 +252,7 @@ void main() {
                 'invalid-phone',
                 '123456',
               ),
-              throwsA(isA<Exception>()),
+              throwsMeerException('INVALID_PHONE_FORMAT'),
             );
 
             expect(rateLimitService.calls, 0);
@@ -205,7 +271,7 @@ void main() {
                 '0501234567',
                 '123456',
               ),
-              throwsA(isA<Exception>()),
+              throwsMeerException('OTP_RATE_LIMITED'),
             );
 
             expect(rateLimitService.calls, 1);
@@ -228,7 +294,7 @@ void main() {
                 '0501234567',
                 '000000',
               ),
-              throwsA(isA<Exception>()),
+              throwsMeerException('INVALID_PHONE_OTP'),
             );
 
             expect(rateLimitService.calls, 1);
@@ -387,7 +453,7 @@ void main() {
                 '0501234567',
                 '123456',
               ),
-              throwsA(isA<Exception>()),
+              throwsMeerException('OTP_RATE_LIMITED'),
             );
 
             expect(rateLimitService.calls, 1);
@@ -454,11 +520,7 @@ void main() {
                 phone,
                 '123456',
               ),
-              throwsA(
-                predicate(
-                  (error) => error.toString().contains('PHONE_ALREADY_IN_USE'),
-                ),
-              ),
+              throwsMeerException('PHONE_ALREADY_IN_USE'),
             );
 
             // التأكد من بقاء الرقم مرتبطًا بصاحبه الأصلي.
@@ -482,9 +544,264 @@ void main() {
             expect(smsService.verifyCalls, 1);
           },
         );
+
+        test(
+          'when phone format is invalid then linking is rejected',
+          () async {
+            final session = await authenticatedSessionWithProfile();
+
+            await expectLater(
+              endpoint.linkVerifiedPhone(session, 'invalid-phone', '123456'),
+              throwsMeerException('INVALID_PHONE_FORMAT'),
+            );
+
+            expect(rateLimitService.calls, 0);
+            expect(smsService.verifyCalls, 0);
+          },
+        );
+
+        test(
+          'when the code is empty or rejected by Authentica then linking '
+          'fails with an invalid OTP error',
+          () async {
+            final session = await authenticatedSessionWithProfile();
+
+            await expectLater(
+              endpoint.linkVerifiedPhone(session, '0501234567', '  '),
+              throwsMeerException('INVALID_PHONE_OTP'),
+            );
+
+            expect(rateLimitService.calls, 0);
+
+            smsService.verifyResult = false;
+
+            await expectLater(
+              endpoint.linkVerifiedPhone(session, '0501234567', '000000'),
+              throwsMeerException('INVALID_PHONE_OTP'),
+            );
+
+            expect(rateLimitService.calls, 1);
+            expect(smsService.verifyCalls, 1);
+          },
+        );
+
+        test(
+          'when the account already has a different phone then linking is '
+          'rejected',
+          () async {
+            final session = await authenticatedSessionWithProfile(
+              phone: '966500000601',
+            );
+
+            await expectLater(
+              endpoint.linkVerifiedPhone(session, '0500000602', '123456'),
+              throwsMeerException('ACCOUNT_ALREADY_HAS_PHONE'),
+            );
+
+            final account = await PhoneAuthAccount.db.findFirstRow(
+              sessionBuilder.build(),
+              where: (t) => t.phone.equals('966500000602'),
+            );
+
+            expect(account, isNull);
+          },
+        );
+      });
+
+      group('with the real OTP rate limiter', () {
+        late AppAuthEndpoint protectedEndpoint;
+
+        setUp(() {
+          protectedEndpoint = AppAuthEndpoint(
+            smsService: smsService,
+            rateLimitService: OtpRateLimitService(
+              clientIpResolver: (_) => '192.0.2.77',
+            ),
+          );
+        });
+
+        Future<int> countAttempts(String purpose) => OtpAttempt.db.count(
+          sessionBuilder.build(),
+          where: (t) => t.purpose.equals(purpose),
+        );
+
+        test(
+          'when a send is allowed then the attempt is recorded before '
+          'Authentica is called',
+          () async {
+            int? attemptsSeenByProvider;
+
+            smsService.onSend = () async {
+              attemptsSeenByProvider = await countAttempts(
+                OtpRateLimitService.sendPurpose,
+              );
+            };
+
+            final result = await protectedEndpoint.sendOtp(
+              sessionBuilder.build(),
+              '0500000701',
+            );
+
+            expect(result, isTrue);
+            expect(attemptsSeenByProvider, 1);
+          },
+        );
+
+        test(
+          'when a second send follows within 60 seconds then it is rate '
+          'limited and no SMS is sent',
+          () async {
+            await protectedEndpoint.sendOtp(
+              sessionBuilder.build(),
+              '0500000702',
+            );
+
+            await expectLater(
+              protectedEndpoint.sendOtp(sessionBuilder.build(), '0500000702'),
+              throwsMeerException('OTP_RATE_LIMITED'),
+            );
+
+            expect(smsService.sendCalls, 1);
+            expect(await countAttempts(OtpRateLimitService.sendPurpose), 1);
+          },
+        );
+
+        test(
+          'when the SMS provider fails then the attempt still counts against '
+          'the limits',
+          () async {
+            smsService.sendResult = false;
+
+            expect(
+              await protectedEndpoint.sendOtp(
+                sessionBuilder.build(),
+                '0500000703',
+              ),
+              isFalse,
+            );
+
+            await expectLater(
+              protectedEndpoint.sendOtp(sessionBuilder.build(), '0500000703'),
+              throwsMeerException('OTP_RATE_LIMITED'),
+            );
+
+            expect(smsService.sendCalls, 1);
+          },
+        );
+
+        test(
+          'when the phone format is invalid then no attempt is recorded',
+          () async {
+            await expectLater(
+              protectedEndpoint.sendOtp(sessionBuilder.build(), '12345'),
+              throwsMeerException('INVALID_PHONE_FORMAT'),
+            );
+
+            expect(await countAttempts(OtpRateLimitService.sendPurpose), 0);
+          },
+        );
+
+        test(
+          'when verifyOtp and linkVerifiedPhone are mixed then they share '
+          'one verification counter for the phone',
+          () async {
+            const phone = '0500000704';
+
+            smsService.verifyResult = false;
+
+            final linkSession = await authenticatedSessionWithProfile();
+
+            // 5 محاولات مسموحة خلال 10 دقائق، موزعة على المسارين.
+            for (var i = 0; i < 3; i++) {
+              await expectLater(
+                protectedEndpoint.verifyOtp(
+                  sessionBuilder.build(),
+                  phone,
+                  '000000',
+                ),
+                throwsMeerException('INVALID_PHONE_OTP'),
+              );
+            }
+
+            for (var i = 0; i < 2; i++) {
+              await expectLater(
+                protectedEndpoint.linkVerifiedPhone(
+                  linkSession,
+                  phone,
+                  '000000',
+                ),
+                throwsMeerException('INVALID_PHONE_OTP'),
+              );
+            }
+
+            expect(smsService.verifyCalls, 5);
+
+            // المحاولة السادسة مرفوضة من أي مسار، حتى لو كان الرمز صحيحًا.
+            smsService.verifyResult = true;
+
+            await expectLater(
+              protectedEndpoint.linkVerifiedPhone(linkSession, phone, '123456'),
+              throwsMeerException('OTP_RATE_LIMITED'),
+            );
+            await expectLater(
+              protectedEndpoint.verifyOtp(
+                sessionBuilder.build(),
+                phone,
+                '123456',
+              ),
+              throwsMeerException('OTP_RATE_LIMITED'),
+            );
+
+            expect(smsService.verifyCalls, 5);
+            expect(await countAttempts(OtpRateLimitService.verifyPurpose), 5);
+          },
+        );
       });
     },
   );
+
+  group('Given auth errors sent to the client', () {
+    final errors = {
+      'OTP_RATE_LIMITED': AuthErrors.rateLimited(),
+      'INVALID_PHONE_OTP': AuthErrors.invalidOtp(),
+      'INVALID_PHONE_FORMAT': AuthErrors.invalidPhoneFormat(),
+      'PHONE_ALREADY_IN_USE': AuthErrors.phoneAlreadyInUse(),
+      'ACCOUNT_ALREADY_HAS_PHONE': AuthErrors.accountAlreadyHasPhone(),
+    };
+
+    for (final MapEntry(key: code, value: error) in errors.entries) {
+      test(
+        'when $code is serialized for the protocol then it keeps its type, '
+        'code and message',
+        () {
+          final protocol = Protocol();
+
+          expect(error, isA<SerializableException>());
+          expect(error.code, code);
+
+          // نفس الترميز الذي يستخدمه Serverpod في رد الخطأ (HTTP 400).
+          final body = protocol.encodeWithTypeForProtocol(error);
+          final json = jsonDecode(body) as Map<String, dynamic>;
+
+          expect(json['className'], 'MeerException');
+          expect(
+            (json['data'] as Map<String, dynamic>).keys,
+            unorderedEquals(['__className__', 'code', 'message']),
+          );
+
+          final decoded = protocol.decodeWithType(body);
+
+          expect(
+            decoded,
+            isA<MeerException>()
+                .having((e) => e.code, 'code', code)
+                .having((e) => e.message, 'message', error.message),
+          );
+        },
+      );
+    }
+  });
+
   withServerpod(
     'Given concurrent phone linking requests',
     (sessionBuilder, _) {
@@ -664,10 +981,15 @@ class _FakeSmsService extends SmsService {
   String? lastPhone;
   String? lastOtp;
 
+  /// يُستدعى لحظة وصول الطلب إلى مزود الرسائل.
+  Future<void> Function()? onSend;
+
   @override
   Future<bool> sendOtp(Session session, String phone) async {
     sendCalls++;
     lastPhone = phone;
+
+    await onSend?.call();
 
     return sendResult;
   }

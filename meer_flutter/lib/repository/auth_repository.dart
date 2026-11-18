@@ -1,36 +1,90 @@
+import 'package:flutter/foundation.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:meer_client/meer_client.dart';
 import 'package:meer_flutter/client.dart';
 import 'package:meer_flutter/core/class/failure.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 
+/// العملية التي حدث فيها الخطأ، لاختيار الرسالة العامة المناسبة.
+enum AuthAction { googleSignIn, sendOtp, verifyOtp, linkPhone }
+
+/// يحوّل أي خطأ في عمليات المصادقة إلى رسالة عربية آمنة للمستخدم.
+///
+/// - أخطاء الخادم المعروفة ([MeerException]) تُترجم حسب `code` فقط.
+/// - أخطاء الشبكة تظهر كمشكلة اتصال.
+/// - أي شيء آخر (بما فيه رمز غير معروف) يظهر كرسالة عامة، ولا يُعرض نص
+///   الاستثناء أو رسالة الخادم للمستخدم أبدًا.
+@visibleForTesting
+Failure mapAuthError(Object error, AuthAction action) {
+  if (error is MeerException) {
+    final known = switch (error.code) {
+      'OTP_RATE_LIMITED' => const AuthFailure(
+        'محاولات كثيرة. يرجى الانتظار قليلًا ثم المحاولة مرة أخرى.',
+      ),
+      'INVALID_PHONE_OTP' => const AuthFailure(
+        'رمز التحقق غير صحيح أو انتهت صلاحيته.',
+      ),
+      'INVALID_PHONE_FORMAT' => const AuthFailure(
+        'صيغة رقم الهاتف غير صحيحة.',
+      ),
+      'PHONE_ALREADY_IN_USE' => const AuthFailure(
+        'رقم الهاتف مرتبط بحساب آخر.',
+      ),
+      'ACCOUNT_ALREADY_HAS_PHONE' => const AuthFailure(
+        'هذا الحساب مرتبط برقم هاتف آخر، ولا يمكن تغييره من هنا.',
+      ),
+      _ => null,
+    };
+
+    if (known != null) return known;
+  }
+
+  if (error is ServerpodClientNetworkException) {
+    return const OfflineFailure(
+      'تعذر الاتصال بالخادم. تحقق من اتصالك بالإنترنت ثم حاول مرة أخرى.',
+    );
+  }
+
+  return ServerFailure(switch (action) {
+    AuthAction.googleSignIn => 'تعذر تسجيل الدخول. حاول مرة أخرى.',
+    AuthAction.sendOtp => smsSendFailedMessage,
+    AuthAction.verifyOtp => 'تعذر إتمام تسجيل الدخول. حاول مرة أخرى.',
+    AuthAction.linkPhone => 'تعذر توثيق رقم الهاتف. حاول مرة أخرى.',
+  });
+}
+
+/// الخادم قبِل الطلب لكن مزود الرسائل لم يؤكد الإرسال. الرقم نفسه سليم،
+/// فلا نطلب من المستخدم التأكد من رقمه.
+@visibleForTesting
+const smsSendFailedMessage =
+    'تعذر إرسال رمز التحقق حاليًا. يرجى المحاولة بعد قليل.';
+
 class AuthRepository {
   /// تسجيل الدخول بحساب جوجل وإرجاع ملف تعريف المستخدم (UserProfileModel)
   Future<Either<Failure, MeerUserProfile>> signInWithGoogle() async {
+    GoogleAuthController? googleController;
+
     try {
-      final googleController = GoogleAuthController(
+      final controller = googleController = GoogleAuthController(
         client: client,
       );
 
-      // تنفيذ عملية تسجيل الدخول
-      await googleController.signIn();
+      await controller.signIn();
 
-      // التحقق مما إذا تم تسجيل الدخول بنجاح
-      if (googleController.isAuthenticated || client.auth.isAuthenticated) {
-        // // جلب أو إنشاء سجل المستخدم المخصص عبر السيرفر
-        final appUser = await client.appAuth
-            .syncGoogleUser(); // // أو الـ Endpoint الذي وضعت فيه الدالة
+      if (controller.isAuthenticated || client.auth.isAuthenticated) {
+        final appUser = await client.appAuth.syncGoogleUser();
 
-        return Right(appUser); // // إرجاع كائن User الموحد بنجاح
+        return Right(appUser);
       }
 
-      return Left(
-        AuthFailure(
-          googleController.errorMessage ?? 'فشل تسجيل الدخول أو تم إلغاؤه',
-        ),
+      // لا نعرض controller.errorMessage لأنه نص الاستثناء الخام.
+      return const Left(
+        AuthFailure('فشل تسجيل الدخول أو تم إلغاؤه'),
       );
     } catch (e) {
-      return Left(ServerFailure('حدث خطأ في الاتصال: ${e.toString()}'));
+      return Left(mapAuthError(e, AuthAction.googleSignIn));
+    } finally {
+      googleController?.dispose();
     }
   }
 
@@ -38,15 +92,17 @@ class AuthRepository {
   Future<Either<Failure, bool>> sendOtp({required String phone}) async {
     try {
       // // استدعاء نقطة الاتصال الخاصة بإرسال الكود
-      bool isSent = await client.appAuth.sendOtp(phone);
+      final isSent = await client.appAuth.sendOtp(phone);
 
       if (isSent) {
         return const Right(true);
-      } else {
-        return Left(AuthFailure('فشل إرسال رمز التحقق، تأكد من صحة الرقم'));
       }
+
+      // الرقم غير الصالح وتجاوز الحدود يصلان كـ MeerException، فالقيمة false
+      // تعني فشل مزود الرسائل فقط.
+      return const Left(ServerFailure(smsSendFailedMessage));
     } catch (e) {
-      return Left(ServerFailure('حدث خطأ في الاتصال: ${e.toString()}'));
+      return Left(mapAuthError(e, AuthAction.sendOtp));
     }
   }
 
@@ -62,35 +118,7 @@ class AuthRepository {
 
       return Right(profile);
     } catch (e) {
-      final errorMessage = e.toString().toLowerCase();
-
-      if (errorMessage.contains('invalid_phone_otp')) {
-        return Left(
-          AuthFailure('رمز التحقق غير صحيح أو انتهت صلاحيته.'),
-        );
-      }
-
-      if (errorMessage.contains('invalid_phone_format')) {
-        return Left(
-          AuthFailure('صيغة رقم الهاتف غير صحيحة.'),
-        );
-      }
-
-      if (errorMessage.contains('phone_already_in_use')) {
-        return Left(
-          AuthFailure('رقم الهاتف مرتبط بحساب آخر.'),
-        );
-      }
-
-      if (errorMessage.contains('هذا الحساب مرتبط')) {
-        return Left(
-          AuthFailure('لا يمكن تغيير رقم الهاتف المرتبط بهذا الحساب.'),
-        );
-      }
-
-      return Left(
-        ServerFailure('تعذر توثيق رقم الهاتف. حاول مرة أخرى.'),
-      );
+      return Left(mapAuthError(e, AuthAction.linkPhone));
     }
   }
 
@@ -121,23 +149,7 @@ class AuthRepository {
 
       return Right(appUser);
     } catch (e) {
-      final errorMessage = e.toString().toLowerCase();
-
-      if (errorMessage.contains('invalid_phone_otp')) {
-        return Left(
-          AuthFailure('رمز التحقق غير صحيح أو انتهت صلاحيته'),
-        );
-      }
-
-      if (errorMessage.contains('invalid_phone_format')) {
-        return Left(
-          AuthFailure('صيغة رقم الهاتف غير صحيحة'),
-        );
-      }
-
-      return Left(
-        ServerFailure('تعذر إتمام تسجيل الدخول: ${e.toString()}'),
-      );
+      return Left(mapAuthError(e, AuthAction.verifyOtp));
     }
   }
 }

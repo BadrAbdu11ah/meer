@@ -1,3 +1,4 @@
+import 'package:meer_server/src/auth/auth_errors.dart';
 import 'package:meer_server/src/auth/phone_auth_account_lock.dart';
 import 'package:meer_server/src/auth/phone_otp_idp.dart';
 import 'package:meer_server/src/generated/protocol.dart';
@@ -37,12 +38,11 @@ class AppAuthEndpoint extends Endpoint {
 
   @unauthenticatedClientCall
   Future<bool> sendOtp(Session session, String phone) async {
-    if (phone.trim().isEmpty) return false;
-
     final formattedPhone = _smsService.formatPhone(phone);
 
+    // خطأ واضح بدل false، حتى تبقى false خاصة بفشل مزود الرسائل.
     if (!_isValidSaudiPhone(formattedPhone)) {
-      return false;
+      throw AuthErrors.invalidPhoneFormat();
     }
 
     // فحص حدود إرسال OTP
@@ -52,12 +52,14 @@ class AppAuthEndpoint extends Endpoint {
       purpose: OtpRateLimitService.sendPurpose,
     );
 
-    // رفض الطلب إذا تجاوز الحدود المسموحة
+    // رفض الطلب إذا تجاوز الحدود المسموحة. نرمي خطأً واضحًا بدل false
+    // حتى لا يظن المستخدم أن رقمه خاطئ.
     if (!allowed) {
-      return false;
+      throw AuthErrors.rateLimited();
     }
 
-    // إرسال OTP بعد اجتياز فحص الحماية
+    // إرسال OTP بعد اجتياز فحص الحماية. القيمة false تعني أن مزود الرسائل
+    // لم يؤكد الإرسال (والتفاصيل في سجلات الخادم فقط).
     return _smsService.sendOtp(session, formattedPhone);
   }
 
@@ -76,11 +78,11 @@ class AppAuthEndpoint extends Endpoint {
     final formattedPhone = _smsService.formatPhone(phone);
 
     if (!_isValidSaudiPhone(formattedPhone)) {
-      throw FormatException('صيغة رقم الهاتف غير صحيحة.');
+      throw AuthErrors.invalidPhoneFormat();
     }
 
     if (code.trim().isEmpty) {
-      throw FormatException('رمز التحقق مطلوب.');
+      throw AuthErrors.invalidOtp();
     }
 
     // فحص حدود محاولات التحقق.
@@ -91,7 +93,7 @@ class AppAuthEndpoint extends Endpoint {
     );
 
     if (!allowed) {
-      throw Exception('OTP_RATE_LIMITED');
+      throw AuthErrors.rateLimited();
     }
 
     // التحقق من الرمز عبر Authentica.
@@ -102,7 +104,7 @@ class AppAuthEndpoint extends Endpoint {
     );
 
     if (!isValid) {
-      throw Exception('INVALID_PHONE_OTP');
+      throw AuthErrors.invalidOtp();
     }
 
     return session.db.transaction(
@@ -137,9 +139,7 @@ class AppAuthEndpoint extends Endpoint {
             return profile;
           }
 
-          throw Exception(
-            'هذا الحساب مرتبط برقم هاتف بالفعل.',
-          );
+          throw AuthErrors.accountAlreadyHasPhone();
         }
 
         // التأكد من أن الرقم غير مرتبط بحساب آخر.
@@ -151,15 +151,13 @@ class AppAuthEndpoint extends Endpoint {
 
         if (existingAccount != null &&
             existingAccount.authUserId != authUserId) {
-          throw Exception('PHONE_ALREADY_IN_USE');
+          throw AuthErrors.phoneAlreadyInUse();
         }
 
         // إذا كان الحساب مرتبطًا بالفعل بالرقم نفسه.
         if (profile.phone.trim().isNotEmpty) {
           if (profile.phone.trim() != formattedPhone) {
-            throw Exception(
-              'هذا الحساب مرتبط برقم هاتف بالفعل.',
-            );
+            throw AuthErrors.accountAlreadyHasPhone();
           }
 
           // إصلاح سجل الربط إذا كان مفقودًا.
@@ -212,13 +210,13 @@ class AppAuthEndpoint extends Endpoint {
     String code,
   ) async {
     if (phone.trim().isEmpty || code.trim().isEmpty) {
-      throw Exception('INVALID_PHONE_OTP');
+      throw AuthErrors.invalidOtp();
     }
 
     final formattedPhone = _smsService.formatPhone(phone);
 
     if (!_isValidSaudiPhone(formattedPhone)) {
-      throw Exception('INVALID_PHONE_FORMAT');
+      throw AuthErrors.invalidPhoneFormat();
     }
 
     // فحص حدود محاولات التحقق.
@@ -229,7 +227,7 @@ class AppAuthEndpoint extends Endpoint {
     );
 
     if (!allowed) {
-      throw Exception('OTP_RATE_LIMITED');
+      throw AuthErrors.rateLimited();
     }
 
     // التحقق من الرمز عبر Authentica.
@@ -240,7 +238,7 @@ class AppAuthEndpoint extends Endpoint {
     );
 
     if (!isValid) {
-      throw Exception('INVALID_PHONE_OTP');
+      throw AuthErrors.invalidOtp();
     }
 
     // إصدار جلسة المصادقة الحديثة بعد التحقق الناجح.

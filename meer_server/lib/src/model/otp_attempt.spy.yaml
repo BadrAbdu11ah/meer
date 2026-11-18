@@ -14,3 +14,9 @@ indexes:
 
   otp_attempt_ip_purpose_created_idx:
     fields: ipHash, purpose, createdAt
+
+  otp_attempt_purpose_created_idx:
+    fields: purpose, createdAt
+
+  otp_attempt_created_idx:
+    fields: createdAt

@@ -16,8 +16,10 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
     this._orderRepository,
     this._sellerRepository,
     this._locationService,
-    this._authRepository,
-  ) : super(const CheckoutState.initial()) {
+    this._authRepository, {
+    DateTime Function()? now,
+  }) : _now = now ?? DateTime.now,
+       super(const CheckoutState.initial()) {
     on<CheckoutStarted>(_onStarted);
     on<CheckoutLocationRequested>(_onLocationRequested);
     on<CheckoutFulfillmentMethodChanged>(
@@ -35,6 +37,7 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
   final SellerRepository _sellerRepository;
   final LocationService _locationService;
   final AuthRepository _authRepository;
+  final DateTime Function() _now;
 
   bool _isVerifiedSaudiPhone(String phone) {
     return RegExp(r'^9665\d{8}$').hasMatch(phone.trim());
@@ -213,6 +216,7 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
 
     result.fold(
       (failure) {
+        // الإرسال الفاشل لا يغيّر codeSentAt، فلا تبدأ المهلة ولا تُعاد.
         emit(
           latest.copyWith(
             isSendingPhoneCode: false,
@@ -225,6 +229,7 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
           latest.copyWith(
             isSendingPhoneCode: false,
             isPhoneCodeSent: true,
+            codeSentAt: _now().toUtc(),
             errorMessage: null,
           ),
         );
@@ -274,6 +279,7 @@ class CheckoutBloc extends Bloc<CheckoutEvent, CheckoutState> {
             phone: profile.phone,
             isPhoneVerified: _isVerifiedSaudiPhone(profile.phone),
             isPhoneCodeSent: false,
+            codeSentAt: null,
             isVerifyingPhone: false,
             errorMessage: null,
           ),

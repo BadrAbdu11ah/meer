@@ -26,6 +26,7 @@ class CheckoutView extends StatelessWidget {
     required this.isPhoneVerified,
     required this.isSendingPhoneCode,
     required this.isPhoneCodeSent,
+    required this.codeSentAt,
     required this.isVerifyingPhone,
     required this.isSubmitting,
     required this.onSendPhoneCode,
@@ -56,6 +57,7 @@ class CheckoutView extends StatelessWidget {
   final bool isPhoneVerified;
   final bool isSendingPhoneCode;
   final bool isPhoneCodeSent;
+  final DateTime? codeSentAt;
   final bool isVerifyingPhone;
   final bool isSubmitting;
 
@@ -133,6 +135,7 @@ class CheckoutView extends StatelessWidget {
               isPhoneVerified: isPhoneVerified,
               isSendingPhoneCode: isSendingPhoneCode,
               isPhoneCodeSent: isPhoneCodeSent,
+              codeSentAt: codeSentAt,
               isVerifyingPhone: isVerifyingPhone,
               isSubmitting: isSubmitting,
               onSendPhoneCode: onSendPhoneCode,

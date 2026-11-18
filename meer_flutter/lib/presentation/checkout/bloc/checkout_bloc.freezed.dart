@@ -763,12 +763,12 @@ return failure(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  locating,TResult Function( String? address,  double? latitude,  double? longitude,  bool sellerOffersDelivery,  double sellerDeliveryFee,  String fulfillmentMethod,  String phone,  bool isPhoneVerified,  bool isSendingPhoneCode,  bool isPhoneCodeSent,  bool isVerifyingPhone,  String? errorMessage)?  ready,TResult Function()?  submitting,TResult Function( OrderInfo order)?  success,TResult Function( String message)?  failure,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  locating,TResult Function( String? address,  double? latitude,  double? longitude,  bool sellerOffersDelivery,  double sellerDeliveryFee,  String fulfillmentMethod,  String phone,  bool isPhoneVerified,  bool isSendingPhoneCode,  bool isPhoneCodeSent,  DateTime? codeSentAt,  bool isVerifyingPhone,  String? errorMessage)?  ready,TResult Function()?  submitting,TResult Function( OrderInfo order)?  success,TResult Function( String message)?  failure,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case CheckoutInitial() when initial != null:
 return initial();case CheckoutLocating() when locating != null:
 return locating();case CheckoutReady() when ready != null:
-return ready(_that.address,_that.latitude,_that.longitude,_that.sellerOffersDelivery,_that.sellerDeliveryFee,_that.fulfillmentMethod,_that.phone,_that.isPhoneVerified,_that.isSendingPhoneCode,_that.isPhoneCodeSent,_that.isVerifyingPhone,_that.errorMessage);case CheckoutSubmitting() when submitting != null:
+return ready(_that.address,_that.latitude,_that.longitude,_that.sellerOffersDelivery,_that.sellerDeliveryFee,_that.fulfillmentMethod,_that.phone,_that.isPhoneVerified,_that.isSendingPhoneCode,_that.isPhoneCodeSent,_that.codeSentAt,_that.isVerifyingPhone,_that.errorMessage);case CheckoutSubmitting() when submitting != null:
 return submitting();case CheckoutSuccess() when success != null:
 return success(_that.order);case CheckoutFailure() when failure != null:
 return failure(_that.message);case _:
@@ -789,12 +789,12 @@ return failure(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  locating,required TResult Function( String? address,  double? latitude,  double? longitude,  bool sellerOffersDelivery,  double sellerDeliveryFee,  String fulfillmentMethod,  String phone,  bool isPhoneVerified,  bool isSendingPhoneCode,  bool isPhoneCodeSent,  bool isVerifyingPhone,  String? errorMessage)  ready,required TResult Function()  submitting,required TResult Function( OrderInfo order)  success,required TResult Function( String message)  failure,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  locating,required TResult Function( String? address,  double? latitude,  double? longitude,  bool sellerOffersDelivery,  double sellerDeliveryFee,  String fulfillmentMethod,  String phone,  bool isPhoneVerified,  bool isSendingPhoneCode,  bool isPhoneCodeSent,  DateTime? codeSentAt,  bool isVerifyingPhone,  String? errorMessage)  ready,required TResult Function()  submitting,required TResult Function( OrderInfo order)  success,required TResult Function( String message)  failure,}) {final _that = this;
 switch (_that) {
 case CheckoutInitial():
 return initial();case CheckoutLocating():
 return locating();case CheckoutReady():
-return ready(_that.address,_that.latitude,_that.longitude,_that.sellerOffersDelivery,_that.sellerDeliveryFee,_that.fulfillmentMethod,_that.phone,_that.isPhoneVerified,_that.isSendingPhoneCode,_that.isPhoneCodeSent,_that.isVerifyingPhone,_that.errorMessage);case CheckoutSubmitting():
+return ready(_that.address,_that.latitude,_that.longitude,_that.sellerOffersDelivery,_that.sellerDeliveryFee,_that.fulfillmentMethod,_that.phone,_that.isPhoneVerified,_that.isSendingPhoneCode,_that.isPhoneCodeSent,_that.codeSentAt,_that.isVerifyingPhone,_that.errorMessage);case CheckoutSubmitting():
 return submitting();case CheckoutSuccess():
 return success(_that.order);case CheckoutFailure():
 return failure(_that.message);}
@@ -811,12 +811,12 @@ return failure(_that.message);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  locating,TResult? Function( String? address,  double? latitude,  double? longitude,  bool sellerOffersDelivery,  double sellerDeliveryFee,  String fulfillmentMethod,  String phone,  bool isPhoneVerified,  bool isSendingPhoneCode,  bool isPhoneCodeSent,  bool isVerifyingPhone,  String? errorMessage)?  ready,TResult? Function()?  submitting,TResult? Function( OrderInfo order)?  success,TResult? Function( String message)?  failure,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  locating,TResult? Function( String? address,  double? latitude,  double? longitude,  bool sellerOffersDelivery,  double sellerDeliveryFee,  String fulfillmentMethod,  String phone,  bool isPhoneVerified,  bool isSendingPhoneCode,  bool isPhoneCodeSent,  DateTime? codeSentAt,  bool isVerifyingPhone,  String? errorMessage)?  ready,TResult? Function()?  submitting,TResult? Function( OrderInfo order)?  success,TResult? Function( String message)?  failure,}) {final _that = this;
 switch (_that) {
 case CheckoutInitial() when initial != null:
 return initial();case CheckoutLocating() when locating != null:
 return locating();case CheckoutReady() when ready != null:
-return ready(_that.address,_that.latitude,_that.longitude,_that.sellerOffersDelivery,_that.sellerDeliveryFee,_that.fulfillmentMethod,_that.phone,_that.isPhoneVerified,_that.isSendingPhoneCode,_that.isPhoneCodeSent,_that.isVerifyingPhone,_that.errorMessage);case CheckoutSubmitting() when submitting != null:
+return ready(_that.address,_that.latitude,_that.longitude,_that.sellerOffersDelivery,_that.sellerDeliveryFee,_that.fulfillmentMethod,_that.phone,_that.isPhoneVerified,_that.isSendingPhoneCode,_that.isPhoneCodeSent,_that.codeSentAt,_that.isVerifyingPhone,_that.errorMessage);case CheckoutSubmitting() when submitting != null:
 return submitting();case CheckoutSuccess() when success != null:
 return success(_that.order);case CheckoutFailure() when failure != null:
 return failure(_that.message);case _:
@@ -895,7 +895,7 @@ String toString() {
 
 
 class CheckoutReady implements CheckoutState {
-  const CheckoutReady({this.address, this.latitude, this.longitude, this.sellerOffersDelivery = false, this.sellerDeliveryFee = 0, this.fulfillmentMethod = 'pickup', this.phone = '', this.isPhoneVerified = false, this.isSendingPhoneCode = false, this.isPhoneCodeSent = false, this.isVerifyingPhone = false, this.errorMessage});
+  const CheckoutReady({this.address, this.latitude, this.longitude, this.sellerOffersDelivery = false, this.sellerDeliveryFee = 0, this.fulfillmentMethod = 'pickup', this.phone = '', this.isPhoneVerified = false, this.isSendingPhoneCode = false, this.isPhoneCodeSent = false, this.codeSentAt, this.isVerifyingPhone = false, this.errorMessage});
   
 
  final  String? address;
@@ -911,6 +911,9 @@ class CheckoutReady implements CheckoutState {
 @JsonKey() final  bool isPhoneVerified;
 @JsonKey() final  bool isSendingPhoneCode;
 @JsonKey() final  bool isPhoneCodeSent;
+// وقت آخر إرسال ناجح للرمز (UTC). يتغير مع كل إرسال ناجح حتى يعيد
+// الزر بدء مهلة إعادة الإرسال. للعرض فقط، والحدود الفعلية في الخادم.
+ final  DateTime? codeSentAt;
 @JsonKey() final  bool isVerifyingPhone;
  final  String? errorMessage;
 
@@ -924,16 +927,16 @@ $CheckoutReadyCopyWith<CheckoutReady> get copyWith => _$CheckoutReadyCopyWithImp
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CheckoutReady&&(identical(other.address, address) || other.address == address)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.sellerOffersDelivery, sellerOffersDelivery) || other.sellerOffersDelivery == sellerOffersDelivery)&&(identical(other.sellerDeliveryFee, sellerDeliveryFee) || other.sellerDeliveryFee == sellerDeliveryFee)&&(identical(other.fulfillmentMethod, fulfillmentMethod) || other.fulfillmentMethod == fulfillmentMethod)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.isPhoneVerified, isPhoneVerified) || other.isPhoneVerified == isPhoneVerified)&&(identical(other.isSendingPhoneCode, isSendingPhoneCode) || other.isSendingPhoneCode == isSendingPhoneCode)&&(identical(other.isPhoneCodeSent, isPhoneCodeSent) || other.isPhoneCodeSent == isPhoneCodeSent)&&(identical(other.isVerifyingPhone, isVerifyingPhone) || other.isVerifyingPhone == isVerifyingPhone)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CheckoutReady&&(identical(other.address, address) || other.address == address)&&(identical(other.latitude, latitude) || other.latitude == latitude)&&(identical(other.longitude, longitude) || other.longitude == longitude)&&(identical(other.sellerOffersDelivery, sellerOffersDelivery) || other.sellerOffersDelivery == sellerOffersDelivery)&&(identical(other.sellerDeliveryFee, sellerDeliveryFee) || other.sellerDeliveryFee == sellerDeliveryFee)&&(identical(other.fulfillmentMethod, fulfillmentMethod) || other.fulfillmentMethod == fulfillmentMethod)&&(identical(other.phone, phone) || other.phone == phone)&&(identical(other.isPhoneVerified, isPhoneVerified) || other.isPhoneVerified == isPhoneVerified)&&(identical(other.isSendingPhoneCode, isSendingPhoneCode) || other.isSendingPhoneCode == isSendingPhoneCode)&&(identical(other.isPhoneCodeSent, isPhoneCodeSent) || other.isPhoneCodeSent == isPhoneCodeSent)&&(identical(other.codeSentAt, codeSentAt) || other.codeSentAt == codeSentAt)&&(identical(other.isVerifyingPhone, isVerifyingPhone) || other.isVerifyingPhone == isVerifyingPhone)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,address,latitude,longitude,sellerOffersDelivery,sellerDeliveryFee,fulfillmentMethod,phone,isPhoneVerified,isSendingPhoneCode,isPhoneCodeSent,isVerifyingPhone,errorMessage);
+int get hashCode => Object.hash(runtimeType,address,latitude,longitude,sellerOffersDelivery,sellerDeliveryFee,fulfillmentMethod,phone,isPhoneVerified,isSendingPhoneCode,isPhoneCodeSent,codeSentAt,isVerifyingPhone,errorMessage);
 
 @override
 String toString() {
-  return 'CheckoutState.ready(address: $address, latitude: $latitude, longitude: $longitude, sellerOffersDelivery: $sellerOffersDelivery, sellerDeliveryFee: $sellerDeliveryFee, fulfillmentMethod: $fulfillmentMethod, phone: $phone, isPhoneVerified: $isPhoneVerified, isSendingPhoneCode: $isSendingPhoneCode, isPhoneCodeSent: $isPhoneCodeSent, isVerifyingPhone: $isVerifyingPhone, errorMessage: $errorMessage)';
+  return 'CheckoutState.ready(address: $address, latitude: $latitude, longitude: $longitude, sellerOffersDelivery: $sellerOffersDelivery, sellerDeliveryFee: $sellerDeliveryFee, fulfillmentMethod: $fulfillmentMethod, phone: $phone, isPhoneVerified: $isPhoneVerified, isSendingPhoneCode: $isSendingPhoneCode, isPhoneCodeSent: $isPhoneCodeSent, codeSentAt: $codeSentAt, isVerifyingPhone: $isVerifyingPhone, errorMessage: $errorMessage)';
 }
 
 
@@ -944,7 +947,7 @@ abstract mixin class $CheckoutReadyCopyWith<$Res> implements $CheckoutStateCopyW
   factory $CheckoutReadyCopyWith(CheckoutReady value, $Res Function(CheckoutReady) _then) = _$CheckoutReadyCopyWithImpl;
 @useResult
 $Res call({
- String? address, double? latitude, double? longitude, bool sellerOffersDelivery, double sellerDeliveryFee, String fulfillmentMethod, String phone, bool isPhoneVerified, bool isSendingPhoneCode, bool isPhoneCodeSent, bool isVerifyingPhone, String? errorMessage
+ String? address, double? latitude, double? longitude, bool sellerOffersDelivery, double sellerDeliveryFee, String fulfillmentMethod, String phone, bool isPhoneVerified, bool isSendingPhoneCode, bool isPhoneCodeSent, DateTime? codeSentAt, bool isVerifyingPhone, String? errorMessage
 });
 
 
@@ -961,7 +964,7 @@ class _$CheckoutReadyCopyWithImpl<$Res>
 
 /// Create a copy of CheckoutState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? address = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? sellerOffersDelivery = null,Object? sellerDeliveryFee = null,Object? fulfillmentMethod = null,Object? phone = null,Object? isPhoneVerified = null,Object? isSendingPhoneCode = null,Object? isPhoneCodeSent = null,Object? isVerifyingPhone = null,Object? errorMessage = freezed,}) {
+@pragma('vm:prefer-inline') $Res call({Object? address = freezed,Object? latitude = freezed,Object? longitude = freezed,Object? sellerOffersDelivery = null,Object? sellerDeliveryFee = null,Object? fulfillmentMethod = null,Object? phone = null,Object? isPhoneVerified = null,Object? isSendingPhoneCode = null,Object? isPhoneCodeSent = null,Object? codeSentAt = freezed,Object? isVerifyingPhone = null,Object? errorMessage = freezed,}) {
   return _then(CheckoutReady(
 address: freezed == address ? _self.address : address // ignore: cast_nullable_to_non_nullable
 as String?,latitude: freezed == latitude ? _self.latitude : latitude // ignore: cast_nullable_to_non_nullable
@@ -973,7 +976,8 @@ as String,phone: null == phone ? _self.phone : phone // ignore: cast_nullable_to
 as String,isPhoneVerified: null == isPhoneVerified ? _self.isPhoneVerified : isPhoneVerified // ignore: cast_nullable_to_non_nullable
 as bool,isSendingPhoneCode: null == isSendingPhoneCode ? _self.isSendingPhoneCode : isSendingPhoneCode // ignore: cast_nullable_to_non_nullable
 as bool,isPhoneCodeSent: null == isPhoneCodeSent ? _self.isPhoneCodeSent : isPhoneCodeSent // ignore: cast_nullable_to_non_nullable
-as bool,isVerifyingPhone: null == isVerifyingPhone ? _self.isVerifyingPhone : isVerifyingPhone // ignore: cast_nullable_to_non_nullable
+as bool,codeSentAt: freezed == codeSentAt ? _self.codeSentAt : codeSentAt // ignore: cast_nullable_to_non_nullable
+as DateTime?,isVerifyingPhone: null == isVerifyingPhone ? _self.isVerifyingPhone : isVerifyingPhone // ignore: cast_nullable_to_non_nullable
 as bool,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,
   ));

@@ -23,6 +23,10 @@ sealed class CheckoutState with _$CheckoutState {
     @Default(false) bool isPhoneVerified,
     @Default(false) bool isSendingPhoneCode,
     @Default(false) bool isPhoneCodeSent,
+
+    // وقت آخر إرسال ناجح للرمز (UTC). يتغير مع كل إرسال ناجح حتى يعيد
+    // الزر بدء مهلة إعادة الإرسال. للعرض فقط، والحدود الفعلية في الخادم.
+    DateTime? codeSentAt,
     @Default(false) bool isVerifyingPhone,
 
     String? errorMessage,
