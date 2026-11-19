@@ -6,6 +6,7 @@ import 'package:serverpod_auth_idp_server/providers/google.dart';
 import 'package:serverpod_cloud_storage/serverpod_cloud_storage.dart';
 
 import 'src/cache_busting.dart';
+import 'src/future_calls/notification_outbox_future_call.dart';
 import 'src/generated/serverpod.dart';
 import 'src/web/routes/app_config_route.dart';
 import 'src/auth/phone_otp_idp_config.dart';
@@ -100,4 +101,46 @@ void run(List<String> args) async {
 
   // Start the server.
   await pod.start();
+
+  await _scheduleNotificationOutboxDispatch(pod);
+}
+
+/// Schedules the recurring call that delivers the notification outbox.
+///
+/// Recurring calls are stored in the database and survive restarts, so the
+/// stored one is replaced instead of adding one more on every start. The
+/// advisory lock makes instances that start together do this one at a time.
+/// An instance that is running the call at that very moment can still leave a
+/// second chain behind: it only causes extra dispatcher runs, which claim
+/// records safely, and the next start removes it.
+Future<void> _scheduleNotificationOutboxDispatch(Serverpod pod) async {
+  // Future calls can only be scheduled once the server has started, and only
+  // when they are enabled in the config.
+  if (!pod.config.futureCall.enabled) return;
+
+  final session = await pod.createSession();
+
+  try {
+    await session.db.transaction((transaction) async {
+      await session.db.unsafeExecute(
+        "SELECT pg_advisory_xact_lock(hashtext('"
+        "${NotificationOutboxFutureCall.recurringIdentifier}'))",
+        transaction: transaction,
+      );
+
+      await pod.futureCalls.cancel(
+        NotificationOutboxFutureCall.recurringIdentifier,
+      );
+
+      await pod.futureCalls
+          .callRecurring(
+            identifier: NotificationOutboxFutureCall.recurringIdentifier,
+          )
+          .every(NotificationOutboxFutureCall.interval)
+          .notificationOutbox
+          .dispatch();
+    });
+  } finally {
+    await session.close();
+  }
 }

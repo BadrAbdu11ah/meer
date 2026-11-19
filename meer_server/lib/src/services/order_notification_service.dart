@@ -1,19 +1,22 @@
-import 'dart:developer' as developer;
-
 import 'package:meer_server/src/generated/protocol.dart';
-import 'package:meer_server/src/services/fcm_service.dart';
 import 'package:serverpod/serverpod.dart';
 
+/// Creates [NotificationOutbox] records for order events.
+///
+/// Nothing is sent from here. Every method runs inside the caller's order
+/// [Transaction], so the order change and its outbox records are committed or
+/// rolled back together. Delivery happens later in
+/// `NotificationOutboxDispatcher`.
 class OrderNotificationService {
-  static final FcmService _fcmService = FcmService();
-
   /// إشعار البائع عند وصول طلب جديد.
-  Future<void> notifyNewOrderToSeller(
+  Future<void> enqueueNewOrderForSeller(
     Session session,
-    OrderInfo order,
-  ) async {
-    await _notifyProfile(
+    OrderInfo order, {
+    required Transaction transaction,
+  }) async {
+    await _enqueueForProfile(
       session: session,
+      transaction: transaction,
       recipientProfileId: order.sellerId,
       actorProfileId: order.customerId,
       order: order,
@@ -24,12 +27,14 @@ class OrderNotificationService {
   }
 
   /// إشعار العميل عند قبول الطلب.
-  Future<void> notifyOrderAcceptedToCustomer(
+  Future<void> enqueueOrderAcceptedForCustomer(
     Session session,
-    OrderInfo order,
-  ) async {
-    await _notifyProfile(
+    OrderInfo order, {
+    required Transaction transaction,
+  }) async {
+    await _enqueueForProfile(
       session: session,
+      transaction: transaction,
       recipientProfileId: order.customerId,
       actorProfileId: order.sellerId,
       order: order,
@@ -40,12 +45,14 @@ class OrderNotificationService {
   }
 
   /// إشعار العميل عند رفض الطلب.
-  Future<void> notifyOrderRejectedToCustomer(
+  Future<void> enqueueOrderRejectedForCustomer(
     Session session,
-    OrderInfo order,
-  ) async {
-    await _notifyProfile(
+    OrderInfo order, {
+    required Transaction transaction,
+  }) async {
+    await _enqueueForProfile(
       session: session,
+      transaction: transaction,
       recipientProfileId: order.customerId,
       actorProfileId: order.sellerId,
       order: order,
@@ -56,12 +63,14 @@ class OrderNotificationService {
   }
 
   /// إشعار العميل عند جاهزية الطلب.
-  Future<void> notifyOrderReadyToCustomer(
+  Future<void> enqueueOrderReadyForCustomer(
     Session session,
-    OrderInfo order,
-  ) async {
-    await _notifyProfile(
+    OrderInfo order, {
+    required Transaction transaction,
+  }) async {
+    await _enqueueForProfile(
       session: session,
+      transaction: transaction,
       recipientProfileId: order.customerId,
       actorProfileId: order.sellerId,
       order: order,
@@ -78,12 +87,14 @@ class OrderNotificationService {
   }
 
   /// إشعار البائع عند إلغاء العميل للطلب.
-  Future<void> notifyOrderCancelledToSeller(
+  Future<void> enqueueOrderCancelledForSeller(
     Session session,
-    OrderInfo order,
-  ) async {
-    await _notifyProfile(
+    OrderInfo order, {
+    required Transaction transaction,
+  }) async {
+    await _enqueueForProfile(
       session: session,
+      transaction: transaction,
       recipientProfileId: order.sellerId,
       actorProfileId: order.customerId,
       order: order,
@@ -93,9 +104,22 @@ class OrderNotificationService {
     );
   }
 
-  /// إرسال إشعار إلى جميع أجهزة المستلم.
-  Future<void> _notifyProfile({
+  /// The key that makes an event unique per order and device installation.
+  static String dedupeKey({
+    required int orderId,
+    required String event,
+    required String installationId,
+  }) {
+    return '$orderId:$event:$installationId';
+  }
+
+  /// إضافة سجل Outbox لكل جهاز مسجل للمستلم.
+  ///
+  /// Database errors are not caught: they abort [transaction], and the order
+  /// change is rolled back with it.
+  Future<void> _enqueueForProfile({
     required Session session,
+    required Transaction transaction,
     required int recipientProfileId,
     required int actorProfileId,
     required OrderInfo order,
@@ -103,94 +127,98 @@ class OrderNotificationService {
     required String Function(String actorName) bodyBuilder,
     required String event,
   }) async {
-    try {
-      final orderId = order.id;
+    final orderId = order.id;
 
-      if (orderId == null) {
-        developer.log(
-          'Cannot notify: order ID is missing.',
-          name: 'meer.notifications',
-        );
-        return;
-      }
-
-      // 1. جلب ملف المستلم.
-      final recipient = await MeerUserProfile.db.findById(
-        session,
-        recipientProfileId,
+    if (orderId == null) {
+      session.log(
+        'Cannot enqueue $event notification: order ID is missing.',
+        level: LogLevel.warning,
       );
-
-      final authUserId = recipient?.authUserId;
-
-      if (recipient == null || authUserId == null) {
-        developer.log(
-          'Recipient profile or authentication link not found.',
-          name: 'meer.notifications',
-        );
-        return;
-      }
-
-      // 2. جلب اسم الطرف الذي قام بالعملية.
-      final actor = await MeerUserProfile.db.findById(
-        session,
-        actorProfileId,
-      );
-
-      final actorName = actor?.fullName.trim();
-
-      final displayName = actorName == null || actorName.isEmpty
-          ? 'أحد مستخدمي مِيْر'
-          : actorName;
-
-      // 3. جلب جميع أجهزة المستلم.
-      final installations = await UserDeviceInstallation.db.find(
-        session,
-        where: (t) => t.authUserId.equals(authUserId),
-      );
-
-      if (installations.isEmpty) {
-        developer.log(
-          'No registered devices for profile $recipientProfileId.',
-          name: 'meer.notifications',
-        );
-        return;
-      }
-
-      // 4. تهيئة FCM.
-      await _fcmService.initialize();
-
-      // 5. إرسال الإشعار لجميع الأجهزة.
-      for (final installation in installations) {
-        try {
-          await _fcmService.sendToInstallation(
-            installationId: installation.installationId,
-            title: title,
-            body: bodyBuilder(displayName),
-            data: {
-              'type': 'order',
-              'event': event,
-              'orderId': orderId.toString(),
-              'actorName': displayName,
-            },
-          );
-        } catch (error, stackTrace) {
-          developer.log(
-            'Failed to send $event notification '
-            'for order $orderId to installation ${installation.id}.',
-            name: 'meer.notifications',
-            error: error,
-            stackTrace: stackTrace,
-          );
-        }
-      }
-    } catch (error, stackTrace) {
-      // فشل الإشعار لا يؤثر على عملية الطلب.
-      developer.log(
-        'Order notification service failed for order ${order.id}.',
-        name: 'meer.notifications',
-        error: error,
-        stackTrace: stackTrace,
-      );
+      return;
     }
+
+    // 1. جلب ملف المستلم.
+    final recipient = await MeerUserProfile.db.findById(
+      session,
+      recipientProfileId,
+      transaction: transaction,
+    );
+
+    final authUserId = recipient?.authUserId;
+
+    if (recipient == null || authUserId == null) {
+      session.log(
+        'Cannot enqueue $event notification for order $orderId: '
+        'recipient profile or authentication link not found.',
+        level: LogLevel.warning,
+      );
+      return;
+    }
+
+    // 2. جلب اسم الطرف الذي قام بالعملية.
+    final actor = await MeerUserProfile.db.findById(
+      session,
+      actorProfileId,
+      transaction: transaction,
+    );
+
+    final actorName = actor?.fullName.trim();
+
+    final displayName = actorName == null || actorName.isEmpty
+        ? 'أحد مستخدمي مِيْر'
+        : actorName;
+
+    // 3. جلب جميع أجهزة المستلم.
+    final installations = await UserDeviceInstallation.db.find(
+      session,
+      where: (t) => t.authUserId.equals(authUserId),
+      transaction: transaction,
+    );
+
+    if (installations.isEmpty) {
+      session.log(
+        'No registered devices for profile $recipientProfileId; '
+        'no $event notification enqueued for order $orderId.',
+      );
+      return;
+    }
+
+    // 4. سجل واحد لكل جهاز حتى تعاد المحاولة للجهاز الفاشل فقط.
+    final body = bodyBuilder(displayName);
+    final now = DateTime.now().toUtc();
+
+    final records = [
+      for (final installation in installations)
+        NotificationOutbox(
+          recipientProfileId: recipientProfileId,
+          installationId: installation.installationId,
+          orderId: orderId,
+          event: event,
+          title: title,
+          body: body,
+          data: {
+            'type': 'order',
+            'event': event,
+            'orderId': orderId.toString(),
+            'actorName': displayName,
+          },
+          nextAttemptAt: now,
+          createdAt: now,
+          dedupeKey: dedupeKey(
+            orderId: orderId,
+            event: event,
+            installationId: installation.installationId,
+          ),
+        ),
+    ];
+
+    // A repeated enqueue of the same event hits the unique dedupe key and is
+    // skipped (ON CONFLICT DO NOTHING) instead of failing the transaction.
+    await NotificationOutbox.db.insert(
+      session,
+      records,
+      transaction: transaction,
+      ignoreConflicts: true,
+    );
   }
 }

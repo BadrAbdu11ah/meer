@@ -13,6 +13,7 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _ida;
 import 'dart:io' as _idi;
+import 'package:meer_server/src/generated/future_calls.dart' as _iw1qqaq2;
 import 'package:meer_server/src/generated/greetings/greeting.dart' as _ih6ywnp4;
 import 'package:meer_server/src/generated/model/cart_item_record.dart'
     as _igx9tmzj;
@@ -166,6 +167,8 @@ void withServerpod(
 }
 
 class TestEndpoints {
+  late final futureCalls = _FutureCalls();
+
   late final _GoogleIdpEndpoint googleIdp;
 
   late final _JwtRefreshEndpoint jwtRefresh;
@@ -241,6 +244,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
   }
+}
+
+class _FutureCalls {
+  late final notificationOutbox = _NotificationOutboxFutureCall();
 }
 
 class _GoogleIdpEndpoint {
@@ -1809,5 +1816,20 @@ class _GreetingEndpoint {
         await _localUniqueSession.close();
       }
     });
+  }
+}
+
+class _NotificationOutboxFutureCall {
+  Future<void> dispatch(_ist.TestSessionBuilder sessionBuilder) async {
+    var _localUniqueSession =
+        (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild();
+    try {
+      await _iw1qqaq2.NotificationOutboxDispatchFutureCall().invoke(
+        _localUniqueSession,
+        null,
+      );
+    } finally {
+      await _localUniqueSession.close();
+    }
   }
 }

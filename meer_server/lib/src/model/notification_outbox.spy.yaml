@@ -1,0 +1,28 @@
+class: NotificationOutbox
+table: notification_outbox
+serverOnly: true
+
+fields:
+  recipientProfileId: int
+  installationId: String
+  orderId: int
+  event: String
+  title: String
+  body: String
+  data: Map<String, String>
+  status: String, default='pending'
+  attemptCount: int, default=0
+  nextAttemptAt: DateTime, default=now
+  lockedAt: DateTime?
+  lastError: String?
+  createdAt: DateTime, default=now
+  sentAt: DateTime?
+  dedupeKey: String
+
+indexes:
+  notification_outbox_dedupe_key_idx:
+    fields: dedupeKey
+    unique: true
+
+  notification_outbox_status_next_attempt_idx:
+    fields: status, nextAttemptAt

@@ -33,6 +33,7 @@ import 'model/image_upload_description.dart' as _ir1pddjn;
 import 'model/meer_city.dart' as _idc5ggrx;
 import 'model/meer_exception.dart' as _ixmkl8ss;
 import 'model/MeerUserProfile.dart' as _ii0ycxhg;
+import 'model/notification_outbox.dart' as _icptlhmq;
 import 'model/order_info.dart' as _ig93noqx;
 import 'model/order_item.dart' as _iae72vfi;
 import 'model/order_item_request.dart' as _i52izl0k;
@@ -49,6 +50,7 @@ export 'model/favorite_product.dart';
 export 'model/image_upload_description.dart';
 export 'model/meer_city.dart';
 export 'model/meer_exception.dart';
+export 'model/notification_outbox.dart';
 export 'model/order_info.dart';
 export 'model/order_item.dart';
 export 'model/order_item_request.dart';
@@ -224,6 +226,149 @@ class Protocol extends _is.DatabaseSerializationManager {
           ],
           type: 'btree',
           isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _isp.TableDefinition(
+      name: 'notification_outbox',
+      dartName: 'NotificationOutbox',
+      schema: 'public',
+      module: 'meer',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'serial',
+        ),
+        _isp.ColumnDefinition(
+          name: 'recipientProfileId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'installationId',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'orderId',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _isp.ColumnDefinition(
+          name: 'event',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'title',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'body',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'data',
+          columnType: _isp.ColumnType.json,
+          isNullable: false,
+          dartType: 'Map<String,String>',
+        ),
+        _isp.ColumnDefinition(
+          name: 'status',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+          columnDefault: '\'pending\'',
+        ),
+        _isp.ColumnDefinition(
+          name: 'attemptCount',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+          columnDefault: '0',
+        ),
+        _isp.ColumnDefinition(
+          name: 'nextAttemptAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+          columnDefault: 'now',
+        ),
+        _isp.ColumnDefinition(
+          name: 'lockedAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: true,
+          dartType: 'DateTime?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'lastError',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+          columnDefault: 'now',
+        ),
+        _isp.ColumnDefinition(
+          name: 'sentAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: true,
+          dartType: 'DateTime?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'dedupeKey',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'notification_outbox_dedupe_key_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'dedupeKey',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+        _isp.IndexDefinition(
+          indexName: 'notification_outbox_status_next_attempt_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'status',
+            ),
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'nextAttemptAt',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
           isPrimary: false,
         ),
       ],
@@ -1002,6 +1147,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _ixmkl8ss.MeerException) {
       return _ixmkl8ss.MeerException.fromJson(data) as T;
     }
+    if (t == _icptlhmq.NotificationOutbox) {
+      return _icptlhmq.NotificationOutbox.fromJson(data) as T;
+    }
     if (t == _ig93noqx.OrderInfo) {
       return _ig93noqx.OrderInfo.fromJson(data) as T;
     }
@@ -1057,6 +1205,10 @@ class Protocol extends _is.DatabaseSerializationManager {
       return (data != null ? _ixmkl8ss.MeerException.fromJson(data) : null)
           as T;
     }
+    if (t == _is.getType<_icptlhmq.NotificationOutbox?>()) {
+      return (data != null ? _icptlhmq.NotificationOutbox.fromJson(data) : null)
+          as T;
+    }
     if (t == _is.getType<_ig93noqx.OrderInfo?>()) {
       return (data != null ? _ig93noqx.OrderInfo.fromJson(data) : null) as T;
     }
@@ -1089,6 +1241,12 @@ class Protocol extends _is.DatabaseSerializationManager {
       return (data != null
               ? _iavwcg9k.UserDeviceInstallation.fromJson(data)
               : null)
+          as T;
+    }
+    if (t == Map<String, String>) {
+      return (data as Map).map(
+            (k, v) => MapEntry(deserialize<String>(k), deserialize<String>(v)),
+          )
           as T;
     }
     if (t == List<_iae72vfi.OrderItem>) {
@@ -1159,6 +1317,7 @@ class Protocol extends _is.DatabaseSerializationManager {
       _ir1pddjn.ImageUploadDescription => 'ImageUploadDescription',
       _idc5ggrx.MeerCity => 'MeerCity',
       _ixmkl8ss.MeerException => 'MeerException',
+      _icptlhmq.NotificationOutbox => 'NotificationOutbox',
       _ig93noqx.OrderInfo => 'OrderInfo',
       _iae72vfi.OrderItem => 'OrderItem',
       _i52izl0k.OrderItemRequest => 'OrderItemRequest',
@@ -1196,6 +1355,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'MeerCity';
       case _ixmkl8ss.MeerException():
         return 'MeerException';
+      case _icptlhmq.NotificationOutbox():
+        return 'NotificationOutbox';
       case _ig93noqx.OrderInfo():
         return 'OrderInfo';
       case _iae72vfi.OrderItem():
@@ -1264,6 +1425,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (dataClassName == 'MeerException') {
       return deserialize<_ixmkl8ss.MeerException>(data['data']);
+    }
+    if (dataClassName == 'NotificationOutbox') {
+      return deserialize<_icptlhmq.NotificationOutbox>(data['data']);
     }
     if (dataClassName == 'OrderInfo') {
       return deserialize<_ig93noqx.OrderInfo>(data['data']);
@@ -1350,6 +1514,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return _ivirwujx.CartItemRecord.t;
       case _i8l2y79r.FavoriteProduct:
         return _i8l2y79r.FavoriteProduct.t;
+      case _icptlhmq.NotificationOutbox:
+        return _icptlhmq.NotificationOutbox.t;
       case _ig93noqx.OrderInfo:
         return _ig93noqx.OrderInfo.t;
       case _iae72vfi.OrderItem:

@@ -307,15 +307,18 @@ class OrderEndpoint extends Endpoint {
           );
         }
 
+        // سجل إشعار البائع يُحفظ مع الطلب في نفس الـ Transaction.
+        await OrderNotificationService().enqueueNewOrderForSeller(
+          session,
+          createdOrder,
+          transaction: transaction,
+        );
+
         return createdOrder;
       },
       settings: TransactionSettings(
         isolationLevel: IsolationLevel.serializable,
       ),
-    );
-    await OrderNotificationService().notifyNewOrderToSeller(
-      session,
-      createdOrder,
     );
 
     return createdOrder;
@@ -386,6 +389,13 @@ class OrderEndpoint extends Endpoint {
           transaction: transaction,
         );
 
+        // سجل إشعار البائع يُحفظ مع الإلغاء في نفس الـ Transaction.
+        await OrderNotificationService().enqueueOrderCancelledForSeller(
+          session,
+          order,
+          transaction: transaction,
+        );
+
         return order;
       },
       settings: TransactionSettings(
@@ -393,17 +403,7 @@ class OrderEndpoint extends Endpoint {
       ),
     );
 
-    if (cancelledOrder == null) {
-      return false;
-    }
-
-    // إرسال الإشعار بعد نجاح الـ Transaction.
-    await OrderNotificationService().notifyOrderCancelledToSeller(
-      session,
-      cancelledOrder,
-    );
-
-    return true;
+    return cancelledOrder != null;
   }
 
   // --------------------------------------------------
@@ -571,6 +571,14 @@ class OrderEndpoint extends Endpoint {
           transaction: transaction,
         );
 
+        // سجل إشعار العميل يُحفظ مع تغيير الحالة في نفس الـ Transaction.
+        await _enqueueStatusNotification(
+          session,
+          order,
+          newStatus: newStatus,
+          transaction: transaction,
+        );
+
         return order;
       },
       settings: TransactionSettings(
@@ -578,30 +586,36 @@ class OrderEndpoint extends Endpoint {
       ),
     );
 
-    if (updatedOrder == null) {
-      return false;
-    }
+    return updatedOrder != null;
+  }
 
-    // إرسال الإشعار بعد نجاح حفظ تغيير الحالة.
+  /// الحالة `completed` لا يصاحبها إشعار.
+  Future<void> _enqueueStatusNotification(
+    Session session,
+    OrderInfo order, {
+    required String newStatus,
+    required Transaction transaction,
+  }) async {
     final notificationService = OrderNotificationService();
 
     if (newStatus == 'preparing') {
-      await notificationService.notifyOrderAcceptedToCustomer(
+      await notificationService.enqueueOrderAcceptedForCustomer(
         session,
-        updatedOrder,
+        order,
+        transaction: transaction,
       );
     } else if (newStatus == 'cancelled') {
-      await notificationService.notifyOrderRejectedToCustomer(
+      await notificationService.enqueueOrderRejectedForCustomer(
         session,
-        updatedOrder,
+        order,
+        transaction: transaction,
       );
     } else if (newStatus == 'ready') {
-      await notificationService.notifyOrderReadyToCustomer(
+      await notificationService.enqueueOrderReadyForCustomer(
         session,
-        updatedOrder,
+        order,
+        transaction: transaction,
       );
     }
-
-    return true;
   }
 }
