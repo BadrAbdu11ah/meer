@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meer_client/meer_client.dart';
+import 'package:meer_flutter/core/constant/app_route.dart';
+import 'package:meer_flutter/core/routes/order_details_route_arguments.dart';
 import 'package:meer_flutter/presentation/customer_orders/view/widgets/customer_order_card.dart';
 import 'package:meer_flutter/presentation/customer_orders/view/widgets/customer_order_empty.dart';
 
@@ -7,14 +9,10 @@ class CustomerOrdersView extends StatelessWidget {
   const CustomerOrdersView({
     super.key,
     required this.orders,
-    required this.cancellingOrderIds,
-    required this.onCancel,
     this.targetOrderId,
   });
 
-  final List<OrderInfo> orders;
-  final Set<int> cancellingOrderIds;
-  final ValueChanged<int> onCancel;
+  final List<OrderPresentation> orders;
   final int? targetOrderId;
 
   @override
@@ -23,11 +21,10 @@ class CustomerOrdersView extends StatelessWidget {
       return CustomerOrderEmpty();
     }
 
-    // تقديم الطلب المستهدف دون تغيير بيانات القائمة الأصلية.
     final targetIndex = targetOrderId == null
         ? -1
         : orders.indexWhere(
-            (order) => order.id == targetOrderId,
+            (presentation) => presentation.order.id == targetOrderId,
           );
 
     final displayOrders = targetIndex > 0
@@ -43,18 +40,23 @@ class CustomerOrdersView extends StatelessWidget {
       itemCount: displayOrders.length,
       separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
-        final order = displayOrders[index];
-        final orderId = order.id;
+        final presentation = displayOrders[index];
+        final orderId = presentation.order.id;
 
         return CustomerOrderCard(
           key: ValueKey('customer-order-$orderId'),
-          order: order,
-          isCancelling: orderId != null && cancellingOrderIds.contains(orderId),
+          presentation: presentation,
           isHighlighted: targetOrderId != null && orderId == targetOrderId,
-          onCancel: () {
-            if (orderId != null) {
-              onCancel(orderId);
-            }
+          onTap: () {
+            if (orderId == null) return;
+
+            Navigator.of(context).pushNamed(
+              AppRoute.orderDetailsScreen,
+              arguments: OrderDetailsRouteArguments(
+                orderId: orderId,
+                isSellerView: false,
+              ),
+            );
           },
         );
       },

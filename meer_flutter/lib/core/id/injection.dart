@@ -14,6 +14,7 @@ import 'package:meer_flutter/presentation/customer_orders/bloc/customer_orders_b
 import 'package:meer_flutter/presentation/favorites/bloc/favorites_bloc.dart';
 import 'package:meer_flutter/presentation/home/bloc/home_bloc.dart';
 import 'package:meer_flutter/presentation/main/bloc/main_bloc.dart';
+import 'package:meer_flutter/presentation/order_details/bloc/order_details_bloc.dart';
 import 'package:meer_flutter/presentation/product_form/bloc/product_form_bloc.dart';
 import 'package:meer_flutter/presentation/search/bloc/search_bloc.dart';
 import 'package:meer_flutter/presentation/seller_details/bloc/seller_details_bloc.dart';
@@ -160,6 +161,13 @@ Future<void> initGetIt() async {
   // // 12. Seller Orders BloC
   sl.registerFactory(
     () => SellerOrdersBloc(
+      sl<OrderRepository>(),
+    ),
+  );
+
+  // // Order Details Bloc
+  sl.registerFactory(
+    () => OrderDetailsBloc(
       sl<OrderRepository>(),
     ),
   );

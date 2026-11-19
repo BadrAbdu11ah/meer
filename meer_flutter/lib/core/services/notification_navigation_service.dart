@@ -6,6 +6,7 @@ import 'package:meer_flutter/client.dart';
 import 'package:meer_flutter/core/constant/app_route.dart';
 import 'package:meer_flutter/core/routes/app_navigator.dart';
 import 'package:meer_flutter/core/routes/main_screen_route_arguments.dart';
+import 'package:meer_flutter/core/routes/order_details_route_arguments.dart';
 import 'package:meer_flutter/core/services/notification_service.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 
@@ -118,19 +119,34 @@ class NotificationNavigationService {
     }
 
     // إشعارات العميل تفتح MainScreen على تبويب طلباتي.
+    _openCustomerOrder(orderId);
+  }
+
+  /// فتح تفاصيل طلب العميل مع إبقاء قائمة طلباتي خلفها.
+  void _openCustomerOrder(int orderId) {
     _navigateTo(
       AppRoute.mainScreen,
-      arguments: MainScreenRouteArguments(
+      arguments: const MainScreenRouteArguments(
         initialPage: 2,
-        initialOrderId: orderId,
       ),
       clearStack: true,
     );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_disposed) return;
+
+      _navigateTo(
+        AppRoute.orderDetailsScreen,
+        arguments: OrderDetailsRouteArguments(
+          orderId: orderId,
+          isSellerView: false,
+        ),
+      );
+    });
   }
 
-  /// فتح طلب البائع مع جعل Account هي الصفحة السابقة دائمًا.
+  /// فتح تفاصيل طلب البائع مع إبقاء قائمة الطلبات الواردة خلفها.
   void _openSellerOrder(int orderId) {
-    // إنشاء MainScreen جديدة وجعل الحساب هو التبويب الأساسي.
     _navigateTo(
       AppRoute.mainScreen,
       arguments: const MainScreenRouteArguments(
@@ -139,14 +155,24 @@ class NotificationNavigationService {
       clearStack: true,
     );
 
-    // بعد إنشاء الصفحة الأساسية، نفتح الطلبات الواردة فوقها.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_disposed) return;
 
-      _navigateTo(
-        AppRoute.sellerOrdersScreen,
-        arguments: orderId,
-      );
+      // فتح قائمة الطلبات الواردة أولاً.
+      _navigateTo(AppRoute.sellerOrdersScreen);
+
+      // بعد إنشاء شاشة القائمة، افتح تفاصيل الطلب فوقها.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_disposed) return;
+
+        _navigateTo(
+          AppRoute.orderDetailsScreen,
+          arguments: OrderDetailsRouteArguments(
+            orderId: orderId,
+            isSellerView: true,
+          ),
+        );
+      });
     });
   }
 

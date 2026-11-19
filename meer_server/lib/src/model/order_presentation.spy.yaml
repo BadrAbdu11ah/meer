@@ -1,0 +1,5 @@
+class: OrderPresentation
+fields:
+  order: OrderInfo
+  counterpartyName: String
+  isSellerView: bool

@@ -6,9 +6,9 @@ import 'package:meer_flutter/core/class/failure.dart';
 class FavoritesRepository {
   // 1.
   /// جلب مفضلة المستخدم الحالي.
-  Future<Either<Failure, List<Product>>> getMyFavorites() async {
+  Future<Either<Failure, List<ProductPresentation>>> getMyFavorites() async {
     try {
-      final products = await _fetchFavorites();
+      final products = await client.favorite.getMyFavorites();
       return Right(products);
     } catch (e) {
       return Left(
@@ -19,7 +19,7 @@ class FavoritesRepository {
 
   // 2.
   /// إضافة منتج إلى المفضلة.
-  Future<Either<Failure, List<Product>>> addFavorite(
+  Future<Either<Failure, List<ProductPresentation>>> addFavorite(
     Product product,
   ) async {
     if (product.id == null) {
@@ -39,7 +39,7 @@ class FavoritesRepository {
         );
       }
 
-      final products = await _fetchFavorites();
+      final products = await client.favorite.getMyFavorites();
       return Right(products);
     } catch (e) {
       return Left(
@@ -50,7 +50,7 @@ class FavoritesRepository {
 
   // 3.
   /// إزالة منتج من المفضلة.
-  Future<Either<Failure, List<Product>>> removeFavorite(
+  Future<Either<Failure, List<ProductPresentation>>> removeFavorite(
     int productId,
   ) async {
     try {
@@ -64,7 +64,7 @@ class FavoritesRepository {
         );
       }
 
-      final products = await _fetchFavorites();
+      final products = await client.favorite.getMyFavorites();
       return Right(products);
     } catch (e) {
       return Left(
@@ -75,37 +75,16 @@ class FavoritesRepository {
 
   // 4.
   /// إفراغ المفضلة.
-  Future<Either<Failure, List<Product>>> clearFavorites() async {
+  Future<Either<Failure, List<ProductPresentation>>> clearFavorites() async {
     try {
       await client.favorite.clearMyFavorites();
 
-      final products = await _fetchFavorites();
+      final products = await client.favorite.getMyFavorites();
       return Right(products);
     } catch (e) {
       return Left(
         ServerFailure('تعذر إفراغ المفضلة: ${e.toString()}'),
       );
     }
-  }
-
-  /// جلب السجلات وتحويلها إلى Product.
-  Future<List<Product>> _fetchFavorites() async {
-    final records = await client.favorite.getMyFavorites();
-
-    final products = <Product>[];
-
-    for (final record in records) {
-      final product = record.product;
-
-      if (product == null || product.id == null) {
-        throw StateError(
-          'تعذر تحميل بيانات أحد المنتجات المفضلة.',
-        );
-      }
-
-      products.add(product);
-    }
-
-    return products;
   }
 }

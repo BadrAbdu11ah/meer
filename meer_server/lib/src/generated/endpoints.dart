@@ -659,6 +659,31 @@ class Endpoints extends _is.EndpointDispatch {
               ) async => (endpoints['order'] as _itwfdqvf.OrderEndpoint)
                   .getMySellerOrders(session),
         ),
+        'getMyOrderDetails': _is.MethodConnector(
+          name: 'getMyOrderDetails',
+          params: {
+            'orderId': _is.ParameterDescription(
+              name: 'orderId',
+              type: _is.getType<int>(),
+              nullable: false,
+            ),
+            'isSellerView': _is.ParameterDescription(
+              name: 'isSellerView',
+              type: _is.getType<bool>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['order'] as _itwfdqvf.OrderEndpoint)
+                  .getMyOrderDetails(
+                    session,
+                    params['orderId'],
+                    params['isSellerView'],
+                  ),
+        ),
         'acceptMyOrder': _is.MethodConnector(
           name: 'acceptMyOrder',
           params: {

@@ -10,14 +10,14 @@ class SearchRepository {
   SearchRepository(this._cityRepository);
 
   /// البحث عن المنتجات المتاحة في المدينة المختارة.
-  Future<Either<Failure, List<Product>>> searchResults(
+  /// البحث عن المنتجات المتاحة في المدينة المختارة.
+  Future<Either<Failure, List<ProductPresentation>>> searchResults(
     String search,
   ) async {
     final query = search.trim();
 
-    // لا نرسل طلبًا إلى الخادم إذا كان البحث فارغًا.
     if (query.isEmpty) {
-      return Right(<Product>[]);
+      return Right(<ProductPresentation>[]);
     }
 
     try {

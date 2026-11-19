@@ -4,12 +4,14 @@ import 'package:meer_flutter/presentation/cart/models/cart_item.dart';
 class CartItemCard extends StatelessWidget {
   const CartItemCard({
     super.key,
+    required this.isLoading,
     required this.item,
     required this.onIncrease,
     required this.onDecrease,
     required this.onRemove,
   });
 
+  final bool isLoading;
   final CartItem item;
   final VoidCallback onIncrease;
   final VoidCallback onDecrease;
@@ -18,7 +20,8 @@ class CartItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final product = item.product;
-    final colors = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -50,8 +53,15 @@ class CartItemCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    '${product.price.toStringAsFixed(2)} ر.س',
-                    style: TextStyle(
+                    'سعر الوحدة: ${product.price.toStringAsFixed(2)} ر.س',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colors.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'الإجمالي: ${(product.price * item.quantity).toStringAsFixed(2)} ر.س',
+                    style: theme.textTheme.titleSmall?.copyWith(
                       color: colors.primary,
                       fontWeight: FontWeight.bold,
                     ),
@@ -61,7 +71,7 @@ class CartItemCard extends StatelessWidget {
                     children: [
                       _QuantityButton(
                         icon: Icons.remove,
-                        onPressed: onDecrease,
+                        onPressed: isLoading ? null : onDecrease,
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -72,7 +82,7 @@ class CartItemCard extends StatelessWidget {
                       ),
                       _QuantityButton(
                         icon: Icons.add,
-                        onPressed: onIncrease,
+                        onPressed: isLoading ? null : onIncrease,
                       ),
                       const Spacer(),
                       IconButton(
@@ -116,7 +126,7 @@ class _QuantityButton extends StatelessWidget {
   });
 
   final IconData icon;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {

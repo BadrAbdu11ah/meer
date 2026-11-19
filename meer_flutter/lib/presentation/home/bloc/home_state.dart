@@ -7,7 +7,7 @@ sealed class HomeState with _$HomeState {
   const factory HomeState.loading() = _HomeLoading;
 
   const factory HomeState.productsLoaded({
-    required List<Product> products,
+    required List<ProductPresentation> products,
   }) = _HomeProductsLoaded;
 
   const factory HomeState.error(String message) = _HomeError;

@@ -1,4 +1,5 @@
 import 'package:meer_server/src/generated/protocol.dart';
+import 'package:meer_server/src/services/product_presentation_service.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_idp_server/core.dart';
 
@@ -27,18 +28,38 @@ class FavoriteEndpoint extends Endpoint {
   }
 
   /// جلب مفضلة المستخدم الحالي مع بيانات المنتجات.
-  Future<List<FavoriteProduct>> getMyFavorites(
+  /// جلب مفضلة المستخدم مع بيانات المنتجات وأسماء الأسر.
+  Future<List<ProductPresentation>> getMyFavorites(
     Session session,
   ) async {
     final profile = await _getCurrentProfile(session);
 
-    return await FavoriteProduct.db.find(
+    final favorites = await FavoriteProduct.db.find(
       session,
       where: (favorite) => favorite.userId.equals(profile.id!),
       orderBy: (favorite) => favorite.createdAt.desc(),
       include: FavoriteProduct.include(
         product: Product.include(),
       ),
+    );
+
+    final products = <Product>[];
+
+    for (final favorite in favorites) {
+      final product = favorite.product;
+
+      if (product == null || product.id == null) {
+        throw Exception(
+          'تعذر تحميل بيانات أحد المنتجات المفضلة.',
+        );
+      }
+
+      products.add(product);
+    }
+
+    return ProductPresentationService().presentProducts(
+      session,
+      products,
     );
   }
 

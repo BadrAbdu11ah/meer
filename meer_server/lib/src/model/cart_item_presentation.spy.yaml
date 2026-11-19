@@ -1,0 +1,5 @@
+class: CartItemPresentation
+fields:
+  product: Product
+  quantity: int
+  sellerName: String

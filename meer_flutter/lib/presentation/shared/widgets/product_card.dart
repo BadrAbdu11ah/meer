@@ -3,6 +3,7 @@ import 'package:meer_client/meer_client.dart';
 
 class ProductCard extends StatelessWidget {
   final Product product;
+  final String? sellerName;
   final VoidCallback? onSellerTap;
   final VoidCallback? onTap;
   final bool isFavorite;
@@ -11,6 +12,7 @@ class ProductCard extends StatelessWidget {
   const ProductCard({
     super.key,
     required this.product,
+    this.sellerName,
     this.onSellerTap,
     this.onTap,
     this.isFavorite = false,
@@ -31,7 +33,7 @@ class ProductCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              flex: 5,
+              flex: 4,
               child: SizedBox(
                 width: double.infinity,
                 child: Stack(
@@ -59,7 +61,7 @@ class ProductCard extends StatelessWidget {
               ),
             ),
             Expanded(
-              flex: 4,
+              flex: 5,
               child: Padding(
                 padding: const EdgeInsets.all(10),
                 child: Column(
@@ -88,9 +90,13 @@ class ProductCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Row(
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Expanded(
+                        // السعر يأخذ عرض البطاقة بالكامل.
+                        SizedBox(
+                          width: double.infinity,
                           child: Text(
                             '${product.price.toStringAsFixed(2)} ر.س',
                             maxLines: 1,
@@ -101,26 +107,41 @@ class ProductCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        if (onSellerTap != null)
-                          TextButton.icon(
-                            onPressed: onSellerTap,
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
+
+                        if (onSellerTap != null) ...[
+                          const SizedBox(height: 4),
+                          InkWell(
+                            onTap: onSellerTap,
+                            borderRadius: BorderRadius.circular(8),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.storefront_outlined,
+                                    size: 16,
+                                    color: colors.onSurfaceVariant,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Expanded(
+                                    child: Text(
+                                      sellerName?.trim().isNotEmpty == true
+                                          ? sellerName!.trim()
+                                          : 'زيارة الأسرة المنتجة',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: colors.primary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              minimumSize: const Size(0, 32),
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              visualDensity: VisualDensity.compact,
-                            ),
-                            icon: const Icon(
-                              Icons.storefront_outlined,
-                              size: 16,
-                            ),
-                            label: const Text(
-                              'الأسرة',
-                              style: TextStyle(fontSize: 12),
                             ),
                           ),
+                        ],
                       ],
                     ),
                   ],

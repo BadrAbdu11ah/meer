@@ -13,10 +13,10 @@
 import 'dart:async' as _ida;
 import 'package:http/http.dart' as _i85jenna;
 import 'package:meer_client/src/protocol/greetings/greeting.dart' as _iqfsds6k;
+import 'package:meer_client/src/protocol/model/cart_item_presentation.dart'
+    as _illo3ltv;
 import 'package:meer_client/src/protocol/model/cart_item_record.dart'
     as _iivmvpvv;
-import 'package:meer_client/src/protocol/model/favorite_product.dart'
-    as _iztphn1q;
 import 'package:meer_client/src/protocol/model/image_upload_description.dart'
     as _i9nqlixc;
 import 'package:meer_client/src/protocol/model/meer_city.dart' as _ifagbua2;
@@ -25,7 +25,11 @@ import 'package:meer_client/src/protocol/model/MeerUserProfile.dart'
 import 'package:meer_client/src/protocol/model/order_info.dart' as _iiv379dz;
 import 'package:meer_client/src/protocol/model/order_item_request.dart'
     as _ix7syfm6;
+import 'package:meer_client/src/protocol/model/order_presentation.dart'
+    as _izvi99z2;
 import 'package:meer_client/src/protocol/model/product.dart' as _i90cwas4;
+import 'package:meer_client/src/protocol/model/product_presentation.dart'
+    as _ietsoqkp;
 import 'package:meer_client/src/protocol/model/seller_public_info.dart'
     as _ioi0o382;
 import 'package:serverpod_auth_client/serverpod_auth_client.dart' as _i312scxx;
@@ -200,8 +204,8 @@ class EndpointCart extends _isc.EndpointRef {
   @override
   String get name => 'cart';
 
-  _ida.Future<List<_iivmvpvv.CartItemRecord>> getMyCart() =>
-      caller.callServerEndpoint<List<_iivmvpvv.CartItemRecord>>(
+  _ida.Future<List<_illo3ltv.CartItemPresentation>> getMyCart() =>
+      caller.callServerEndpoint<List<_illo3ltv.CartItemPresentation>>(
         'cart',
         'getMyCart',
         {},
@@ -253,8 +257,9 @@ class EndpointFavorite extends _isc.EndpointRef {
   String get name => 'favorite';
 
   /// جلب مفضلة المستخدم الحالي مع بيانات المنتجات.
-  _ida.Future<List<_iztphn1q.FavoriteProduct>> getMyFavorites() =>
-      caller.callServerEndpoint<List<_iztphn1q.FavoriteProduct>>(
+  /// جلب مفضلة المستخدم مع بيانات المنتجات وأسماء الأسر.
+  _ida.Future<List<_ietsoqkp.ProductPresentation>> getMyFavorites() =>
+      caller.callServerEndpoint<List<_ietsoqkp.ProductPresentation>>(
         'favorite',
         'getMyFavorites',
         {},
@@ -375,8 +380,8 @@ class EndpointOrder extends _isc.EndpointRef {
     },
   );
 
-  _ida.Future<List<_iiv379dz.OrderInfo>> getMyCustomerOrders() =>
-      caller.callServerEndpoint<List<_iiv379dz.OrderInfo>>(
+  _ida.Future<List<_izvi99z2.OrderPresentation>> getMyCustomerOrders() =>
+      caller.callServerEndpoint<List<_izvi99z2.OrderPresentation>>(
         'order',
         'getMyCustomerOrders',
         {},
@@ -390,12 +395,24 @@ class EndpointOrder extends _isc.EndpointRef {
         {'orderId': orderId},
       );
 
-  _ida.Future<List<_iiv379dz.OrderInfo>> getMySellerOrders() =>
-      caller.callServerEndpoint<List<_iiv379dz.OrderInfo>>(
+  _ida.Future<List<_izvi99z2.OrderPresentation>> getMySellerOrders() =>
+      caller.callServerEndpoint<List<_izvi99z2.OrderPresentation>>(
         'order',
         'getMySellerOrders',
         {},
       );
+
+  _ida.Future<_izvi99z2.OrderPresentation> getMyOrderDetails(
+    int orderId,
+    bool isSellerView,
+  ) => caller.callServerEndpoint<_izvi99z2.OrderPresentation>(
+    'order',
+    'getMyOrderDetails',
+    {
+      'orderId': orderId,
+      'isSellerView': isSellerView,
+    },
+  );
 
   _ida.Future<bool> acceptMyOrder(int orderId) =>
       caller.callServerEndpoint<bool>(
@@ -441,9 +458,9 @@ class EndpointProduct extends _isc.EndpointRef {
         {'product': product},
       );
 
-  _ida.Future<List<_i90cwas4.Product>> getAllAvailableProducts(
+  _ida.Future<List<_ietsoqkp.ProductPresentation>> getAllAvailableProducts(
     _ifagbua2.MeerCity city,
-  ) => caller.callServerEndpoint<List<_i90cwas4.Product>>(
+  ) => caller.callServerEndpoint<List<_ietsoqkp.ProductPresentation>>(
     'product',
     'getAllAvailableProducts',
     {'city': city},
@@ -476,10 +493,10 @@ class EndpointProduct extends _isc.EndpointRef {
   );
 
   /// البحث في أسماء المنتجات وأوصافها.
-  _ida.Future<List<_i90cwas4.Product>> searchProducts(
+  _ida.Future<List<_ietsoqkp.ProductPresentation>> searchProducts(
     String search,
     _ifagbua2.MeerCity city,
-  ) => caller.callServerEndpoint<List<_i90cwas4.Product>>(
+  ) => caller.callServerEndpoint<List<_ietsoqkp.ProductPresentation>>(
     'product',
     'searchProducts',
     {

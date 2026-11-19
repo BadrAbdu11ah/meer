@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meer_client/meer_client.dart';
 import 'package:meer_flutter/core/constant/app_route.dart';
+import 'package:meer_flutter/core/routes/product_details_route_arguments.dart';
 import 'package:meer_flutter/presentation/favorites/bloc/favorites_bloc.dart';
 import 'package:meer_flutter/presentation/shared/widgets/product_card.dart';
 
@@ -11,7 +12,7 @@ class FavoritesView extends StatelessWidget {
     required this.products,
   });
 
-  final List<Product> products;
+  final List<ProductPresentation> products;
 
   @override
   Widget build(BuildContext context) {
@@ -58,10 +59,12 @@ class FavoritesView extends StatelessWidget {
         childAspectRatio: 0.68,
       ),
       itemBuilder: (context, index) {
-        final product = products[index];
+        final presentation = products[index];
+        final product = presentation.product;
 
         return ProductCard(
           product: product,
+          sellerName: presentation.sellerName,
           isFavorite: true,
           onFavoriteTap: () {
             context.read<FavoritesBloc>().add(
@@ -73,7 +76,10 @@ class FavoritesView extends StatelessWidget {
           onTap: () {
             Navigator.of(context).pushNamed(
               AppRoute.productDetailsScreen,
-              arguments: product,
+              arguments: ProductDetailsRouteArguments(
+                product: product,
+                sellerName: presentation.sellerName,
+              ),
             );
           },
           onSellerTap: () {

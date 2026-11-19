@@ -1,0 +1,4 @@
+class: ProductPresentation
+fields:
+  product: Product
+  sellerName: String

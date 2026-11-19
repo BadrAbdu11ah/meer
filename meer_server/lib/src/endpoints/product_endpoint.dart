@@ -1,4 +1,5 @@
 import 'package:meer_server/src/generated/protocol.dart';
+import 'package:meer_server/src/services/product_presentation_service.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_idp_server/core.dart';
 
@@ -97,7 +98,7 @@ class ProductEndpoint extends Endpoint {
     };
   }
 
-  Future<List<Product>> getAllAvailableProducts(
+  Future<List<ProductPresentation>> getAllAvailableProducts(
     Session session,
     MeerCity city,
   ) async {
@@ -107,9 +108,14 @@ class ProductEndpoint extends Endpoint {
       return [];
     }
 
-    return await Product.db.find(
+    final products = await Product.db.find(
       session,
       where: (p) => p.isAvailable.equals(true) & p.sellerId.inSet(sellerIds),
+    );
+
+    return ProductPresentationService().presentProducts(
+      session,
+      products,
     );
   }
 
@@ -185,7 +191,7 @@ class ProductEndpoint extends Endpoint {
   // --------------------------------------------------
 
   /// البحث في أسماء المنتجات وأوصافها.
-  Future<List<Product>> searchProducts(
+  Future<List<ProductPresentation>> searchProducts(
     Session session,
     String search,
     MeerCity city,
@@ -204,12 +210,17 @@ class ProductEndpoint extends Endpoint {
 
     final pattern = '%$query%';
 
-    return Product.db.find(
+    final products = await Product.db.find(
       session,
       where: (p) =>
           p.isAvailable.equals(true) &
           p.sellerId.inSet(sellerIds) &
           (p.name.ilike(pattern) | p.description.ilike(pattern)),
+    );
+
+    return ProductPresentationService().presentProducts(
+      session,
+      products,
     );
   }
 

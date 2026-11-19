@@ -125,7 +125,7 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( List<Product> products)?  productsLoaded,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( List<ProductPresentation> products)?  productsLoaded,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _HomeInitial() when initial != null:
 return initial();case _HomeLoading() when loading != null:
@@ -149,7 +149,7 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( List<Product> products)  productsLoaded,required TResult Function( String message)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( List<ProductPresentation> products)  productsLoaded,required TResult Function( String message)  error,}) {final _that = this;
 switch (_that) {
 case _HomeInitial():
 return initial();case _HomeLoading():
@@ -169,7 +169,7 @@ return error(_that.message);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( List<Product> products)?  productsLoaded,TResult? Function( String message)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( List<ProductPresentation> products)?  productsLoaded,TResult? Function( String message)?  error,}) {final _that = this;
 switch (_that) {
 case _HomeInitial() when initial != null:
 return initial();case _HomeLoading() when loading != null:
@@ -251,11 +251,11 @@ String toString() {
 
 
 class _HomeProductsLoaded implements HomeState {
-  const _HomeProductsLoaded({required final  List<Product> products}): _products = products;
+  const _HomeProductsLoaded({required final  List<ProductPresentation> products}): _products = products;
   
 
- final  List<Product> _products;
- List<Product> get products {
+ final  List<ProductPresentation> _products;
+ List<ProductPresentation> get products {
   if (_products is EqualUnmodifiableListView) return _products;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_products);
@@ -292,7 +292,7 @@ abstract mixin class _$HomeProductsLoadedCopyWith<$Res> implements $HomeStateCop
   factory _$HomeProductsLoadedCopyWith(_HomeProductsLoaded value, $Res Function(_HomeProductsLoaded) _then) = __$HomeProductsLoadedCopyWithImpl;
 @useResult
 $Res call({
- List<Product> products
+ List<ProductPresentation> products
 });
 
 
@@ -312,7 +312,7 @@ class __$HomeProductsLoadedCopyWithImpl<$Res>
 @pragma('vm:prefer-inline') $Res call({Object? products = null,}) {
   return _then(_HomeProductsLoaded(
 products: null == products ? _self._products : products // ignore: cast_nullable_to_non_nullable
-as List<Product>,
+as List<ProductPresentation>,
   ));
 }
 

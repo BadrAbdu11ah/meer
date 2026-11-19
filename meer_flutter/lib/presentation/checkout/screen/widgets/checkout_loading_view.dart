@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meer_flutter/presentation/shared/widgets/app_page_header.dart';
 
 class CheckoutLoadingView extends StatelessWidget {
   const CheckoutLoadingView({super.key});
@@ -6,11 +7,20 @@ class CheckoutLoadingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('إتمام الطلب'),
-      ),
-      body: const Center(
-        child: CircularProgressIndicator(),
+      body: Column(
+        children: [
+          AppPageHeader(
+            title: 'إتمام الطلب',
+            subtitle: 'جارٍ تجهيز بيانات طلبك',
+            showBackButton: Navigator.of(context).canPop(),
+            onBack: () => Navigator.of(context).maybePop(),
+          ),
+          const Expanded(
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
+        ],
       ),
     );
   }

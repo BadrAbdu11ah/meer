@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meer_flutter/presentation/favorites/bloc/favorites_bloc.dart';
 import 'package:meer_flutter/presentation/favorites/view/favorites_view.dart';
+import 'package:meer_flutter/presentation/shared/widgets/app_page_header.dart';
 
 class FavoritesScreen extends StatelessWidget {
   const FavoritesScreen({super.key});
@@ -52,22 +53,26 @@ class FavoritesScreen extends StatelessWidget {
       },
       builder: (context, state) {
         return Scaffold(
-          appBar: AppBar(
-            title: const Text(
-              'المفضلة',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            actions: [
-              if (!state.isEmpty)
-                IconButton(
-                  tooltip: 'إفراغ المفضلة',
-                  onPressed: () => _confirmClear(context),
-                  icon: const Icon(Icons.delete_sweep_outlined),
+          body: Column(
+            children: [
+              AppPageHeader(
+                title: 'المفضلة',
+                subtitle: 'المنتجات التي حفظتها',
+                actions: [
+                  if (!state.isEmpty)
+                    IconButton(
+                      tooltip: 'إفراغ المفضلة',
+                      onPressed: () => _confirmClear(context),
+                      icon: const Icon(Icons.delete_sweep_outlined),
+                    ),
+                ],
+              ),
+              Expanded(
+                child: FavoritesView(
+                  products: state.products,
                 ),
+              ),
             ],
-          ),
-          body: FavoritesView(
-            products: state.products,
           ),
         );
       },

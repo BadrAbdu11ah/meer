@@ -8,6 +8,7 @@ import 'package:meer_flutter/presentation/checkout/screen/widgets/checkout_loadi
 import 'package:meer_flutter/presentation/checkout/screen/widgets/checkout_submit_bar.dart';
 import 'package:meer_flutter/presentation/checkout/screen/widgets/checkout_success_view.dart';
 import 'package:meer_flutter/presentation/checkout/view/checkout_view.dart';
+import 'package:meer_flutter/presentation/shared/widgets/app_page_header.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -241,38 +242,45 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             final isLocating = state is CheckoutLocating;
 
             return Scaffold(
-              appBar: AppBar(
-                title: const Text(
-                  'إتمام الطلب',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-              body: CheckoutView(
-                items: cartState.items,
-                addressController: _addressController,
-                phoneController: _phoneController,
-                codeController: _codeController,
-                formKey: _formKey,
-
-                fulfillmentMethod: readyState.fulfillmentMethod,
-                sellerOffersDelivery: readyState.sellerOffersDelivery,
-                sellerDeliveryFee: readyState.sellerDeliveryFee,
-                onFulfillmentMethodChanged: _changeFulfillmentMethod,
-
-                hasLocation:
-                    readyState.latitude != null && readyState.longitude != null,
-                isLocating: isLocating,
-                onUseCurrentLocation: _requestCurrentLocation,
-                onAddressChanged: _onAddressChanged,
-
-                isPhoneVerified: readyState.isPhoneVerified,
-                isSendingPhoneCode: readyState.isSendingPhoneCode,
-                isPhoneCodeSent: readyState.isPhoneCodeSent,
-                codeSentAt: readyState.codeSentAt,
-                isVerifyingPhone: readyState.isVerifyingPhone,
-                isSubmitting: isSubmitting,
-                onSendPhoneCode: _sendPhoneCode,
-                onVerifyPhone: _verifyPhone,
+              body: Column(
+                children: [
+                  AppPageHeader(
+                    title: 'إتمام الطلب',
+                    subtitle: 'راجع التفاصيل وأكمل طلبك',
+                    showBackButton: Navigator.of(context).canPop(),
+                    onBack: () {
+                      Navigator.of(context).maybePop();
+                    },
+                  ),
+                  Expanded(
+                    child: CheckoutView(
+                      items: cartState.items,
+                      sellerName: cartState.items.first.sellerName,
+                      addressController: _addressController,
+                      phoneController: _phoneController,
+                      codeController: _codeController,
+                      formKey: _formKey,
+                      fulfillmentMethod: readyState.fulfillmentMethod,
+                      sellerOffersDelivery: readyState.sellerOffersDelivery,
+                      sellerDeliveryFee: readyState.sellerDeliveryFee,
+                      onFulfillmentMethodChanged: _changeFulfillmentMethod,
+                      hasLocation:
+                          readyState.latitude != null &&
+                          readyState.longitude != null,
+                      isLocating: isLocating,
+                      onUseCurrentLocation: _requestCurrentLocation,
+                      onAddressChanged: _onAddressChanged,
+                      isPhoneVerified: readyState.isPhoneVerified,
+                      isSendingPhoneCode: readyState.isSendingPhoneCode,
+                      isPhoneCodeSent: readyState.isPhoneCodeSent,
+                      codeSentAt: readyState.codeSentAt,
+                      isVerifyingPhone: readyState.isVerifyingPhone,
+                      isSubmitting: isSubmitting,
+                      onSendPhoneCode: _sendPhoneCode,
+                      onVerifyPhone: _verifyPhone,
+                    ),
+                  ),
+                ],
               ),
               bottomNavigationBar: CheckoutSubmitBar(
                 isSubmitting: isSubmitting,

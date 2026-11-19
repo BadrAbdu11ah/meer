@@ -60,7 +60,9 @@ class CustomerOrdersBloc
 
     // لا نسمح بإلغاء طلب غير موجود أو بدأ تجهيزه.
     final orderExists = orders.any(
-      (order) => order.id == event.orderId && order.status == 'pending',
+      (presentation) =>
+          presentation.order.id == event.orderId &&
+          presentation.order.status == 'pending',
     );
 
     if (!orderExists) return;
@@ -137,7 +139,7 @@ class CustomerOrdersBloc
     );
   }
 
-  List<OrderInfo>? _currentOrders() {
+  List<OrderPresentation>? _currentOrders() {
     return state.maybeWhen(
       loaded: (orders, cancellingIds, message) => orders,
       orElse: () => null,

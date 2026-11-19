@@ -74,7 +74,7 @@ class ProductRepository {
 
   // 4.
   /// جلب المنتجات المتاحة للمشترين في مدينة محددة.
-  Future<Either<Failure, List<Product>>> getAllAvailableProducts(
+  Future<Either<Failure, List<ProductPresentation>>> getAllAvailableProducts(
     MeerCity city,
   ) async {
     try {

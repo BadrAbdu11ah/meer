@@ -1,23 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:meer_client/meer_client.dart';
-import 'package:meer_flutter/presentation/customer_orders/view/widgets/customer_order_amounts_section.dart';
-import 'package:meer_flutter/presentation/customer_orders/view/widgets/customer_order_fulfillment_section.dart';
-import 'package:meer_flutter/presentation/customer_orders/view/widgets/order_item_tile.dart';
-import 'package:meer_flutter/presentation/customer_orders/view/widgets/order_status_tracker.dart';
 
 class CustomerOrderCard extends StatelessWidget {
   const CustomerOrderCard({
     super.key,
-    required this.order,
-    required this.isCancelling,
+    required this.presentation,
     this.isHighlighted = false,
-    required this.onCancel,
+    required this.onTap,
   });
 
-  final OrderInfo order;
-  final bool isCancelling;
+  final OrderPresentation presentation;
   final bool isHighlighted;
-  final VoidCallback onCancel;
+  final VoidCallback onTap;
+
+  OrderInfo get order => presentation.order;
 
   String _statusLabel(String status) {
     final isPickup = order.fulfillmentMethod == 'pickup';
@@ -25,18 +21,15 @@ class CustomerOrderCard extends StatelessWidget {
     return switch (status) {
       'pending' => 'بانتظار قبول الأسرة',
       'preparing' => 'قيد التجهيز',
-      'ready' => isPickup ? 'طلبك جاهز للاستلام' : 'طلبك جاهز للتوصيل',
+      'ready' => isPickup ? 'جاهز للاستلام' : 'جاهز للتوصيل',
       'delivering' => 'جارٍ التوصيل',
       'completed' => 'مكتمل',
-      'cancelled' => 'تم إلغاء الطلب',
+      'cancelled' => 'ملغي',
       _ => 'حالة الطلب: $status',
     };
   }
 
-  Color _statusColor(
-    String status,
-    ColorScheme colors,
-  ) {
+  Color _statusColor(String status, ColorScheme colors) {
     return switch (status) {
       'pending' => colors.tertiary,
       'preparing' => colors.primary,
@@ -50,7 +43,6 @@ class CustomerOrderCard extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     final localDate = date.toLocal();
-
     final day = localDate.day.toString().padLeft(2, '0');
     final month = localDate.month.toString().padLeft(2, '0');
     final hour = localDate.hour.toString().padLeft(2, '0');
@@ -59,43 +51,12 @@ class CustomerOrderCard extends StatelessWidget {
     return '$day/$month/${localDate.year} - $hour:$minute';
   }
 
-  Future<void> _confirmCancel(BuildContext context) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('إلغاء الطلب'),
-        content: Text(
-          'هل أنت متأكد من إلغاء الطلب رقم #${order.id}؟',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('رجوع'),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('تأكيد الإلغاء'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true && context.mounted) {
-      onCancel();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final isHighlighted = this.isHighlighted;
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-
     final statusColor = _statusColor(order.status, colors);
-    final items = order.items ?? const <OrderItem>[];
+    final itemCount = order.items?.length ?? 0;
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -106,136 +67,124 @@ class CustomerOrderCard extends StatelessWidget {
           width: isHighlighted ? 2 : 1,
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // رقم الطلب والتاريخ.
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'طلب رقم #${order.id ?? '-'}',
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'طلب رقم #${order.id ?? '-'}',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const Icon(
+                    Icons.receipt_long_outlined,
+                    color: Colors.grey,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                _formatDate(order.createdAt),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: colors.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  Icon(
+                    Icons.storefront_outlined,
+                    size: 19,
+                    color: colors.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      presentation.counterpartyName,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: statusColor.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      _statusLabel(order.status),
+                      style: TextStyle(
+                        color: statusColor,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    '${order.totalAmount.toStringAsFixed(2)} ر.س',
                     style: theme.textTheme.titleMedium?.copyWith(
+                      color: colors.primary,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-                const Icon(
-                  Icons.receipt_long_outlined,
-                  color: Colors.grey,
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 6),
-
-            Text(
-              _formatDate(order.createdAt),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colors.onSurfaceVariant,
+                ],
               ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // حالة الطلب.
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 7,
-              ),
-              decoration: BoxDecoration(
-                color: statusColor.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                _statusLabel(order.status),
-                style: TextStyle(
-                  color: statusColor,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 12,
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 18),
-
-            // مسار متابعة الطلب.
-            OrderStatusTracker(
-              status: order.status,
-              fulfillmentMethod: order.fulfillmentMethod,
-            ),
-
-            const SizedBox(height: 16),
-
-            CustomerOrderFulfillmentSection(
-              order: order,
-            ),
-
-            const SizedBox(height: 16),
-            if (order.status == 'pending') ...[
-              const SizedBox(height: 8),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: isCancelling
-                      ? null
-                      : () => _confirmCancel(context),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: colors.error,
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Icon(
+                    Icons.shopping_bag_outlined,
+                    size: 17,
+                    color: colors.onSurfaceVariant,
                   ),
-                  icon: isCancelling
-                      ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : const Icon(Icons.cancel_outlined),
-                  label: Text(
-                    isCancelling ? 'جارٍ إلغاء الطلب...' : 'إلغاء الطلب',
+                  const SizedBox(width: 6),
+                  Text(
+                    '$itemCount منتجات',
+                    style: theme.textTheme.bodySmall,
                   ),
-                ),
+                  const SizedBox(width: 16),
+                  Icon(
+                    order.fulfillmentMethod == 'pickup'
+                        ? Icons.store_outlined
+                        : Icons.delivery_dining_outlined,
+                    size: 17,
+                    color: colors.onSurfaceVariant,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    order.fulfillmentMethod == 'pickup' ? 'استلام' : 'توصيل',
+                    style: theme.textTheme.bodySmall,
+                  ),
+                  const Spacer(),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    size: 14,
+                    color: colors.onSurfaceVariant,
+                  ),
+                ],
               ),
             ],
-            const Divider(),
-
-            const Divider(),
-
-            CustomerOrderAmountsSection(
-              order: order,
-            ),
-
-            const SizedBox(height: 16),
-
-            // تفاصيل المنتجات والعنوان.
-            ExpansionTile(
-              tilePadding: EdgeInsets.zero,
-              childrenPadding: EdgeInsets.zero,
-              title: Text(
-                'تفاصيل الطلب (${items.length} منتجات)',
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              children: [
-                if (items.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.all(12),
-                    child: Text(
-                      'تعذر تحميل تفاصيل المنتجات.',
-                    ),
-                  )
-                else
-                  ...items.map(
-                    (item) => OrderItemTile(item: item),
-                  ),
-              ],
-            ),
-          ],
+          ),
         ),
       ),
     );

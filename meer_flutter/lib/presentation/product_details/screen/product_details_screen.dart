@@ -4,14 +4,17 @@ import 'package:meer_client/meer_client.dart';
 import 'package:meer_flutter/core/constant/app_route.dart';
 import 'package:meer_flutter/presentation/cart/bloc/cart_bloc.dart';
 import 'package:meer_flutter/presentation/product_details/view/product_details_view.dart';
+import 'package:meer_flutter/presentation/shared/widgets/app_page_header.dart';
 
 class ProductDetailsScreen extends StatelessWidget {
   const ProductDetailsScreen({
     super.key,
     required this.product,
+    required this.sellerName,
   });
 
   final Product product;
+  final String sellerName;
 
   @override
   Widget build(BuildContext context) {
@@ -33,22 +36,28 @@ class ProductDetailsScreen extends StatelessWidget {
         );
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'تفاصيل المنتج',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ),
-        body: SafeArea(
-          child: ProductDetailsView(
-            product: product,
-            onSellerTap: () {
-              Navigator.of(context).pushReplacementNamed(
-                AppRoute.sellerDetailsScreen,
-                arguments: product.sellerId,
-              );
-            },
-          ),
+        body: Column(
+          children: [
+            AppPageHeader(
+              title: 'تفاصيل المنتج',
+              showBackButton: Navigator.of(context).canPop(),
+              onBack: () => Navigator.of(context).maybePop(),
+            ),
+            Expanded(
+              child: SafeArea(
+                child: ProductDetailsView(
+                  product: product,
+                  sellerName: sellerName,
+                  onSellerTap: () {
+                    Navigator.of(context).pushReplacementNamed(
+                      AppRoute.sellerDetailsScreen,
+                      arguments: product.sellerId,
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
 
         bottomNavigationBar: BlocBuilder<CartBloc, CartState>(

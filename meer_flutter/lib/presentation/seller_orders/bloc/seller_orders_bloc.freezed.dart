@@ -675,7 +675,7 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( List<OrderInfo> orders,  Set<int> updatingOrderIds,  String? message)?  loaded,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( List<OrderPresentation> orders,  Set<int> updatingOrderIds,  String? message)?  loaded,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case SellerOrdersInitial() when initial != null:
 return initial();case SellerOrdersLoading() when loading != null:
@@ -699,7 +699,7 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( List<OrderInfo> orders,  Set<int> updatingOrderIds,  String? message)  loaded,required TResult Function( String message)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( List<OrderPresentation> orders,  Set<int> updatingOrderIds,  String? message)  loaded,required TResult Function( String message)  error,}) {final _that = this;
 switch (_that) {
 case SellerOrdersInitial():
 return initial();case SellerOrdersLoading():
@@ -719,7 +719,7 @@ return error(_that.message);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( List<OrderInfo> orders,  Set<int> updatingOrderIds,  String? message)?  loaded,TResult? Function( String message)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( List<OrderPresentation> orders,  Set<int> updatingOrderIds,  String? message)?  loaded,TResult? Function( String message)?  error,}) {final _that = this;
 switch (_that) {
 case SellerOrdersInitial() when initial != null:
 return initial();case SellerOrdersLoading() when loading != null:
@@ -801,11 +801,11 @@ String toString() {
 
 
 class SellerOrdersLoaded implements SellerOrdersState {
-  const SellerOrdersLoaded({required final  List<OrderInfo> orders, final  Set<int> updatingOrderIds = const <int>{}, this.message}): _orders = orders,_updatingOrderIds = updatingOrderIds;
+  const SellerOrdersLoaded({required final  List<OrderPresentation> orders, final  Set<int> updatingOrderIds = const <int>{}, this.message}): _orders = orders,_updatingOrderIds = updatingOrderIds;
   
 
- final  List<OrderInfo> _orders;
- List<OrderInfo> get orders {
+ final  List<OrderPresentation> _orders;
+ List<OrderPresentation> get orders {
   if (_orders is EqualUnmodifiableListView) return _orders;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_orders);
@@ -850,7 +850,7 @@ abstract mixin class $SellerOrdersLoadedCopyWith<$Res> implements $SellerOrdersS
   factory $SellerOrdersLoadedCopyWith(SellerOrdersLoaded value, $Res Function(SellerOrdersLoaded) _then) = _$SellerOrdersLoadedCopyWithImpl;
 @useResult
 $Res call({
- List<OrderInfo> orders, Set<int> updatingOrderIds, String? message
+ List<OrderPresentation> orders, Set<int> updatingOrderIds, String? message
 });
 
 
@@ -870,7 +870,7 @@ class _$SellerOrdersLoadedCopyWithImpl<$Res>
 @pragma('vm:prefer-inline') $Res call({Object? orders = null,Object? updatingOrderIds = null,Object? message = freezed,}) {
   return _then(SellerOrdersLoaded(
 orders: null == orders ? _self._orders : orders // ignore: cast_nullable_to_non_nullable
-as List<OrderInfo>,updatingOrderIds: null == updatingOrderIds ? _self._updatingOrderIds : updatingOrderIds // ignore: cast_nullable_to_non_nullable
+as List<OrderPresentation>,updatingOrderIds: null == updatingOrderIds ? _self._updatingOrderIds : updatingOrderIds // ignore: cast_nullable_to_non_nullable
 as Set<int>,message: freezed == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String?,
   ));

@@ -6,6 +6,7 @@ import 'package:meer_flutter/core/id/injection.dart';
 import 'package:meer_flutter/core/services/notification_registration_service.dart';
 import 'package:meer_flutter/presentation/account/bloc/account_bloc.dart';
 import 'package:meer_flutter/presentation/account/view/account_view.dart';
+import 'package:meer_flutter/presentation/shared/widgets/app_page_header.dart';
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart';
 
 class AccountScreen extends StatefulWidget {
@@ -138,111 +139,119 @@ class _AccountScreenState extends State<AccountScreen> {
 
           loaded: (profile) {
             return Scaffold(
-              appBar: AppBar(
-                title: const Text(
-                  'حسابي',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
+              body: Column(
+                children: [
+                  AppPageHeader(
+                    title: 'حسابي',
+                    subtitle: 'إدارة حسابك ومتجرك',
+                    actions: [
+                      IconButton(
+                        tooltip: 'تحديث الحساب',
+                        onPressed: () {
+                          context.read<AccountBloc>().add(
+                            const AccountEvent.refreshRequested(),
+                          );
+                        },
+                        icon: const Icon(Icons.refresh),
+                      ),
+                    ],
                   ),
-                ),
-                actions: [
-                  IconButton(
-                    tooltip: 'تحديث الحساب',
-                    onPressed: () {
-                      context.read<AccountBloc>().add(
-                        const AccountEvent.refreshRequested(),
-                      );
-                    },
-                    icon: const Icon(Icons.refresh),
+                  Expanded(
+                    child: AccountView(
+                      isSeller: profile.isSeller,
+                      profile: profile,
+
+                      onManageProducts: () {
+                        Navigator.pushNamed(
+                          context,
+                          AppRoute.sellerProductsScreen,
+                        );
+                      },
+
+                      onManageOrders: () {
+                        Navigator.pushNamed(
+                          context,
+                          AppRoute.sellerOrdersScreen,
+                        );
+                      },
+
+                      onEditStore: () async {
+                        await Navigator.pushNamed(
+                          context,
+                          AppRoute.sellerSetupScreen,
+                          arguments: profile,
+                        );
+
+                        if (!context.mounted) return;
+
+                        context.read<AccountBloc>().add(
+                          const AccountEvent.refreshRequested(),
+                        );
+                      },
+
+                      onSignOut: signOut,
+                      onEnableNotifications: enableNotifications,
+                      onSendTestNotification: sendTestNotification,
+
+                      onStartSelling: () async {
+                        await Navigator.pushNamed(
+                          context,
+                          AppRoute.sellerSetupScreen,
+                        );
+
+                        if (!context.mounted) return;
+
+                        context.read<AccountBloc>().add(
+                          const AccountEvent.refreshRequested(),
+                        );
+                      },
+                    ),
                   ),
                 ],
-              ),
-              body: AccountView(
-                isSeller: profile.isSeller,
-                profile: profile,
-
-                onManageProducts: () {
-                  Navigator.pushNamed(
-                    context,
-                    AppRoute.sellerProductsScreen,
-                  );
-                },
-
-                onManageOrders: () {
-                  Navigator.pushNamed(
-                    context,
-                    AppRoute.sellerOrdersScreen,
-                  );
-                },
-
-                onEditStore: () async {
-                  await Navigator.pushNamed(
-                    context,
-                    AppRoute.sellerSetupScreen,
-                    arguments: profile,
-                  );
-
-                  if (!context.mounted) return;
-
-                  context.read<AccountBloc>().add(
-                    const AccountEvent.refreshRequested(),
-                  );
-                },
-
-                onSignOut: signOut,
-                onEnableNotifications: enableNotifications,
-
-                onSendTestNotification: sendTestNotification,
-
-                onStartSelling: () async {
-                  await Navigator.pushNamed(
-                    context,
-                    AppRoute.sellerSetupScreen,
-                  );
-
-                  if (!context.mounted) return;
-
-                  context.read<AccountBloc>().add(
-                    const AccountEvent.refreshRequested(),
-                  );
-                },
               ),
             );
           },
 
           error: (message) {
             return Scaffold(
-              appBar: AppBar(
-                title: const Text('حسابي'),
-              ),
-              body: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.error_outline,
-                        size: 48,
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        message,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      FilledButton.icon(
-                        onPressed: () {
-                          context.read<AccountBloc>().add(
-                            const AccountEvent.loadRequested(),
-                          );
-                        },
-                        icon: const Icon(Icons.refresh),
-                        label: const Text('إعادة المحاولة'),
-                      ),
-                    ],
+              body: Column(
+                children: [
+                  const AppPageHeader(
+                    title: 'حسابي',
+                    subtitle: 'إدارة حسابك ومتجرك',
                   ),
-                ),
+                  Expanded(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.error_outline,
+                              size: 48,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              message,
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 16),
+                            FilledButton.icon(
+                              onPressed: () {
+                                context.read<AccountBloc>().add(
+                                  const AccountEvent.loadRequested(),
+                                );
+                              },
+                              icon: const Icon(Icons.refresh),
+                              label: const Text('إعادة المحاولة'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             );
           },
@@ -252,12 +261,19 @@ class _AccountScreenState extends State<AccountScreen> {
   }
 
   Widget _buildLoadingScreen() {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('حسابي'),
-      ),
-      body: const Center(
-        child: CircularProgressIndicator(),
+    return const Scaffold(
+      body: Column(
+        children: [
+          AppPageHeader(
+            title: 'حسابي',
+            subtitle: 'إدارة حسابك ومتجرك',
+          ),
+          Expanded(
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
+        ],
       ),
     );
   }

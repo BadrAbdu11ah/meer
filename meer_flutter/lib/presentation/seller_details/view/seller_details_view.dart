@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meer_client/meer_client.dart';
 import 'package:meer_flutter/core/constant/app_route.dart';
+import 'package:meer_flutter/core/routes/product_details_route_arguments.dart';
 import 'package:meer_flutter/presentation/shared/widgets/product_card.dart';
 
 class SellerDetailsView extends StatelessWidget {
@@ -102,7 +103,10 @@ class SellerDetailsView extends StatelessWidget {
                       onTap: () {
                         Navigator.of(context).pushReplacementNamed(
                           AppRoute.productDetailsScreen,
-                          arguments: products[index],
+                          arguments: ProductDetailsRouteArguments(
+                            product: products[index],
+                            sellerName: seller.storeName,
+                          ),
                         );
                       },
                     );

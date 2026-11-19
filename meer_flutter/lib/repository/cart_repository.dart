@@ -108,7 +108,7 @@ class CartRepository {
     for (final record in records) {
       final product = record.product;
 
-      if (product == null || product.id == null) {
+      if (product.id == null) {
         throw StateError(
           'تعذر تحميل بيانات أحد المنتجات الموجودة في السلة.',
         );
@@ -118,10 +118,13 @@ class CartRepository {
         throw StateError('توجد كمية غير صحيحة في السلة.');
       }
 
+      final sellerName = record.sellerName.trim();
+
       items.add(
         CartItem(
           product: product,
           quantity: record.quantity,
+          sellerName: sellerName.isNotEmpty ? sellerName : 'أسرة منتجة',
         ),
       );
     }

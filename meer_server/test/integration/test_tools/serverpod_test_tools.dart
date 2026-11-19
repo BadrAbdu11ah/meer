@@ -15,10 +15,10 @@ import 'dart:async' as _ida;
 import 'dart:io' as _idi;
 import 'package:meer_server/src/generated/future_calls.dart' as _iw1qqaq2;
 import 'package:meer_server/src/generated/greetings/greeting.dart' as _ih6ywnp4;
+import 'package:meer_server/src/generated/model/cart_item_presentation.dart'
+    as _iud6fth6;
 import 'package:meer_server/src/generated/model/cart_item_record.dart'
     as _igx9tmzj;
-import 'package:meer_server/src/generated/model/favorite_product.dart'
-    as _ieqdpo46;
 import 'package:meer_server/src/generated/model/image_upload_description.dart'
     as _ipzrgtmi;
 import 'package:meer_server/src/generated/model/meer_city.dart' as _ibpct1hm;
@@ -27,7 +27,11 @@ import 'package:meer_server/src/generated/model/MeerUserProfile.dart'
 import 'package:meer_server/src/generated/model/order_info.dart' as _i8hwzj5x;
 import 'package:meer_server/src/generated/model/order_item_request.dart'
     as _i4g4bzck;
+import 'package:meer_server/src/generated/model/order_presentation.dart'
+    as _is56wy8u;
 import 'package:meer_server/src/generated/model/product.dart' as _iq8dxf2n;
+import 'package:meer_server/src/generated/model/product_presentation.dart'
+    as _ik2srkvq;
 import 'package:meer_server/src/generated/model/seller_public_info.dart'
     as _ilv77xsv;
 import 'package:serverpod/serverpod.dart' as _is;
@@ -613,7 +617,7 @@ class _CartEndpoint {
 
   final _is.SerializationManager _serializationManager;
 
-  _ida.Future<List<_igx9tmzj.CartItemRecord>> getMyCart(
+  _ida.Future<List<_iud6fth6.CartItemPresentation>> getMyCart(
     _ist.TestSessionBuilder sessionBuilder,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
@@ -635,7 +639,7 @@ class _CartEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _ida.Future<List<_igx9tmzj.CartItemRecord>>);
+                as _ida.Future<List<_iud6fth6.CartItemPresentation>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -783,7 +787,7 @@ class _FavoriteEndpoint {
 
   final _is.SerializationManager _serializationManager;
 
-  _ida.Future<List<_ieqdpo46.FavoriteProduct>> getMyFavorites(
+  _ida.Future<List<_ik2srkvq.ProductPresentation>> getMyFavorites(
     _ist.TestSessionBuilder sessionBuilder,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
@@ -805,7 +809,7 @@ class _FavoriteEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _ida.Future<List<_ieqdpo46.FavoriteProduct>>);
+                as _ida.Future<List<_ik2srkvq.ProductPresentation>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1137,7 +1141,7 @@ class _OrderEndpoint {
     });
   }
 
-  _ida.Future<List<_i8hwzj5x.OrderInfo>> getMyCustomerOrders(
+  _ida.Future<List<_is56wy8u.OrderPresentation>> getMyCustomerOrders(
     _ist.TestSessionBuilder sessionBuilder,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
@@ -1159,7 +1163,7 @@ class _OrderEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _ida.Future<List<_i8hwzj5x.OrderInfo>>);
+                as _ida.Future<List<_is56wy8u.OrderPresentation>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1198,7 +1202,7 @@ class _OrderEndpoint {
     });
   }
 
-  _ida.Future<List<_i8hwzj5x.OrderInfo>> getMySellerOrders(
+  _ida.Future<List<_is56wy8u.OrderPresentation>> getMySellerOrders(
     _ist.TestSessionBuilder sessionBuilder,
   ) async {
     return _ist.callAwaitableFunctionAndHandleExceptions(() async {
@@ -1220,7 +1224,42 @@ class _OrderEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _ida.Future<List<_i8hwzj5x.OrderInfo>>);
+                as _ida.Future<List<_is56wy8u.OrderPresentation>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_is56wy8u.OrderPresentation> getMyOrderDetails(
+    _ist.TestSessionBuilder sessionBuilder,
+    int orderId,
+    bool isSellerView,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'order',
+            method: 'getMyOrderDetails',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'order',
+          methodName: 'getMyOrderDetails',
+          parameters: _ist.testObjectToJson({
+            'orderId': orderId,
+            'isSellerView': isSellerView,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_is56wy8u.OrderPresentation>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1394,7 +1433,7 @@ class _ProductEndpoint {
     });
   }
 
-  _ida.Future<List<_iq8dxf2n.Product>> getAllAvailableProducts(
+  _ida.Future<List<_ik2srkvq.ProductPresentation>> getAllAvailableProducts(
     _ist.TestSessionBuilder sessionBuilder,
     _ibpct1hm.MeerCity city,
   ) async {
@@ -1417,7 +1456,7 @@ class _ProductEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _ida.Future<List<_iq8dxf2n.Product>>);
+                as _ida.Future<List<_ik2srkvq.ProductPresentation>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1521,7 +1560,7 @@ class _ProductEndpoint {
     });
   }
 
-  _ida.Future<List<_iq8dxf2n.Product>> searchProducts(
+  _ida.Future<List<_ik2srkvq.ProductPresentation>> searchProducts(
     _ist.TestSessionBuilder sessionBuilder,
     String search,
     _ibpct1hm.MeerCity city,
@@ -1548,7 +1587,7 @@ class _ProductEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _ida.Future<List<_iq8dxf2n.Product>>);
+                as _ida.Future<List<_ik2srkvq.ProductPresentation>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

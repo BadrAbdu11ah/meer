@@ -7,7 +7,7 @@ sealed class CustomerOrdersState with _$CustomerOrdersState {
   const factory CustomerOrdersState.loading() = CustomerOrdersLoading;
 
   const factory CustomerOrdersState.loaded({
-    required List<OrderInfo> orders,
+    required List<OrderPresentation> orders,
     @Default(<int>{}) Set<int> cancellingOrderIds,
     String? message,
   }) = CustomerOrdersLoaded;

@@ -5,6 +5,8 @@ import 'package:meer_flutter/client.dart';
 import 'package:meer_flutter/core/constant/app_route.dart';
 import 'package:meer_flutter/core/id/injection.dart';
 import 'package:meer_flutter/core/routes/main_screen_route_arguments.dart';
+import 'package:meer_flutter/core/routes/order_details_route_arguments.dart';
+import 'package:meer_flutter/core/routes/product_details_route_arguments.dart';
 import 'package:meer_flutter/presentation/auth/login/bloc/login_bloc.dart';
 import 'package:meer_flutter/presentation/auth/login/screen/login_screen.dart';
 import 'package:meer_flutter/presentation/auth/verify_otp/bloc/verify_otp_bloc.dart';
@@ -14,6 +16,8 @@ import 'package:meer_flutter/presentation/checkout/bloc/checkout_bloc.dart';
 import 'package:meer_flutter/presentation/checkout/screen/checkout_screen.dart';
 import 'package:meer_flutter/presentation/main/bloc/main_bloc.dart';
 import 'package:meer_flutter/presentation/main/screen/main_screen.dart';
+import 'package:meer_flutter/presentation/order_details/bloc/order_details_bloc.dart';
+import 'package:meer_flutter/presentation/order_details/screen/order_details_screen.dart';
 import 'package:meer_flutter/presentation/product_details/screen/product_details_screen.dart';
 import 'package:meer_flutter/presentation/product_form/bloc/product_form_bloc.dart';
 import 'package:meer_flutter/presentation/product_form/screen/product_form_screen.dart';
@@ -145,14 +149,15 @@ class AppRouter {
       case AppRoute.productDetailsScreen:
         final argument = settings.arguments;
 
-        if (argument is! Product) {
+        if (argument is! ProductDetailsRouteArguments) {
           return null;
         }
 
         return MaterialPageRoute(
           settings: settings,
           builder: (_) => ProductDetailsScreen(
-            product: argument,
+            product: argument.product,
+            sellerName: argument.sellerName,
           ),
         );
 
@@ -182,6 +187,29 @@ class AppRouter {
               ),
             child: SellerOrdersScreen(
               initialOrderId: orderId,
+            ),
+          ),
+        );
+      case AppRoute.orderDetailsScreen:
+        final argument = settings.arguments;
+
+        if (argument is! OrderDetailsRouteArguments || argument.orderId <= 0) {
+          return null;
+        }
+
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => BlocProvider(
+            create: (_) => sl<OrderDetailsBloc>()
+              ..add(
+                OrderDetailsEvent.loadRequested(
+                  orderId: argument.orderId,
+                  isSellerView: argument.isSellerView,
+                ),
+              ),
+            child: OrderDetailsScreen(
+              orderId: argument.orderId,
+              isSellerView: argument.isSellerView,
             ),
           ),
         );

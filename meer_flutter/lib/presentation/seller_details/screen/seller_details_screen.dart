@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meer_flutter/presentation/seller_details/bloc/seller_details_bloc.dart';
 import 'package:meer_flutter/presentation/seller_details/view/seller_details_view.dart';
+import 'package:meer_flutter/presentation/shared/widgets/app_page_header.dart';
 
 class SellerDetailsScreen extends StatelessWidget {
   const SellerDetailsScreen({
@@ -21,24 +22,39 @@ class SellerDetailsScreen extends StatelessWidget {
         );
 
         return Scaffold(
-          appBar: AppBar(
-            title: Text(
-              title,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
           body: state.when(
-            initial: () => const Center(
-              child: CircularProgressIndicator(),
+            initial: () => Column(
+              children: [
+                AppPageHeader(
+                  title: title,
+                  subtitle: 'منتجات ومعلومات الأسرة',
+                  showBackButton: Navigator.of(context).canPop(),
+                  onBack: () => Navigator.of(context).maybePop(),
+                ),
+                Expanded(
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+              ],
             ),
             loading: () => const Center(
               child: CircularProgressIndicator(),
             ),
-            loaded: (seller, products) => SellerDetailsView(
-              seller: seller,
-              products: products,
+            loaded: (seller, products) => Column(
+              children: [
+                AppPageHeader(
+                  title: "معلومات ومنتجات الأسرة",
+                  showBackButton: Navigator.of(context).canPop(),
+                  onBack: () => Navigator.of(context).maybePop(),
+                ),
+                Expanded(
+                  child: SellerDetailsView(
+                    seller: seller,
+                    products: products,
+                  ),
+                ),
+              ],
             ),
             error: (message) => Center(
               child: Padding(

@@ -35,8 +35,69 @@ class OrderEndpoint extends Endpoint {
     return profile;
   }
 
+  /// تحويل الطلبات إلى بيانات العرض، مع إظهار اسم الطرف الآخر فقط.
+  Future<List<OrderPresentation>> _toOrderPresentations(
+    Session session,
+    List<OrderInfo> orders, {
+    required bool isSellerView,
+  }) async {
+    if (orders.isEmpty) {
+      return [];
+    }
+
+    // تحديد الطرف الآخر الذي نحتاج إلى اسمه فقط.
+    final profileIds = orders
+        .map((order) => isSellerView ? order.customerId : order.sellerId)
+        .toSet();
+
+    // جلب الملفات المطلوبة دفعة واحدة لتجنب استعلام لكل طلب.
+    final profiles = await MeerUserProfile.db.find(
+      session,
+      where: (profile) => profile.id.inSet(profileIds),
+    );
+
+    final profilesById = {
+      for (final profile in profiles)
+        if (profile.id != null) profile.id!: profile,
+    };
+
+    return orders.map((order) {
+      final counterpartyId = isSellerView ? order.customerId : order.sellerId;
+
+      final profile = profilesById[counterpartyId];
+
+      String counterpartyName;
+
+      if (isSellerView) {
+        // البائع يرى اسم العميل.
+        counterpartyName = profile?.fullName.trim() ?? '';
+
+        if (counterpartyName.isEmpty) {
+          counterpartyName = 'عميل';
+        }
+      } else {
+        // العميل يرى اسم الأسرة.
+        final storeName = profile?.storeName?.trim() ?? '';
+
+        counterpartyName = storeName.isNotEmpty
+            ? storeName
+            : profile?.fullName.trim() ?? '';
+
+        if (counterpartyName.isEmpty) {
+          counterpartyName = 'أسرة منتجة';
+        }
+      }
+
+      return OrderPresentation(
+        order: order,
+        counterpartyName: counterpartyName,
+        isSellerView: isSellerView,
+      );
+    }).toList();
+  }
+
   // --------------------------------------------------
-  // 1. إنشاء طلب جديد
+  // إنشاء طلب جديد
   // --------------------------------------------------
 
   Future<OrderInfo> createOrder(
@@ -210,9 +271,9 @@ class OrderEndpoint extends Endpoint {
         }
 
         // لا يطلب البائع من متجره نفسه.
-        if (seller.id == customer.id) {
-          throw FormatException('لا يمكنك طلب منتجات من متجرك.');
-        }
+        // if (seller.id == customer.id) {
+        //   throw FormatException('لا يمكنك طلب منتجات من متجرك.');
+        // }
 
         // التحقق من توفر طريقة التنفيذ المطلوبة.
         if (fulfillmentMethod == 'delivery' && !seller.offersDelivery) {
@@ -325,15 +386,15 @@ class OrderEndpoint extends Endpoint {
   }
 
   // --------------------------------------------------
-  // 2. جلب طلبات المشتري الحالي
+  // جلب طلبات المشتري الحالي
   // --------------------------------------------------
 
-  Future<List<OrderInfo>> getMyCustomerOrders(
+  Future<List<OrderPresentation>> getMyCustomerOrders(
     Session session,
   ) async {
     final customer = await _getCurrentProfile(session);
 
-    return await OrderInfo.db.find(
+    final orders = await OrderInfo.db.find(
       session,
       where: (o) => o.customerId.equals(customer.id!),
       orderBy: (o) => o.createdAt.desc(),
@@ -345,10 +406,16 @@ class OrderEndpoint extends Endpoint {
         ),
       ),
     );
+
+    return _toOrderPresentations(
+      session,
+      orders,
+      isSellerView: false,
+    );
   }
 
   // --------------------------------------------------
-  // 3. إلغاء طلب المشتري الحالي
+  // إلغاء طلب المشتري الحالي
   // --------------------------------------------------
 
   /// يسمح بالإلغاء فقط قبل قبول الأسرة وبدء التجهيز.
@@ -407,10 +474,10 @@ class OrderEndpoint extends Endpoint {
   }
 
   // --------------------------------------------------
-  // 4. جلب الطلبات الواردة للأسرة الحالية
+  // جلب الطلبات الواردة للأسرة الحالية
   // --------------------------------------------------
 
-  Future<List<OrderInfo>> getMySellerOrders(
+  Future<List<OrderPresentation>> getMySellerOrders(
     Session session,
   ) async {
     final seller = await _getCurrentProfile(session);
@@ -419,7 +486,7 @@ class OrderEndpoint extends Endpoint {
       throw Exception('يجب تفعيل صلاحية البيع أولاً.');
     }
 
-    return await OrderInfo.db.find(
+    final orders = await OrderInfo.db.find(
       session,
       where: (o) => o.sellerId.equals(seller.id!),
       orderBy: (o) => o.createdAt.desc(),
@@ -431,10 +498,67 @@ class OrderEndpoint extends Endpoint {
         ),
       ),
     );
+
+    return _toOrderPresentations(
+      session,
+      orders,
+      isSellerView: true,
+    );
   }
 
   // --------------------------------------------------
-  // 5. قبول الطلب
+  // جلب تفاصيل طلب واحد للطرف صاحب الصلاحية
+  // --------------------------------------------------
+
+  Future<OrderPresentation> getMyOrderDetails(
+    Session session,
+    int orderId,
+    bool isSellerView,
+  ) async {
+    final currentProfile = await _getCurrentProfile(session);
+
+    if (orderId <= 0) {
+      throw FormatException('رقم الطلب غير صحيح.');
+    }
+
+    final order = await OrderInfo.db.findFirstRow(
+      session,
+      where: (o) => o.id.equals(orderId),
+      include: OrderInfo.include(
+        items: OrderItem.includeList(
+          include: OrderItem.include(
+            product: Product.include(),
+          ),
+        ),
+      ),
+    );
+
+    if (order == null) {
+      throw Exception('لم يتم العثور على الطلب.');
+    }
+
+    // التحقق من ملكية الطلب حسب منظور العرض المطلوب.
+    if (isSellerView) {
+      if (!currentProfile.isSeller || order.sellerId != currentProfile.id) {
+        throw Exception('هذا الطلب لا يخص متجرك.');
+      }
+    } else {
+      if (order.customerId != currentProfile.id) {
+        throw Exception('هذا الطلب لا يخص حسابك.');
+      }
+    }
+
+    final presentations = await _toOrderPresentations(
+      session,
+      [order],
+      isSellerView: isSellerView,
+    );
+
+    return presentations.single;
+  }
+
+  // --------------------------------------------------
+  // قبول الطلب
   // pending -> preparing
   // --------------------------------------------------
 
@@ -451,7 +575,7 @@ class OrderEndpoint extends Endpoint {
   }
 
   // --------------------------------------------------
-  // 6. رفض الطلب
+  // رفض الطلب
   // pending -> cancelled
   // --------------------------------------------------
 
@@ -468,7 +592,7 @@ class OrderEndpoint extends Endpoint {
   }
 
   // --------------------------------------------------
-  // 7. تأكيد جاهزية الطلب
+  // تأكيد جاهزية الطلب
   // preparing -> ready
   // --------------------------------------------------
 
@@ -485,7 +609,7 @@ class OrderEndpoint extends Endpoint {
   }
 
   // --------------------------------------------------
-  // 8. تأكيد تسليم الطلب للمشتري
+  // تأكيد تسليم الطلب للمشتري
   // ready -> completed
   // --------------------------------------------------
 
@@ -502,7 +626,7 @@ class OrderEndpoint extends Endpoint {
   }
 
   // --------------------------------------------------
-  // 9. دالة داخلية لتغيير حالة طلب الأسرة الحالية
+  // دالة داخلية لتغيير حالة طلب الأسرة الحالية
   // --------------------------------------------------
 
   Future<bool> _changeMyOrderStatus(

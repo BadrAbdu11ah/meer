@@ -140,7 +140,7 @@ class SellerOrdersBloc extends Bloc<SellerOrdersEvent, SellerOrdersState> {
     if (currentUpdatingIds.contains(orderId)) return;
 
     final orderExists = currentOrders.any(
-      (order) => order.id == orderId,
+      (presentation) => presentation.order.id == orderId,
     );
 
     if (!orderExists) return;
@@ -241,7 +241,7 @@ class SellerOrdersBloc extends Bloc<SellerOrdersEvent, SellerOrdersState> {
     );
   }
 
-  List<OrderInfo>? _currentOrders() {
+  List<OrderPresentation>? _currentOrders() {
     return state.maybeWhen(
       loaded: (orders, updatingOrderIds, message) => orders,
       orElse: () => null,

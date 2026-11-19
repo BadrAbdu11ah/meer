@@ -31,7 +31,7 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
 
   /// التعامل مع نتيجة العملية وإصدار الحالة المناسبة.
   void _handleResult(
-    Either<Failure, List<Product>> result,
+    Either<Failure, List<ProductPresentation>> result,
     Emitter<FavoritesState> emit, {
     required String errorMessage,
     String? successMessage,

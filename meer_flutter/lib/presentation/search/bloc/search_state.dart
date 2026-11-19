@@ -13,6 +13,6 @@ class SearchStatus with _$SearchStatus {
 abstract class SearchState with _$SearchState {
   const factory SearchState({
     @Default(SearchStatus.initial()) SearchStatus status,
-    @Default([]) List<Product> searchResults,
+    @Default([]) List<ProductPresentation> searchResults,
   }) = _SearchState;
 }

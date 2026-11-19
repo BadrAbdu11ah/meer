@@ -3,7 +3,7 @@ part of 'favorites_bloc.dart';
 @freezed
 sealed class FavoritesState with _$FavoritesState {
   const factory FavoritesState({
-    @Default(<Product>[]) List<Product> products,
+    @Default(<ProductPresentation>[]) List<ProductPresentation> products,
     @Default(false) bool isLoading,
     String? message,
   }) = _FavoritesState;
@@ -14,7 +14,7 @@ extension FavoritesStateX on FavoritesState {
     if (productId == null) return false;
 
     return products.any(
-      (product) => product.id == productId,
+      (presentation) => presentation.product.id == productId,
     );
   }
 

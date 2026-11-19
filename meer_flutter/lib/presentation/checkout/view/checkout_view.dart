@@ -6,11 +6,13 @@ import 'package:meer_flutter/presentation/checkout/view/widgets/checkout_payment
 import 'package:meer_flutter/presentation/checkout/view/widgets/checkout_phone_section.dart';
 import 'package:meer_flutter/presentation/checkout/view/widgets/checkout_products_section.dart';
 import 'package:meer_flutter/presentation/checkout/view/widgets/checkout_summary_section.dart';
+import 'package:meer_flutter/presentation/shared/widgets/seller_summary_card.dart';
 
 class CheckoutView extends StatelessWidget {
   const CheckoutView({
     super.key,
     required this.items,
+    required this.sellerName,
     required this.addressController,
     required this.formKey,
     required this.fulfillmentMethod,
@@ -34,6 +36,7 @@ class CheckoutView extends StatelessWidget {
   });
 
   final List<CartItem> items;
+  final String sellerName;
 
   final TextEditingController addressController;
   final GlobalKey<FormState> formKey;
@@ -105,6 +108,11 @@ class CheckoutView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            SellerSummaryCard(
+              sellerName: sellerName,
+              subtitle: 'تأكد من الأسرة قبل تأكيد طلبك.',
+            ),
+            const SizedBox(height: 20),
             // 1. طريقة تنفيذ الطلب.
             CheckoutFulfillmentSection(
               fulfillmentMethod: fulfillmentMethod,

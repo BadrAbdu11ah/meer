@@ -1,29 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:meer_client/meer_client.dart';
+import 'package:meer_flutter/core/constant/app_route.dart';
+import 'package:meer_flutter/core/routes/order_details_route_arguments.dart';
 import 'package:meer_flutter/presentation/seller_orders/view/widgets/seller_order_card.dart';
 
 class SellerOrdersView extends StatelessWidget {
-  final Future<void> Function()? onRefreshRequested;
-
-  final List<OrderInfo> orders;
-  final Set<int> updatingOrderIds;
-  final int? targetOrderId;
-  final ValueChanged<int> onAccept;
-  final ValueChanged<int> onReject;
-  final ValueChanged<int> onMarkReady;
-  final ValueChanged<int> onMarkCompleted;
-
   const SellerOrdersView({
     super.key,
     required this.orders,
-    required this.updatingOrderIds,
     this.targetOrderId,
-    required this.onAccept,
-    required this.onReject,
-    required this.onMarkReady,
-    required this.onMarkCompleted,
     this.onRefreshRequested,
   });
+
+  final List<OrderPresentation> orders;
+  final int? targetOrderId;
+  final Future<void> Function()? onRefreshRequested;
 
   @override
   Widget build(BuildContext context) {
@@ -65,9 +56,11 @@ class SellerOrdersView extends StatelessWidget {
         ],
       );
     } else {
-      final targetIndex = orders.indexWhere(
-        (order) => order.id == targetOrderId,
-      );
+      final targetIndex = targetOrderId == null
+          ? -1
+          : orders.indexWhere(
+              (presentation) => presentation.order.id == targetOrderId,
+            );
 
       final displayOrders = targetIndex > 0
           ? [
@@ -76,33 +69,30 @@ class SellerOrdersView extends StatelessWidget {
               ...orders.skip(targetIndex + 1),
             ]
           : orders;
+
       content = ListView.separated(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16),
         itemCount: displayOrders.length,
         separatorBuilder: (_, _) => const SizedBox(height: 12),
         itemBuilder: (context, index) {
-          final order = displayOrders[index];
-          final orderId = order.id;
+          final presentation = displayOrders[index];
+          final orderId = presentation.order.id;
 
           return SellerOrderCard(
-            key: ValueKey('seller-order-${order.id}'),
-            order: order,
-            isHighlighted: order.id == targetOrderId,
-            isUpdating: orderId != null && updatingOrderIds.contains(orderId),
-            onAccept: () {
-              if (orderId != null) onAccept(orderId);
-            },
-            onReject: () {
-              if (orderId != null) onReject(orderId);
-            },
-            onMarkReady: () {
-              if (orderId != null) onMarkReady(orderId);
-            },
-            onMarkCompleted: () {
-              if (orderId != null) {
-                onMarkCompleted(orderId);
-              }
+            key: ValueKey('seller-order-$orderId'),
+            presentation: presentation,
+            isHighlighted: orderId == targetOrderId,
+            onTap: () {
+              if (orderId == null) return;
+
+              Navigator.of(context).pushNamed(
+                AppRoute.orderDetailsScreen,
+                arguments: OrderDetailsRouteArguments(
+                  orderId: orderId,
+                  isSellerView: true,
+                ),
+              );
             },
           );
         },

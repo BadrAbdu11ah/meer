@@ -34,6 +34,7 @@ order:
   - getMyCustomerOrders:
   - cancelMyOrder:
   - getMySellerOrders:
+  - getMyOrderDetails:
   - acceptMyOrder:
   - rejectMyOrder:
   - markMyOrderReady:

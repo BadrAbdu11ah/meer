@@ -386,7 +386,7 @@ String toString() {
 /// @nodoc
 mixin _$FavoritesState {
 
- List<Product> get products; bool get isLoading; String? get message;
+ List<ProductPresentation> get products; bool get isLoading; String? get message;
 /// Create a copy of FavoritesState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -417,7 +417,7 @@ abstract mixin class $FavoritesStateCopyWith<$Res>  {
   factory $FavoritesStateCopyWith(FavoritesState value, $Res Function(FavoritesState) _then) = _$FavoritesStateCopyWithImpl;
 @useResult
 $Res call({
- List<Product> products, bool isLoading, String? message
+ List<ProductPresentation> products, bool isLoading, String? message
 });
 
 
@@ -437,7 +437,7 @@ class _$FavoritesStateCopyWithImpl<$Res>
 @pragma('vm:prefer-inline') @override $Res call({Object? products = null,Object? isLoading = null,Object? message = freezed,}) {
   return _then(_self.copyWith(
 products: null == products ? _self.products : products // ignore: cast_nullable_to_non_nullable
-as List<Product>,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
+as List<ProductPresentation>,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
 as bool,message: freezed == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
@@ -521,7 +521,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<Product> products,  bool isLoading,  String? message)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<ProductPresentation> products,  bool isLoading,  String? message)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _FavoritesState() when $default != null:
 return $default(_that.products,_that.isLoading,_that.message);case _:
@@ -542,7 +542,7 @@ return $default(_that.products,_that.isLoading,_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<Product> products,  bool isLoading,  String? message)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<ProductPresentation> products,  bool isLoading,  String? message)  $default,) {final _that = this;
 switch (_that) {
 case _FavoritesState():
 return $default(_that.products,_that.isLoading,_that.message);}
@@ -559,7 +559,7 @@ return $default(_that.products,_that.isLoading,_that.message);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<Product> products,  bool isLoading,  String? message)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<ProductPresentation> products,  bool isLoading,  String? message)?  $default,) {final _that = this;
 switch (_that) {
 case _FavoritesState() when $default != null:
 return $default(_that.products,_that.isLoading,_that.message);case _:
@@ -574,11 +574,11 @@ return $default(_that.products,_that.isLoading,_that.message);case _:
 
 
 class _FavoritesState implements FavoritesState {
-  const _FavoritesState({final  List<Product> products = const <Product>[], this.isLoading = false, this.message}): _products = products;
+  const _FavoritesState({final  List<ProductPresentation> products = const <ProductPresentation>[], this.isLoading = false, this.message}): _products = products;
   
 
- final  List<Product> _products;
-@override@JsonKey() List<Product> get products {
+ final  List<ProductPresentation> _products;
+@override@JsonKey() List<ProductPresentation> get products {
   if (_products is EqualUnmodifiableListView) return _products;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_products);
@@ -617,7 +617,7 @@ abstract mixin class _$FavoritesStateCopyWith<$Res> implements $FavoritesStateCo
   factory _$FavoritesStateCopyWith(_FavoritesState value, $Res Function(_FavoritesState) _then) = __$FavoritesStateCopyWithImpl;
 @override @useResult
 $Res call({
- List<Product> products, bool isLoading, String? message
+ List<ProductPresentation> products, bool isLoading, String? message
 });
 
 
@@ -637,7 +637,7 @@ class __$FavoritesStateCopyWithImpl<$Res>
 @override @pragma('vm:prefer-inline') $Res call({Object? products = null,Object? isLoading = null,Object? message = freezed,}) {
   return _then(_FavoritesState(
 products: null == products ? _self._products : products // ignore: cast_nullable_to_non_nullable
-as List<Product>,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
+as List<ProductPresentation>,isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
 as bool,message: freezed == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String?,
   ));

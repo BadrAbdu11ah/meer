@@ -34,7 +34,7 @@ class OrderRepository {
   }
 
   /// جلب طلبات المشتري الحالي.
-  Future<Either<Failure, List<OrderInfo>>> getMyCustomerOrders() async {
+  Future<Either<Failure, List<OrderPresentation>>> getMyCustomerOrders() async {
     try {
       final orders = await client.order.getMyCustomerOrders();
 
@@ -49,7 +49,7 @@ class OrderRepository {
   }
 
   /// جلب الطلبات الواردة للبائع الحالي.
-  Future<Either<Failure, List<OrderInfo>>> getMySellerOrders() async {
+  Future<Either<Failure, List<OrderPresentation>>> getMySellerOrders() async {
     try {
       final orders = await client.order.getMySellerOrders();
 
@@ -58,6 +58,27 @@ class OrderRepository {
       return Left(
         ServerFailure(
           'تعذر تحميل الطلبات الواردة: ${error.toString()}',
+        ),
+      );
+    }
+  }
+
+  /// جلب تفاصيل طلب واحد وفق منظور العميل أو البائع.
+  Future<Either<Failure, OrderPresentation>> getMyOrderDetails(
+    int orderId, {
+    required bool isSellerView,
+  }) async {
+    try {
+      final presentation = await client.order.getMyOrderDetails(
+        orderId,
+        isSellerView,
+      );
+
+      return Right(presentation);
+    } catch (error) {
+      return Left(
+        ServerFailure(
+          'تعذر تحميل تفاصيل الطلب: ${error.toString()}',
         ),
       );
     }

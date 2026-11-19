@@ -1,4 +1,5 @@
 import 'package:meer_server/src/generated/protocol.dart';
+import 'package:meer_server/src/services/product_presentation_service.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_idp_server/core.dart';
 
@@ -35,12 +36,12 @@ class CartEndpoint extends Endpoint {
   // 2. جلب سلة المستخدم الحالي
   // --------------------------------------------------
 
-  Future<List<CartItemRecord>> getMyCart(
+  Future<List<CartItemPresentation>> getMyCart(
     Session session,
   ) async {
     final profile = await _getCurrentProfile(session);
 
-    return await CartItemRecord.db.find(
+    final records = await CartItemRecord.db.find(
       session,
       where: (item) => item.userId.equals(profile.id!),
       orderBy: (item) => item.createdAt.asc(),
@@ -48,6 +49,43 @@ class CartEndpoint extends Endpoint {
         product: Product.include(),
       ),
     );
+
+    // استخراج المنتجات والتحقق من اكتمال بياناتها.
+    final products = <Product>[];
+
+    for (final record in records) {
+      final product = record.product;
+
+      if (product == null || product.id == null) {
+        throw StateError(
+          'تعذر تحميل بيانات أحد المنتجات الموجودة في السلة.',
+        );
+      }
+
+      products.add(product);
+    }
+
+    // جلب أسماء الأسر لجميع المنتجات باستعلام مجمع.
+    final presentations = await ProductPresentationService().presentProducts(
+      session,
+      products,
+    );
+
+    final sellerNamesByProductId = {
+      for (final presentation in presentations)
+        presentation.product.id!: presentation.sellerName,
+    };
+
+    // تجهيز بيانات السلة للعميل.
+    return records.map((record) {
+      final product = record.product!;
+
+      return CartItemPresentation(
+        product: product,
+        quantity: record.quantity,
+        sellerName: sellerNamesByProductId[product.id] ?? 'أسرة منتجة',
+      );
+    }).toList();
   }
 
   // --------------------------------------------------

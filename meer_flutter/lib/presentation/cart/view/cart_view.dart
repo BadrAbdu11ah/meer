@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meer_flutter/presentation/cart/bloc/cart_bloc.dart';
 import 'package:meer_flutter/presentation/cart/view/widgets/cart_item_card.dart';
+import 'package:meer_flutter/presentation/shared/widgets/seller_summary_card.dart';
 
 class CartView extends StatelessWidget {
   const CartView({super.key});
@@ -45,14 +46,30 @@ class CartView extends StatelessWidget {
 
         return ListView.separated(
           padding: const EdgeInsets.all(16),
-          itemCount: state.items.length,
+          itemCount: state.items.length + 1,
           separatorBuilder: (_, _) => const SizedBox(height: 10),
           itemBuilder: (context, index) {
-            final item = state.items[index];
+            // عرض اسم الأسرة مرة واحدة قبل المنتجات.
+            if (index == 0) {
+              return Column(
+                children: [
+                  SellerSummaryCard(
+                    sellerName: state.items.first.sellerName,
+                    subtitle: 'جميع المنتجات في سلتك من هذه الأسرة.',
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                ],
+              );
+            }
+
+            final item = state.items[index - 1];
             final productId = item.product.id;
 
             if (productId == null) {
               return CartItemCard(
+                isLoading: state.isLoading,
                 item: item,
                 onIncrease: () {},
                 onDecrease: () {},
@@ -61,26 +78,22 @@ class CartView extends StatelessWidget {
             }
 
             return CartItemCard(
+              isLoading: state.isLoading,
               item: item,
+
               onIncrease: () {
                 bloc.add(
-                  CartEvent.quantityIncreased(
-                    productId: productId,
-                  ),
+                  CartEvent.quantityIncreased(productId: productId),
                 );
               },
               onDecrease: () {
                 bloc.add(
-                  CartEvent.quantityDecreased(
-                    productId: productId,
-                  ),
+                  CartEvent.quantityDecreased(productId: productId),
                 );
               },
               onRemove: () {
                 bloc.add(
-                  CartEvent.productRemoved(
-                    productId: productId,
-                  ),
+                  CartEvent.productRemoved(productId: productId),
                 );
               },
             );

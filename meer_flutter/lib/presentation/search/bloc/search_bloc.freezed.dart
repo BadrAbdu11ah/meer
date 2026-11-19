@@ -656,7 +656,7 @@ as String,
 /// @nodoc
 mixin _$SearchState {
 
- SearchStatus get status; List<Product> get searchResults;
+ SearchStatus get status; List<ProductPresentation> get searchResults;
 /// Create a copy of SearchState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -687,7 +687,7 @@ abstract mixin class $SearchStateCopyWith<$Res>  {
   factory $SearchStateCopyWith(SearchState value, $Res Function(SearchState) _then) = _$SearchStateCopyWithImpl;
 @useResult
 $Res call({
- SearchStatus status, List<Product> searchResults
+ SearchStatus status, List<ProductPresentation> searchResults
 });
 
 
@@ -708,7 +708,7 @@ class _$SearchStateCopyWithImpl<$Res>
   return _then(_self.copyWith(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as SearchStatus,searchResults: null == searchResults ? _self.searchResults : searchResults // ignore: cast_nullable_to_non_nullable
-as List<Product>,
+as List<ProductPresentation>,
   ));
 }
 /// Create a copy of SearchState
@@ -802,7 +802,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( SearchStatus status,  List<Product> searchResults)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( SearchStatus status,  List<ProductPresentation> searchResults)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SearchState() when $default != null:
 return $default(_that.status,_that.searchResults);case _:
@@ -823,7 +823,7 @@ return $default(_that.status,_that.searchResults);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( SearchStatus status,  List<Product> searchResults)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( SearchStatus status,  List<ProductPresentation> searchResults)  $default,) {final _that = this;
 switch (_that) {
 case _SearchState():
 return $default(_that.status,_that.searchResults);case _:
@@ -843,7 +843,7 @@ return $default(_that.status,_that.searchResults);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( SearchStatus status,  List<Product> searchResults)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( SearchStatus status,  List<ProductPresentation> searchResults)?  $default,) {final _that = this;
 switch (_that) {
 case _SearchState() when $default != null:
 return $default(_that.status,_that.searchResults);case _:
@@ -858,12 +858,12 @@ return $default(_that.status,_that.searchResults);case _:
 
 
 class _SearchState implements SearchState {
-  const _SearchState({this.status = const SearchStatus.initial(), final  List<Product> searchResults = const []}): _searchResults = searchResults;
+  const _SearchState({this.status = const SearchStatus.initial(), final  List<ProductPresentation> searchResults = const []}): _searchResults = searchResults;
   
 
 @override@JsonKey() final  SearchStatus status;
- final  List<Product> _searchResults;
-@override@JsonKey() List<Product> get searchResults {
+ final  List<ProductPresentation> _searchResults;
+@override@JsonKey() List<ProductPresentation> get searchResults {
   if (_searchResults is EqualUnmodifiableListView) return _searchResults;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_searchResults);
@@ -900,7 +900,7 @@ abstract mixin class _$SearchStateCopyWith<$Res> implements $SearchStateCopyWith
   factory _$SearchStateCopyWith(_SearchState value, $Res Function(_SearchState) _then) = __$SearchStateCopyWithImpl;
 @override @useResult
 $Res call({
- SearchStatus status, List<Product> searchResults
+ SearchStatus status, List<ProductPresentation> searchResults
 });
 
 
@@ -921,7 +921,7 @@ class __$SearchStateCopyWithImpl<$Res>
   return _then(_SearchState(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as SearchStatus,searchResults: null == searchResults ? _self._searchResults : searchResults // ignore: cast_nullable_to_non_nullable
-as List<Product>,
+as List<ProductPresentation>,
   ));
 }
 
