@@ -4,8 +4,12 @@ import 'package:meer_flutter/presentation/seller_orders/bloc/seller_orders_bloc.
 import 'package:meer_flutter/presentation/seller_orders/view/seller_orders_view.dart';
 
 class SellerOrdersScreen extends StatelessWidget {
-  const SellerOrdersScreen({super.key});
+  const SellerOrdersScreen({
+    super.key,
+    this.initialOrderId,
+  });
 
+  final int? initialOrderId;
   @override
   Widget build(BuildContext context) {
     Future<void> refreshOrders() async {
@@ -87,6 +91,7 @@ class SellerOrdersScreen extends StatelessWidget {
             loaded: (orders, updatingIds, message) {
               return SellerOrdersView(
                 orders: orders,
+                targetOrderId: initialOrderId,
                 updatingOrderIds: updatingIds,
                 onAccept: (id) {
                   context.read<SellerOrdersBloc>().add(

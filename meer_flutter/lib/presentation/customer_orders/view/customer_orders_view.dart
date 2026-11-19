@@ -9,11 +9,13 @@ class CustomerOrdersView extends StatelessWidget {
     required this.orders,
     required this.cancellingOrderIds,
     required this.onCancel,
+    this.targetOrderId,
   });
 
   final List<OrderInfo> orders;
   final Set<int> cancellingOrderIds;
   final ValueChanged<int> onCancel;
+  final int? targetOrderId;
 
   @override
   Widget build(BuildContext context) {
@@ -21,17 +23,34 @@ class CustomerOrdersView extends StatelessWidget {
       return CustomerOrderEmpty();
     }
 
+    // تقديم الطلب المستهدف دون تغيير بيانات القائمة الأصلية.
+    final targetIndex = targetOrderId == null
+        ? -1
+        : orders.indexWhere(
+            (order) => order.id == targetOrderId,
+          );
+
+    final displayOrders = targetIndex > 0
+        ? [
+            orders[targetIndex],
+            ...orders.take(targetIndex),
+            ...orders.skip(targetIndex + 1),
+          ]
+        : orders;
+
     return ListView.separated(
       padding: const EdgeInsets.all(16),
-      itemCount: orders.length,
+      itemCount: displayOrders.length,
       separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
-        final order = orders[index];
+        final order = displayOrders[index];
         final orderId = order.id;
 
         return CustomerOrderCard(
+          key: ValueKey('customer-order-$orderId'),
           order: order,
           isCancelling: orderId != null && cancellingOrderIds.contains(orderId),
+          isHighlighted: targetOrderId != null && orderId == targetOrderId,
           onCancel: () {
             if (orderId != null) {
               onCancel(orderId);

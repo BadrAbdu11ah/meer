@@ -10,11 +10,13 @@ class CustomerOrderCard extends StatelessWidget {
     super.key,
     required this.order,
     required this.isCancelling,
+    this.isHighlighted = false,
     required this.onCancel,
   });
 
   final OrderInfo order;
   final bool isCancelling;
+  final bool isHighlighted;
   final VoidCallback onCancel;
 
   String _statusLabel(String status) {
@@ -88,6 +90,7 @@ class CustomerOrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isHighlighted = this.isHighlighted;
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
@@ -96,6 +99,13 @@ class CustomerOrderCard extends StatelessWidget {
 
     return Card(
       clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: isHighlighted ? colors.primary : colors.outlineVariant,
+          width: isHighlighted ? 2 : 1,
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

@@ -12,6 +12,7 @@ class SellerOrderCard extends StatelessWidget {
     super.key,
     required this.order,
     required this.isUpdating,
+    this.isHighlighted = false,
     required this.onAccept,
     required this.onReject,
     required this.onMarkReady,
@@ -20,6 +21,7 @@ class SellerOrderCard extends StatelessWidget {
 
   final OrderInfo order;
   final bool isUpdating;
+  final bool isHighlighted;
 
   final VoidCallback onAccept;
   final VoidCallback onReject;
@@ -33,6 +35,15 @@ class SellerOrderCard extends StatelessWidget {
 
     return Card(
       clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: isHighlighted
+              ? theme.colorScheme.primary
+              : theme.colorScheme.outlineVariant,
+          width: isHighlighted ? 2 : 1,
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

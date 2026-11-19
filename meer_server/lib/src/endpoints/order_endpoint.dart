@@ -1,4 +1,5 @@
 import 'package:meer_server/src/generated/protocol.dart';
+import 'package:meer_server/src/services/order_notification_service.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_idp_server/core.dart';
 
@@ -129,7 +130,7 @@ class OrderEndpoint extends Endpoint {
     }
 
     // حفظ الطلب وعناصره كوحدة واحدة.
-    return await session.db.transaction(
+    final createdOrder = await session.db.transaction(
       (transaction) async {
         final validatedProducts = <Product>[];
 
@@ -312,6 +313,12 @@ class OrderEndpoint extends Endpoint {
         isolationLevel: IsolationLevel.serializable,
       ),
     );
+    await OrderNotificationService().notifyNewOrderToSeller(
+      session,
+      createdOrder,
+    );
+
+    return createdOrder;
   }
 
   // --------------------------------------------------
@@ -348,7 +355,7 @@ class OrderEndpoint extends Endpoint {
   ) async {
     final customer = await _getCurrentProfile(session);
 
-    return await session.db.transaction(
+    final cancelledOrder = await session.db.transaction(
       (transaction) async {
         final order = await OrderInfo.db.findById(
           session,
@@ -358,7 +365,7 @@ class OrderEndpoint extends Endpoint {
         );
 
         if (order == null) {
-          return false;
+          return null;
         }
 
         // التأكد من أن الطلب يخص المستخدم الحالي.
@@ -368,7 +375,7 @@ class OrderEndpoint extends Endpoint {
 
         // الإلغاء مسموح فقط قبل بدء التجهيز.
         if (order.status != 'pending') {
-          return false;
+          return null;
         }
 
         order.status = 'cancelled';
@@ -379,12 +386,24 @@ class OrderEndpoint extends Endpoint {
           transaction: transaction,
         );
 
-        return true;
+        return order;
       },
       settings: TransactionSettings(
         isolationLevel: IsolationLevel.readCommitted,
       ),
     );
+
+    if (cancelledOrder == null) {
+      return false;
+    }
+
+    // إرسال الإشعار بعد نجاح الـ Transaction.
+    await OrderNotificationService().notifyOrderCancelledToSeller(
+      session,
+      cancelledOrder,
+    );
+
+    return true;
   }
 
   // --------------------------------------------------
@@ -498,7 +517,7 @@ class OrderEndpoint extends Endpoint {
       throw Exception('يجب تفعيل صلاحية البيع أولاً.');
     }
 
-    return await session.db.transaction(
+    final updatedOrder = await session.db.transaction(
       (transaction) async {
         // قفل الطلب حتى تنتهي العملية الحالية.
         final order = await OrderInfo.db.findById(
@@ -509,7 +528,7 @@ class OrderEndpoint extends Endpoint {
         );
 
         if (order == null) {
-          return false;
+          return null;
         }
 
         // التأكد من ملكية الطلب.
@@ -519,11 +538,10 @@ class OrderEndpoint extends Endpoint {
 
         // التحقق من الحالة بعد الحصول على القفل.
         if (order.status != expectedStatus) {
-          return false;
+          return null;
         }
 
         // عند قبول طلب الاستلام، ننسخ عنوان الأسرة إلى الطلب.
-        // لن يكون العنوان موجودًا في الطلب قبل هذه اللحظة.
         if (newStatus == 'preparing' && order.fulfillmentMethod == 'pickup') {
           final currentSeller = await MeerUserProfile.db.findById(
             session,
@@ -553,11 +571,37 @@ class OrderEndpoint extends Endpoint {
           transaction: transaction,
         );
 
-        return true;
+        return order;
       },
       settings: TransactionSettings(
         isolationLevel: IsolationLevel.readCommitted,
       ),
     );
+
+    if (updatedOrder == null) {
+      return false;
+    }
+
+    // إرسال الإشعار بعد نجاح حفظ تغيير الحالة.
+    final notificationService = OrderNotificationService();
+
+    if (newStatus == 'preparing') {
+      await notificationService.notifyOrderAcceptedToCustomer(
+        session,
+        updatedOrder,
+      );
+    } else if (newStatus == 'cancelled') {
+      await notificationService.notifyOrderRejectedToCustomer(
+        session,
+        updatedOrder,
+      );
+    } else if (newStatus == 'ready') {
+      await notificationService.notifyOrderReadyToCustomer(
+        session,
+        updatedOrder,
+      );
+    }
+
+    return true;
   }
 }

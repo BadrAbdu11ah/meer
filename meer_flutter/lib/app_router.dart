@@ -4,6 +4,7 @@ import 'package:meer_client/meer_client.dart';
 import 'package:meer_flutter/client.dart';
 import 'package:meer_flutter/core/constant/app_route.dart';
 import 'package:meer_flutter/core/id/injection.dart';
+import 'package:meer_flutter/core/routes/main_screen_route_arguments.dart';
 import 'package:meer_flutter/presentation/auth/login/bloc/login_bloc.dart';
 import 'package:meer_flutter/presentation/auth/login/screen/login_screen.dart';
 import 'package:meer_flutter/presentation/auth/verify_otp/bloc/verify_otp_bloc.dart';
@@ -60,10 +61,30 @@ class AppRouter {
           ),
         );
       case AppRoute.mainScreen:
+        final rawArguments = settings.arguments;
+
+        final MainScreenRouteArguments arguments;
+
+        if (rawArguments is MainScreenRouteArguments) {
+          arguments = rawArguments;
+        } else if (rawArguments is int) {
+          // دعم الاستدعاءات القديمة التي كانت تمرر رقم الطلب مباشرة.
+          arguments = MainScreenRouteArguments(
+            initialPage: 2,
+            initialOrderId: rawArguments,
+          );
+        } else {
+          arguments = const MainScreenRouteArguments();
+        }
+
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => BlocProvider(
             create: (_) => sl<MainBloc>(),
-            child: const MainScreen(),
+            child: MainScreen(
+              initialPage: arguments.initialPage,
+              initialOrderId: arguments.initialOrderId,
+            ),
           ),
         );
       case AppRoute.sellerProductsScreen:
@@ -149,14 +170,19 @@ class AppRouter {
           ),
         );
       case AppRoute.sellerOrdersScreen:
+        final orderId = settings.arguments is int
+            ? settings.arguments as int
+            : null;
+
         return MaterialPageRoute(
-          settings: settings,
           builder: (_) => BlocProvider(
             create: (_) => sl<SellerOrdersBloc>()
               ..add(
                 const SellerOrdersEvent.loadRequested(),
               ),
-            child: const SellerOrdersScreen(),
+            child: SellerOrdersScreen(
+              initialOrderId: orderId,
+            ),
           ),
         );
       default:

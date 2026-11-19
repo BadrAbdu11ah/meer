@@ -16,7 +16,14 @@ import 'package:meer_flutter/presentation/main/bloc/main_bloc.dart';
 import 'package:meer_flutter/presentation/main/view/main_bottom_app_bar.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  const MainScreen({
+    super.key,
+    this.initialPage,
+    this.initialOrderId,
+  });
+
+  final int? initialPage;
+  final int? initialOrderId;
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -32,6 +39,15 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
+
+    final pageToOpen =
+        widget.initialPage ?? (widget.initialOrderId != null ? 2 : null);
+
+    if (pageToOpen != null) {
+      context.read<MainBloc>().add(
+        MainEvent.pageChanged(pageToOpen),
+      );
+    }
 
     context.read<CartBloc>().add(
       const CartEvent.loadRequested(),
@@ -77,7 +93,9 @@ class _MainScreenState extends State<MainScreen> {
 
             return bloc;
           },
-          child: const CustomerOrdersScreen(),
+          child: CustomerOrdersScreen(
+            initialOrderId: widget.initialOrderId,
+          ),
         );
 
       case 3:

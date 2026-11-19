@@ -4,8 +4,12 @@ import 'package:meer_flutter/presentation/customer_orders/bloc/customer_orders_b
 import 'package:meer_flutter/presentation/customer_orders/view/customer_orders_view.dart';
 
 class CustomerOrdersScreen extends StatelessWidget {
-  const CustomerOrdersScreen({super.key});
+  const CustomerOrdersScreen({
+    super.key,
+    this.initialOrderId,
+  });
 
+  final int? initialOrderId;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,6 +74,7 @@ class CustomerOrdersScreen extends StatelessWidget {
               return CustomerOrdersView(
                 orders: orders,
                 cancellingOrderIds: cancellingIds,
+                targetOrderId: initialOrderId,
                 onCancel: (orderId) {
                   context.read<CustomerOrdersBloc>().add(
                     CustomerOrdersEvent.cancelRequested(

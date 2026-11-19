@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 // import 'package:meer_flutter/client.dart';
 import 'package:meer_flutter/core/services/app_service.dart';
+import 'package:meer_flutter/core/services/notification_navigation_service.dart';
 import 'package:meer_flutter/core/services/notification_registration_service.dart';
 import 'package:meer_flutter/core/services/notification_service.dart';
 import 'package:meer_flutter/core/services/location_service.dart';
@@ -37,6 +38,12 @@ Future<void> initGetIt() async {
   sl.registerLazySingleton(() => AppService());
   sl.registerLazySingleton<NotificationService>(
     () => NotificationService(),
+    dispose: (service) => service.dispose(),
+  );
+  sl.registerLazySingleton<NotificationNavigationService>(
+    () => NotificationNavigationService(
+      notificationService: sl<NotificationService>(),
+    ),
     dispose: (service) => service.dispose(),
   );
   // 2. Repositories

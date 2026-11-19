@@ -7,6 +7,7 @@ class SellerOrdersView extends StatelessWidget {
 
   final List<OrderInfo> orders;
   final Set<int> updatingOrderIds;
+  final int? targetOrderId;
   final ValueChanged<int> onAccept;
   final ValueChanged<int> onReject;
   final ValueChanged<int> onMarkReady;
@@ -16,6 +17,7 @@ class SellerOrdersView extends StatelessWidget {
     super.key,
     required this.orders,
     required this.updatingOrderIds,
+    this.targetOrderId,
     required this.onAccept,
     required this.onReject,
     required this.onMarkReady,
@@ -63,17 +65,30 @@ class SellerOrdersView extends StatelessWidget {
         ],
       );
     } else {
+      final targetIndex = orders.indexWhere(
+        (order) => order.id == targetOrderId,
+      );
+
+      final displayOrders = targetIndex > 0
+          ? [
+              orders[targetIndex],
+              ...orders.take(targetIndex),
+              ...orders.skip(targetIndex + 1),
+            ]
+          : orders;
       content = ListView.separated(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16),
-        itemCount: orders.length,
+        itemCount: displayOrders.length,
         separatorBuilder: (_, _) => const SizedBox(height: 12),
         itemBuilder: (context, index) {
-          final order = orders[index];
+          final order = displayOrders[index];
           final orderId = order.id;
 
           return SellerOrderCard(
+            key: ValueKey('seller-order-${order.id}'),
             order: order,
+            isHighlighted: order.id == targetOrderId,
             isUpdating: orderId != null && updatingOrderIds.contains(orderId),
             onAccept: () {
               if (orderId != null) onAccept(orderId);
